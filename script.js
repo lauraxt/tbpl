@@ -204,7 +204,7 @@ function tinderboxLoaded() {
 }
 
 function parseTinderbox(doc) {
-    if (!doc.querySelectorAll("#build_waterfall tr:nth-child(3) > td:first-child > a").length)
+    if (!doc.querySelectorAll("#build_waterfall tr > td:first-child > a").length)
         throw "I can't parse that";
 
     machines = [];
@@ -220,7 +220,7 @@ function parseTinderbox(doc) {
         addBoxToMatrix(os, type, machines.length - 1); // { "#11dd11": "success", "#ffaa00": "testfailed", "#000000": "busted"}[cell.parentNode.getAttribute("bgcolor")]
     });
     
-    var todayDate = doc.querySelectorAll("#build_waterfall tr:nth-child(3) > td:first-child > a")[0].childNodes[1].data.match(/[0-9\/]+/)[0];
+    var todayDate = doc.querySelectorAll("#build_waterfall tr > td:first-child > a")[0].childNodes[1].data.match(/[0-9\/]+/)[0];
     function parseTime(str) {
         if (str.indexOf("/") < 0)
             str = todayDate + " " + str;
