@@ -181,7 +181,7 @@ function saneLineBreakNote(note) {
                .replace(/\n\n/g, "<br>")
                .replace(/\]\n/g, "]<br>")
                .replace(/\n\*\*\*/g, "<br>***")
-               .replace(/\nTEST\-/g, "<br>TEST-");
+               .replace(/\n(REF)?TEST/g, "<br>$1TEST");
 }
 function linkBugs(text) {
     return text.replace(/(bug\s*)?\b([0-9]{4,7})\b/ig, '<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=$2">$1$2</a>')
