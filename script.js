@@ -233,7 +233,7 @@ function parseTinderbox(doc) {
     }
     
     var notes = [];
-    var script = doc.getElementsByTagName("script")[0].textContent;
+    var script = doc.querySelectorAll(".script")[0].textContent;
     var match = script.match(/notes\[([0-9]+)\].*"(.*)"/g);
     if (match) {
         match.forEach(function(m) {

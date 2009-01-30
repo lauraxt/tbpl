@@ -13,7 +13,9 @@ if ($site == "tinderbox") {
     $code = preg_replace("/<img.*>/Ui", "",
             preg_replace("/<style.*\/style>/Ui", "",
             preg_replace("/<iframe.*\/iframe>/Ui", "",
-                         $code)));
+            preg_replace("/<script/Ui", "<textarea class=script",
+            preg_replace("/<\/script/Ui", "</textarea",
+                         $code)))));
 }
 
 echo $code;
