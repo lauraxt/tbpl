@@ -104,7 +104,8 @@ function nukeUnfinishedBuildsFromBoxMatrix() {
     for (machineType in boxMatrix) {
         for (os in boxMatrix[machineType]) {
             for (var i = 0; i < boxMatrix[machineType][os].length; i++) {
-                if (machines[boxMatrix[machineType][os][i]].latestFinishedRun.id < 0) {
+                if (machines[boxMatrix[machineType][os][i]].latestFinishedRun.id < 0 ||
+                    !machineResults[machines[boxMatrix[machineType][os][i]].latestFinishedRun.id]) {
                     boxMatrix[machineType][os].splice(i, 1);
                     i--;
                 }
