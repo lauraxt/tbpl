@@ -263,3 +263,6 @@ em.testfail {
 #results.hasStar:hover {
     background-image: url(bigstar_hover.png);
 }
+#results.hasStar > h3 {
+    background: url(bigstar_hover.png) -1000px 0 no-repeat transparent;
+}
