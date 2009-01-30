@@ -61,11 +61,16 @@ function updateStatus() {
             loading.push({ tinderbox: "Tinderbox", pushlog: "pushlog" }[i]);
     }
     var text = loading.join(" and ");
-    text = text != "" ? "Loading " + text + "..." : "";
+    var statusSpan = document.getElementById("loading");
+    statusSpan.className = "";
+    if (loading.length) {
+        text = "Loading " + text + "...";
+        statusSpan.className = "loading";
+    }
     if (loadStatus.tinderbox == "fail") {
         text += " Parsing Tinderbox failed. :-(";
+        statusSpan.className = "fail";
     }
-    var statusSpan = document.getElementById("loading");
     statusSpan.style.visibility = text == "" ? "hidden" : "visible";
     statusSpan.innerHTML = text;
 }

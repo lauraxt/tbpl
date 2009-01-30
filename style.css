@@ -21,7 +21,9 @@ html {
 #loading {
     margin-left: 100px;
     font-weight: normal;
-    padding-left: 20px;
+    padding: 1px 0 1px 20px;
+}
+#loading.loading {
     background: url(loading_16.png) center left no-repeat transparent;
 }
 
