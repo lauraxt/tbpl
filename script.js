@@ -563,14 +563,15 @@ function scrollElemIntoView(elem, box, margin) {
     var elemBox = elem.getBoundingClientRect();
     if (elemBox.top < boxBox.top) {
         // over the scrollport
-        animateScroll(box, box.scrollTop, box.scrollTop - (boxBox.top - elemBox.top) - margin, 200);
+        animateScroll(box, box.scrollTop - (boxBox.top - elemBox.top) - margin, 150);
     } else if (elemBox.bottom > boxBox.bottom) {
         // under the scrollport
-        animateScroll(box, box.scrollTop, box.scrollTop + (elemBox.bottom - boxBox.bottom) + margin, 200);
+        animateScroll(box, box.scrollTop + (elemBox.bottom - boxBox.bottom) + margin, 150);
     }
 }
-function animateScroll(scrollBox, start, end, duration) {
+function animateScroll(scrollBox, end, duration) {
     var startTime = Date.now();
+    var start = scrollBox.scrollTop;
     var timer = setInterval(function() {
         var now = Date.now();
         var newpos = 0;
