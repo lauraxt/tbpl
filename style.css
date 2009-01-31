@@ -112,11 +112,20 @@ iframe {
 .machineResult.building[active=true]   { background-color: #CCC; }
 
 a {
-  text-decoration: none;
+    text-decoration: none;
+}
+a:visited {
+    color: #528;
 }
 a:hover {
-  text-decoration: underline;
-  color: #C00;
+    text-decoration: underline;
+}
+a:hover, a:focus {
+    color: #D00;
+    outline: none;
+}
+a:active {
+    color: #800;
 }
 
 /* Boxes */
@@ -282,6 +291,14 @@ em.testfail {
     border-bottom: 0;
     background: white;
     padding: 1px 5px 2px;
+    color: #00F;
+}
+#addNotePopup a:hover,
+#addNotePopup a:focus {
+    color: #D00;
+}
+#addNotePopup a:active {
+    color: #800;
 }
 #addNotePopup iframe {
     display: block;
