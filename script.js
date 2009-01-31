@@ -138,6 +138,57 @@ function tinderboxLoaded() {
     updateStatus();
 }
 
+function getUnitTestResults(reva) {
+    var e = reva.nextSibling;
+    if (e) e = e.nextSibling;
+    while (e && e.nodeType != Node.TEXT_NODE)
+        e = e.nextSibling;
+
+    if (!e || e.data != " TUnit")
+        return [];
+
+    var testResults = [];
+    while (e) { 
+        var testname = e.textContent.trim(), testresult = "";
+        e = e.nextSibling;
+        while (e && nodeIsBR(e)) {
+            e = e.nextSibling;
+        }
+        while (e && !nodeIsBR(e)) {
+            testresult += " " + getTextWithMarker(e).trim();
+            e = e.nextSibling;
+        }
+        while (e && nodeIsBR(e)) {
+            e = e.nextSibling;
+        }
+        testResults.push({
+            name: testname.trim(),
+            result: testresult.trim()
+        });
+    }
+    return testResults;
+}
+
+function getTalosResults(tt) {
+    var seriesURLs = {};
+    Array.forEach(tt.querySelectorAll("p > a"), function(sa) {
+        seriesURLs[sa.textContent] = sa.getAttribute("href");
+    });
+    return Array.map(tt.querySelectorAll('tt > a[href^="http://graphs"]'), function(ra) {
+        var resultURL = ra.getAttribute("href");
+        var match = ra.textContent.match(/(.*)\:(.*)/);
+        if (!match)
+            return null;
+        var testname = match[1].trim();
+        return {
+            name: testname,
+            result: match[2].trim(),
+            seriesURL: seriesURLs[testname],
+            "resultURL": resultURL
+        };
+    }).filter(function(a) a);
+}
+
 function parseTinderbox(doc) {
     if (!doc.querySelectorAll("#build_waterfall tr > td:first-child > a").length)
         throw "I can't parse that";
@@ -195,51 +246,13 @@ function parseTinderbox(doc) {
             endTime = parseTime(match[4]);
             var reva = td.querySelectorAll('a[href^="http://hg.mozilla.org"]')[0];
             if (reva) {
-                rev = reva.firstChild.data.substr(4, 12);
-                
+                rev = reva.textContent.substr(4, 12);
+
                 // Get individual test results or Talos times.
                 if (machines[machineIndex].type == "Unit Test") {
-                    var e = reva.nextSibling;
-                    if (e) e = e.nextSibling;
-                    while (e && e.nodeType != Node.TEXT_NODE)
-                        e = e.nextSibling;
-                    if (e && e.data == " TUnit") {
-                        while (e) { 
-                            var testname = e.textContent.trim(), testresult = "";
-                            e = e.nextSibling;
-                            while (e && nodeIsBR(e)) {
-                                e = e.nextSibling;
-                            }
-                            while (e && !nodeIsBR(e)) {
-                                testresult += " " + getTextWithMarker(e).trim();
-                                e = e.nextSibling;
-                            }
-                            while (e && nodeIsBR(e)) {
-                                e = e.nextSibling;
-                            }
-                            testResults.push({
-                                name: testname.trim(),
-                                result: testresult.trim()
-                            });
-                        }
-                    }
+                    testResults = getUnitTestResults(reva);
                 } else if (machines[machineIndex].type == "Talos") {
-                    var seriesURLs = {};
-                    Array.forEach(tt.querySelectorAll("p > a"), function(sa) {
-                        seriesURLs[sa.textContent] = sa.getAttribute("href");
-                    });
-                    Array.forEach(tt.querySelectorAll('tt > a[href^="http://graphs"]'), function(ra) {
-                        var resultURL = ra.getAttribute("href");
-                        var match = ra.textContent.match(/(.*)\:(.*)/);
-                        if (!match) return;
-                        var testname = match[1].trim();
-                        testResults.push({
-                            name: testname,
-                            result: match[2].trim(),
-                            seriesURL: seriesURLs[testname],
-                            "resultURL": resultURL
-                        })
-                    });
+                    testResults = getTalosResults(tt);
                 }
             }
         }
