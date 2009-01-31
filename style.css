@@ -243,7 +243,7 @@ em.testfail {
     font-weight: bold;
     color: #F00;
 }
-.stars {
+.stars, #addNotePopup {
     display: none;
     position: absolute;
     bottom: 10em;
@@ -265,4 +265,29 @@ em.testfail {
 }
 #results.hasStar > h3 {
     background: url(bigstar_hover.png) -1000px 0 no-repeat transparent;
+}
+
+#addNotePopup {
+    z-index: 4;
+    background: url(loading_16.png) center center no-repeat white;
+    padding: 0;
+}
+#addNotePopup a {
+    position: absolute;
+    left: -1px;
+    bottom: 100%;
+    border: 1px solid #DDD;
+    border-bottom: 0;
+    background: white;
+    padding: 1px 5px 2px;
+}
+#addNotePopup iframe {
+    display: block;
+    width: 40em;
+    height: 30em;
+    border: 0;
+}
+#addNotePopup.open {
+    display: block;
+    margin: 0;
 }

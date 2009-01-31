@@ -605,7 +605,7 @@ function displayResult() {
         + '<a class="briefLog" href="' + result.briefLogURL
         + '">View Brief Log</a> <a class="fullLog" href="'
         + result.fullLogURL + '">View Full Log</a> <a class="addNote" href="'
-        + result.addNoteURL + '">Add a Comment</a>'
+        + result.addNoteURL + '">Add a Comment</a> <div id="addNotePopup"></div>'
         + (function() {
             if (!result.testResults.length)
                 return '';
@@ -633,6 +633,23 @@ function displayResult() {
             + result.stars.map(function (s) '<div>'+s+'</div>').join("") + '</div>';
         })();
     })();
+    var addNoteLink = document.querySelectorAll("a.addNote")[0];
+    addNoteLink.addEventListener("click", logLinkClick, false);
+}
+
+function logLinkClick(e) {
+    var div = document.getElementById("addNotePopup");
+    if (!div)
+        return;
+    div.innerHTML = '<a href="">close</a> <iframe src="' + this.getAttribute("href") +
+                    '"></iframe>';
+    div.getElementsByTagName("a")[0].addEventListener("click", function(e2) {
+        div.innerHTML = '';
+        div.className = '';
+        e2.preventDefault();
+    }, false);
+    div.className = "open";
+    e.preventDefault();
 }
 
 String.prototype.trim = function() {
