@@ -92,75 +92,6 @@ function getMachineType(name) {
     ];
 }
 
-function addBoxToMatrix(os, machineType, ID) {
-    if (!boxMatrix[machineType])
-        boxMatrix[machineType] = {};
-    if (!boxMatrix[machineType][os])
-        boxMatrix[machineType][os] = [];
-    boxMatrix[machineType][os].push(ID);
-}
-
-function nukeUnfinishedBuildsFromBoxMatrix() {
-    for (machineType in boxMatrix) {
-        for (os in boxMatrix[machineType]) {
-            for (var i = 0; i < boxMatrix[machineType][os].length; i++) {
-                if (machines[boxMatrix[machineType][os][i]].latestFinishedRun.id < 0 ||
-                    !machineResults[machines[boxMatrix[machineType][os][i]].latestFinishedRun.id]) {
-                    boxMatrix[machineType][os].splice(i, 1);
-                    i--;
-                }
-            }
-            if (!boxMatrix[machineType][os].length)
-                delete boxMatrix[machineType][os];
-        }
-        if (JSON.stringify(boxMatrix[machineType]) == "{}") // UGH
-            delete boxMatrix[machineType];
-    }
-}
-
-function updateBoxMatrix() {
-    nukeUnfinishedBuildsFromBoxMatrix();
-    var colspans = { "linux": 1, "osx": 1, "windows": 1 };
-    for (mt in boxMatrix) {
-        for (os in colspans) {
-            colspans[os] *= boxMatrix[mt][os] ? boxMatrix[mt][os].length : 1;
-        }
-    }
-    oss.forEach(function(os) {
-        document.getElementById(os + "th").setAttribute("colspan", colspans[os]);
-    });
-
-    var table = document.getElementsByTagName("table")[0];
-    table.removeChild(document.getElementsByTagName("tbody")[0]);
-    var tbody = document.createElement("tbody");
-    table.appendChild(tbody);
-    ["Build", "Leak Test", "Unit Test", "Talos", "Nightly"].forEach(function(t) {
-        if (!boxMatrix[t])
-            return;
-        var row = document.createElement("tr");
-        tbody.appendChild(row);
-        row.innerHTML = '<th>' + t + '</th>';
-        oss.forEach(function(os) {
-            if (!boxMatrix[t][os]) {
-                row.innerHTML += '<td class="empty" colspan=' + colspans[os] + '></td>';
-                return;
-            }
-            var boxColspan = colspans[os] / boxMatrix[t][os].length;
-            boxMatrix[t][os].forEach(function(machineID) {
-                var runID = machines[machineID].latestFinishedRun.id;
-                if (!machineResults[runID])
-                    return;
-                var status = machineResults[runID].state;
-                row.innerHTML += '<td class="' + status + '" colspan=' + boxColspan + ' resultID="' + runID + '"></td>';
-            });
-        });
-    });
-    table.style.visibility = "visible";
-    Array.forEach(document.querySelectorAll("td[resultID]"), function(cell) {
-        cell.addEventListener("click", resultLinkClick, false);
-    });
-}
-
 var machines = [];
 var machineResults = {};
 
@@ -201,6 +132,7 @@ function tinderboxLoaded() {
         updateBoxMatrix();
         maybeCombineResults();
     } catch (e) {
+        alert(e);
         loadStatus.tinderbox = "fail";
     }
     updateStatus();
@@ -220,7 +152,6 @@ function parseTinderbox(doc) {
             return;
         }
         machines.push({ "name": name, "os": os, "type": type, latestFinishedRun: { id: "", startTime: -1 } });
-        addBoxToMatrix(os, type, machines.length - 1); // { "#11dd11": "success", "#ffaa00": "testfailed", "#000000": "busted"}[cell.parentNode.getAttribute("bgcolor")]
     });
     
     var todayDate = doc.querySelectorAll("#build_waterfall tr > td:first-child > a")[0].childNodes[1].data.match(/[0-9\/]+/)[0];
@@ -346,6 +277,60 @@ function parseTinderbox(doc) {
                 };
             }
         }
+    });
+    buildBoxMatrix();
+}
+
+function buildBoxMatrix() {
+    machines.forEach(function(machine) {
+        if (!machine.latestFinishedRun.id) {
+            // Ignore machines without run information.
+            return;
+        }
+        if (!boxMatrix[machine.type])
+            boxMatrix[machine.type] = {};
+        if (!boxMatrix[machine.type][machine.os])
+            boxMatrix[machine.type][machine.os] = [];
+        boxMatrix[machine.type][machine.os].push(machineResults[machine.latestFinishedRun.id]);
+    });
+}
+
+function updateBoxMatrix() {
+    var colspans = { "linux": 1, "osx": 1, "windows": 1 };
+    for (mt in boxMatrix) {
+        for (os in colspans) {
+            colspans[os] *= boxMatrix[mt][os] ? boxMatrix[mt][os].length : 1;
+        }
+    }
+    oss.forEach(function(os) {
+        document.getElementById(os + "th").setAttribute("colspan", colspans[os]);
+    });
+
+    var table = document.getElementsByTagName("table")[0];
+    table.removeChild(document.getElementsByTagName("tbody")[0]);
+    var tbody = document.createElement("tbody");
+    table.appendChild(tbody);
+    ["Build", "Leak Test", "Unit Test", "Talos", "Nightly"].forEach(function(t) {
+        if (!boxMatrix[t])
+            return;
+        var row = document.createElement("tr");
+        tbody.appendChild(row);
+        row.innerHTML = '<th>' + t + '</th>';
+        oss.forEach(function(os) {
+            if (!boxMatrix[t][os]) {
+                row.innerHTML += '<td class="empty" colspan=' + colspans[os] + '></td>';
+                return;
+            }
+            var boxColspan = colspans[os] / boxMatrix[t][os].length;
+            boxMatrix[t][os].forEach(function(machineResult) {
+                var status = machineResult.state;
+                row.innerHTML += '<td class="' + status + '" colspan=' + boxColspan + ' resultID="' + machineResult.runID + '"></td>';
+            });
+        });
+    });
+    table.style.visibility = "visible";
+    Array.forEach(document.querySelectorAll("td[resultID]"), function(cell) {
+        cell.addEventListener("click", resultLinkClick, false);
     });
 }
 
