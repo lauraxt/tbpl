@@ -605,7 +605,7 @@ function displayResult() {
         + '<a class="briefLog" href="' + result.briefLogURL
         + '">View Brief Log</a> <a class="fullLog" href="'
         + result.fullLogURL + '">View Full Log</a> <a class="addNote" href="'
-        + result.addNoteURL + '">Add a Comment</a> <div id="addNotePopup"></div>'
+        + result.addNoteURL + '">Add a Comment</a>'
         + (function() {
             if (!result.testResults.length)
                 return '';
@@ -639,15 +639,19 @@ function displayResult() {
 
 function logLinkClick(e) {
     var div = document.getElementById("addNotePopup");
-    if (!div)
-        return;
-    div.innerHTML = '<a href="">close</a> <iframe src="' + this.getAttribute("href") +
-                    '"></iframe>';
-    div.getElementsByTagName("a")[0].addEventListener("click", function(e2) {
-        div.innerHTML = '';
+
+    // Recreate iframe to keep it transparent while loading.
+    var iframe = div.getElementsByTagName("iframe")[0];
+    if (iframe)
+        div.removeChild(iframe);
+    var iframe = document.createElement("iframe");
+    iframe.setAttribute("src", this.getAttribute("href"));
+    div.appendChild(iframe);
+
+    div.getElementsByTagName("a")[0].onclick = function(e2) {
         div.className = '';
         e2.preventDefault();
-    }, false);
+    };
     div.className = "open";
     e.preventDefault();
 }

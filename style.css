@@ -247,7 +247,8 @@ em.testfail {
     display: none;
     position: absolute;
     bottom: 10em;
-    right: -1px;
+    right: 0;
+    margin-right: -1px;
     background: #FFFACC;
     border: 1px solid #DDD;
     padding: 10px;
@@ -268,6 +269,7 @@ em.testfail {
 }
 
 #addNotePopup {
+    right: 24em;
     z-index: 4;
     background: url(loading_16.png) center center no-repeat white;
     padding: 0;
