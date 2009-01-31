@@ -71,7 +71,7 @@ function updateStatus() {
         text += " Parsing Tinderbox failed. :-(";
         statusSpan.className = "fail";
     }
-    statusSpan.style.visibility = text == "" ? "hidden" : "visible";
+    statusSpan.style.visibility = text ? "visible" : "hidden";
     statusSpan.innerHTML = text;
 }
 
