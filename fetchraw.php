@@ -8,14 +8,15 @@ $url = $site == "tinderbox" ? "http://tinderbox.mozilla.org/" . $tree . "/" : ($
 header("Content-Type: text/html,charset=utf-8");
 
 $code = file_get_contents($url);
-$code = preg_replace("/<link.*>/Ui", "", $code);
+$code = preg_replace("/<link.*>/Ui", "", 
+        preg_replace("/<img.*>/Ui", "",
+                     $code));
 if ($site == "tinderbox") {
-    $code = preg_replace("/<img.*>/Ui", "",
-            preg_replace("/<style.*\/style>/Ui", "",
+    $code = preg_replace("/<style.*\/style>/Ui", "",
             preg_replace("/<iframe.*\/iframe>/Ui", "",
             preg_replace("/<script/Ui", "<textarea class=script",
             preg_replace("/<\/script/Ui", "</textarea",
-                         $code)))));
+                         $code))));
 }
 
 echo $code;
