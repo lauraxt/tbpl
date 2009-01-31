@@ -198,15 +198,12 @@ function tinderboxLoaded() {
     try {
         parseTinderbox(this.contentDocument);
         loadStatus.tinderbox = "complete";
+        updateBoxMatrix();
+        maybeCombineResults();
     } catch (e) {
         loadStatus.tinderbox = "fail";
-        updateStatus();
-        console.log(e);
-        return;
     }
     updateStatus();
-    updateBoxMatrix();
-    maybeCombineResults();
 }
 
 function parseTinderbox(doc) {
