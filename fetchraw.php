@@ -17,10 +17,11 @@ $code = preg_replace("/<link.*>/Ui", "",
                      $code));
 if ($site == "tinderbox") {
     $code = preg_replace("/<style.*\/style>/Ui", "",
+            preg_replace("/<li data\-status.*\/li>/Ui", "",
             preg_replace("/<iframe.*\/iframe>/Ui", "",
             preg_replace("/<script/Ui", "<textarea class=script",
             preg_replace("/<\/script/Ui", "</textarea",
-                         $code))));
+                         $code)))));
 }
 
 echo $code;
