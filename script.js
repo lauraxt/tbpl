@@ -7,7 +7,9 @@ if (match)
 var repoNames = {
     "Firefox": "mozilla-central",
     "Firefox3.1": "releases/mozilla1.9.1",
-    "TraceMonkey": "tracemonkey"
+    "TraceMonkey": "tracemonkey",
+    "Thunderbird": "comm-central",
+    "SeaMonkey": "comm-central"
 }
 
 var pushlogURL = "http://hg.mozilla.org/" + repoNames[treeName] + "/";
@@ -79,16 +81,17 @@ function getMachineType(name) {
     return [
         /Linux/.test(name) ? "linux" :
         /OS\s?X/.test(name) ? "osx" :
-        /WINNT/.test(name) ? "windows" :
+        /^WIN/i.test(name) ? "windows" :
         /bsmedberg/.test(name) ? "linux" : "",
 
         /talos/i.test(name) ? "Talos" :
         /nightly/i.test(name) ? "Nightly" :
         /unit test/i.test(name) ? "Unit Test" :
         /depend/i.test(name) ? "Build" :
-        /leak/i.test(name) ? "Leak Test" :
+        /(leak|bloat)/i.test(name) ? "Leak Test" :
         /build/i.test(name) ? "Build" :
-        /bsmedberg/.test(name) ? "Static Analysis" : ""
+        /bsmedberg/.test(name) ? "Static Analysis" :
+        /check/.test(name) ? "Unit Test" : ""
     ];
 }
 
