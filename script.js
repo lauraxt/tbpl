@@ -6,7 +6,7 @@ if (match)
 
 var repoNames = {
     "Firefox": "mozilla-central",
-    "Firefox3.1": "releases/mozilla1.9.1",
+    "Firefox3.1": "releases/mozilla-1.9.1",
     "TraceMonkey": "tracemonkey",
     "Thunderbird": "comm-central",
     "SeaMonkey": "comm-central"
