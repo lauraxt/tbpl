@@ -253,7 +253,6 @@ em.testfail {
     color: #F00;
 }
 .stars, #addNotePopup {
-    display: none;
     position: absolute;
     bottom: 10em;
     right: 0;
@@ -263,21 +262,13 @@ em.testfail {
     padding: 10px;
     z-index: 3;
 }
-#results:hover .stars {
-    display: block;
-}
 
 #results.hasStar {
     background: url(bigstar.png) 80% 50% no-repeat white;
 }
-#results.hasStar:hover {
-    background-image: url(bigstar_hover.png);
-}
-#results.hasStar > h3 {
-    background: url(bigstar_hover.png) -1000px 0 no-repeat transparent;
-}
 
 #addNotePopup {
+    display: none;
     right: 24em;
     z-index: 4;
     background: url(loading_16.png) center center no-repeat white;
