@@ -177,7 +177,7 @@ function getUnitTestResults(reva) {
 
 function getTalosResults(tt) {
     var seriesURLs = {};
-    Array.forEach(tt.querySelectorAll("p > a"), function(sa) {
+    Array.forEach(tt.querySelectorAll("p a"), function(sa) {
         seriesURLs[sa.textContent] = sa.getAttribute("href");
     });
     return Array.map(tt.querySelectorAll('tt > a[href^="http://graphs"]'), function(ra) {
@@ -626,8 +626,9 @@ function displayResult() {
                 return '<ul class="talosResults">\n'
                 + result.testResults.map(function(r) {
                     return '<li>' + r.name + ': <a href="' + r.resultURL
-                    + '">' + r.result + '</a> (<a href="' + r.seriesURL
-                    + '">details</a>)</li>';
+                    + '">' + r.result + '</a>'
+                    + (r.seriesURL ? ' (<a href="' + r.seriesURL
+                    + '">details</a>)' : '') + '</li>';
                 }).join("")
                 + '</ul>';
             }
