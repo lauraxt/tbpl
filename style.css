@@ -262,7 +262,10 @@ em.testfail {
     padding: 10px;
     z-index: 3;
 }
-
+.stars {
+  max-height: 30em;
+  overflow: auto;
+}
 #results.hasStar {
     background: url(bigstar.png) 80% 50% no-repeat white;
 }
