@@ -10,7 +10,8 @@ var repoNames = {
     "TraceMonkey": "tracemonkey",
     "Thunderbird": "comm-central",
     "Thunderbird3.0": "comm-central",
-    "SeaMonkey": "comm-central"
+    "SeaMonkey": "comm-central",
+    "Sunbird": "comm-central",
 }
 
 var pushlogURL = "http://hg.mozilla.org/" + repoNames[treeName] + "/";
