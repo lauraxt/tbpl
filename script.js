@@ -91,7 +91,7 @@ function getMachineType(name) {
         /(leak|bloat)/i.test(name) ? "Leak Test" :
         /build/i.test(name) ? "Build" :
         /bsmedberg/.test(name) ? "Static Analysis" :
-        /check/.test(name) ? "Unit Test" : ""
+        /(check|test)/.test(name) ? "Unit Test" : ""
     ];
 }
 
