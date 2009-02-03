@@ -117,10 +117,13 @@ function stripTags(text) {
 function saneLineBreakNote(note) {
     // There are too many line breaks in notes; only use those that make sense.
     return note.replace(/\\n/g, "\n")
-               .replace(/<\/?pre>/, "")
+               .replace(/\\"/g, "\"")
+               .replace(/<\/?pre>/g, "")
                .replace(/\n\n/g, "<br>")
                .replace(/\]\n/g, "]<br>")
                .replace(/\n\*\*\*/g, "<br>***")
+               .replace(/\n\+\+/g, "<br>++")
+               .replace(/\nWARNING/g, "<br>WARNING")
                .replace(/\n(REF)?TEST/g, "<br>$1TEST");
 }
 function linkBugs(text) {
@@ -217,10 +220,10 @@ function parseTinderbox(doc) {
     
     var notes = [];
     var script = doc.querySelectorAll(".script")[0].textContent;
-    var match = script.match(/notes\[([0-9]+)\].*"(.*)"/g);
+    var match = script.match(/notes\[([0-9]+)\] = "(.*)";/g);
     if (match) {
         match.forEach(function(m) {
-            var match = m.match(/notes\[([0-9]+)\].*"(.*)"/);
+            var match = m.match(/notes\[([0-9]+)\] = "(.*)";/);
             notes[match[1]*1] = linkBugs(saneLineBreakNote(match[2]));
         });
     }
