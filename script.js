@@ -9,6 +9,7 @@ var repoNames = {
     "Firefox3.1": "releases/mozilla-1.9.1",
     "TraceMonkey": "tracemonkey",
     "Thunderbird": "comm-central",
+    "Thunderbird3.0": "comm-central",
     "SeaMonkey": "comm-central"
 }
 
