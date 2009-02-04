@@ -198,12 +198,12 @@ function getTalosResults(tt) {
 }
 
 function parseTinderbox(doc) {
-    if (!doc.querySelectorAll("#build_waterfall tr > td:first-child > a").length)
+    if (!$("#build_waterfall tr > td:first-child > a", doc).length)
         throw "I can't parse that";
 
     machines = [];
     boxMatrix = {};
-    Array.forEach(doc.querySelectorAll("#build_waterfall th ~ td > font"), function(cell) {
+    $("#build_waterfall th ~ td > font", doc).get().forEach(function(cell) {
         var name = cell.textContent.replace(/%/, "").trim();
         var [os, type] = getMachineType(name);
         if (!os || !type) {
@@ -213,7 +213,7 @@ function parseTinderbox(doc) {
         machines.push({ "name": name, "os": os, "type": type, latestFinishedRun: { id: "", startTime: -1 } });
     });
     
-    var todayDate = doc.querySelectorAll("#build_waterfall tr > td:first-child > a")[0].childNodes[1].data.match(/[0-9\/]+/)[0];
+    var todayDate = $("#build_waterfall tr > td:first-child > a", doc).get(0).childNodes[1].data.match(/[0-9\/]+/)[0];
     function parseTime(str) {
         if (str.indexOf("/") < 0)
             str = todayDate + " " + str;
@@ -221,7 +221,7 @@ function parseTinderbox(doc) {
     }
     
     var notes = [];
-    var script = doc.querySelectorAll(".script")[0].textContent;
+    var script = $(".script", doc).get(0).textContent;
     var match = script.match(/notes\[([0-9]+)\] = "(.*)";/g);
     if (match) {
         match.forEach(function(m) {
@@ -232,9 +232,9 @@ function parseTinderbox(doc) {
     
     machineResults = {};
     var seenMachines = [];
-    Array.forEach(doc.querySelectorAll("#build_waterfall td > tt"), function(tt) {
+    $("#build_waterfall td > tt", doc).get().forEach(function(tt) {
         var td = tt.parentNode;
-        var a = td.querySelectorAll('a[onclick^="return log"]')[0];
+        var a = $('a[onclick^="return log"]', td).get(0);
         var state = a.title; /* building, success, testfailed, busted */
         var machineIndex = 0, startTime = 0, endTime = 0, rev = "", machineRunID = "", testResults = [];
         if (state == "building") {
@@ -252,7 +252,7 @@ function parseTinderbox(doc) {
                 return;
             startTime = parseTime(match[3]);
             endTime = parseTime(match[4]);
-            var reva = td.querySelectorAll('a[href^="http://hg.mozilla.org"]')[0];
+            var reva = $('a[href^="http://hg.mozilla.org"]', td).get(0);
             if (reva) {
                 rev = reva.textContent.substr(4, 12);
 
@@ -269,7 +269,7 @@ function parseTinderbox(doc) {
             return;
 
         var stars = [];
-        Array.forEach(td.querySelectorAll('a[onclick^="return note"]'), function(s) {
+        $('a[onclick^="return note"]', td).get().forEach(function(s) {
             var match = s.getAttribute("onclick").match(/note\(event,([0-9]+),/);
             if (!match)
                 return;
@@ -353,7 +353,7 @@ function updateBoxMatrix() {
         });
     });
     table.style.visibility = "visible";
-    Array.forEach(table.querySelectorAll("a"), function(cell) {
+    $("a", table).get().forEach(function(cell) {
         cell.addEventListener("click", resultLinkClick, false);
     });
 }
@@ -367,11 +367,11 @@ function pushlogLoaded() {
 
     pushes = [];
     var table = doc.getElementsByTagName("table")[0];
-    Array.forEach(table.querySelectorAll("td[rowspan]:first-child"), function(cell) {
-        var numPatches = cell.getAttribute("rowspan") * 1;
+    $("td[rowspan]:first-child", table).each(function() {
+        var numPatches = this.getAttribute("rowspan") * 1;
         var patches = [];
-        for (var i = 0, row = cell.parentNode; i < numPatches && row; i++, row = row.nextSibling) {
-            var rev = row.querySelectorAll("td.age")[0].firstChild.firstChild.data;
+        for (var i = 0, row = this.parentNode; i < numPatches && row; i++, row = row.nextSibling) {
+            var rev = $("td.age", row).get(0).firstChild.firstChild.data;
             var strong = row.lastChild.firstChild.innerHTML;
             var dashpos = strong.indexOf(String.fromCharCode(8212));
             var author = strong.substring(0, dashpos - 1);
@@ -382,8 +382,8 @@ function pushlogLoaded() {
                "desc": linkBugs(stripTags(desc))
             });
         }
-        var pusher = cell.firstChild.firstChild.data;
-        var date = new Date(cell.querySelectorAll(".date")[0].innerHTML);
+        var pusher = this.firstChild.firstChild.data;
+        var date = new Date($(".date", this).get(0).innerHTML);
         pushes.push({
             "pusher": pusher,
             "date": date,
@@ -534,8 +534,8 @@ function buildPushesList() {
         + '</ul>\n'
         + '</li>';
     }).join("\n");
-    Array.forEach(document.querySelectorAll("a.machineResult"), function(a) {
-        a.addEventListener("click", resultLinkClick, false);
+    $("a.machineResult").each(function() {
+        this.addEventListener("click", resultLinkClick, false);
     });
     setActiveResult(activeResult, false);
 }
@@ -548,13 +548,13 @@ function resultLinkClick(e) {
 
 function setActiveResult(resultID, scroll) {
     if (activeResult != -1) {
-        var activeA = document.querySelectorAll('.results a[resultID="' + activeResult + '"]')[0];
+        var activeA = $('.results a[resultID="' + activeResult + '"]').get(0);
         if (activeA)
             activeA.removeAttribute("active");
     }
     activeResult = resultID;
     if (activeResult != -1) {
-        var activeA = document.querySelectorAll('.results a[resultID="' + activeResult + '"]')[0];
+        var activeA = $('.results a[resultID="' + activeResult + '"]').get(0);
         if (activeA) {
             activeA.setAttribute("active", "true");
             if (scroll)
@@ -645,7 +645,7 @@ function displayResult() {
             + result.stars.map(function (s) '<div>'+s+'</div>').join("") + '</div>';
         })();
     })();
-    var addNoteLink = document.querySelectorAll("a.addNote")[0];
+    var addNoteLink = $("a.addNote").get(0);
     addNoteLink.addEventListener("click", logLinkClick, false);
 }
 
