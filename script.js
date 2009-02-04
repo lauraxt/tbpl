@@ -183,8 +183,8 @@ function getUnitTestResults(reva) {
 
 function getTalosResults(cell) {
     var seriesURLs = {};
-    Array.forEach(cell.querySelectorAll("p a"), function(sa) {
-        seriesURLs[sa.textContent] = sa.getAttribute("href");
+    $("p a", cell).each(function() {
+        seriesURLs[this.textContent] = this.getAttribute("href");
     });
     return Array.map(cell.querySelectorAll('td > a[href^="http://graphs"]'), function(ra) {
         var resultURL = ra.getAttribute("href");
