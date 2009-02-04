@@ -202,7 +202,6 @@ function getTalosResults(cell) {
 }
 
 
-var dumpedCell = false;
 function getBuildScrape(td, machineIndex, machineRunID) {
     if (!td.scrape[machineRunID])
         return null;
@@ -219,10 +218,6 @@ function getBuildScrape(td, machineIndex, machineRunID) {
     // Get individual test results or Talos times.
     if (machines[machineIndex].type == "Unit Test") {
         testResults = getUnitTestResults(reva);
-        if (!dumpedCell) {
-            console.log(cell);
-            dumpedCell = true;
-        }
     } else if (machines[machineIndex].type == "Talos") {
         testResults = getTalosResults(cell);
     }
@@ -288,7 +283,6 @@ function parseTinderbox(td) {
             }
         }
     }); });
-    console.log(machineResults);
     buildBoxMatrix();
 }
 
