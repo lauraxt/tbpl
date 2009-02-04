@@ -186,7 +186,7 @@ function getTalosResults(cell) {
     $("p a", cell).each(function() {
         seriesURLs[this.textContent] = this.getAttribute("href");
     });
-    return Array.map(cell.querySelectorAll('td > a[href^="http://graphs"]'), function(ra) {
+    return $('a[href^="http://graphs"]', cell).get().map(function(ra) {
         var resultURL = ra.getAttribute("href");
         var match = ra.textContent.match(/(.*)\:(.*)/);
         if (!match)
