@@ -129,11 +129,11 @@ function processNote(note) {
     // XXX Unfortunately that's not true for the Tinderbox JSON - those notes have no line breaks at all... bug 476872
     return note.replace(/<\/?pre>/g, "")
                .replace(/\n\n/g, "<br>")
-               .replace(/\]\n/g, "]<br>")
-               .replace(/\n\*\*\*/g, "<br>***")
-               .replace(/\n\+\+/g, "<br>++")
-               .replace(/\nWARNING/g, "<br>WARNING")
-               .replace(/\n(REF)?TEST/g, "<br>$1TEST");
+               .replace(/\<\/b>]/g, "</b>]<br>")
+               .replace(/\b\*\*\*/g, "<br>***")
+               .replace(/\b\+\+/g, "<br>++")
+               .replace(/\bWARNING/g, "<br>WARNING")
+               .replace(/\b(REF)?TEST/g, "<br>$1TEST");
 }
 function linkBugs(text) {
     return text.replace(/(bug\s*)?\b([0-9]{5,7})\b/ig, '<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=$2">$1$2</a>')
