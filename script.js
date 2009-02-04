@@ -15,6 +15,7 @@ var repoNames = {
 }
 
 var pushlogURL = "http://hg.mozilla.org/" + repoNames[treeName] + "/";
+var tinderboxURL = "http://tinderbox.mozilla.org/" + treeName + "/json.js";
 var timezone = "-0800";
 var pickupDelay = 1 * 60 * 1000; // number of ms until machine starts building a push
 
@@ -38,7 +39,7 @@ function startStatusRequest() {
     
     setTimeout(function() {
         var s1 = document.createElement("script");
-        s1.src = "http://tinderbox.mozilla.org/Firefox/json.js";
+        s1.src = tinderboxURL;
         s1.type = "text/javascript";
         var s2 = document.createElement("script");
         s2.src = "data:text/javascript,tinderboxLoaded();";
