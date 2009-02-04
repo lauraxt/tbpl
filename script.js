@@ -208,7 +208,7 @@ function getBuildScrape(td, machineIndex, machineRunID) {
     
     var cell = document.createElement("td");
     cell.innerHTML = td.scrape[machineRunID].join("<br>\n");
-    var reva = cell.querySelectorAll('a[href^="http://hg.mozilla.org"]')[0];
+    var reva = $('a[href^="http://hg.mozilla.org"]', cell).get(0);
     if (!reva)
         return null;
 
@@ -334,8 +334,8 @@ function updateBoxMatrix() {
         });
     });
     table.style.visibility = "visible";
-    Array.forEach(document.querySelectorAll("td[resultID]"), function(cell) {
-        cell.addEventListener("click", resultLinkClick, false);
+    $("td[resultID]").each(function() {
+        this.addEventListener("click", resultLinkClick, false);
     });
 }
 
@@ -348,11 +348,11 @@ function pushlogLoaded() {
 
     pushes = [];
     var table = doc.getElementsByTagName("table")[0];
-    Array.forEach(table.querySelectorAll("td[rowspan]:first-child"), function(cell) {
-        var numPatches = cell.getAttribute("rowspan") * 1;
+    $("td[rowspan]:first-child", table).each(function() {
+        var numPatches = this.getAttribute("rowspan") * 1;
         var patches = [];
-        for (var i = 0, row = cell.parentNode; i < numPatches && row; i++, row = row.nextSibling) {
-            var rev = row.querySelectorAll("td.age")[0].firstChild.firstChild.data;
+        for (var i = 0, row = this.parentNode; i < numPatches && row; i++, row = row.nextSibling) {
+            var rev = $("td.age", row).get(0).firstChild.firstChild.data;
             var strong = row.lastChild.firstChild.innerHTML;
             var dashpos = strong.indexOf(String.fromCharCode(8212));
             var author = strong.substring(0, dashpos - 1);
@@ -363,8 +363,8 @@ function pushlogLoaded() {
                "desc": linkBugs(stripTags(desc))
             });
         }
-        var pusher = cell.firstChild.firstChild.data;
-        var date = new Date(cell.querySelectorAll(".date")[0].innerHTML);
+        var pusher = this.firstChild.firstChild.data;
+        var date = new Date($(".date", this).get(0).innerHTML);
         pushes.push({
             "pusher": pusher,
             "date": date,
@@ -515,8 +515,8 @@ function buildPushesList() {
         + '</ul>\n'
         + '</li>';
     }).join("\n");
-    Array.forEach(document.querySelectorAll("a.machineResult"), function(a) {
-        a.addEventListener("click", resultLinkClick, false);
+    $("a.machineResult").each(function() {
+        this.addEventListener("click", resultLinkClick, false);
     });
     setActiveResult(activeResult, false);
 }
@@ -529,13 +529,13 @@ function resultLinkClick(e) {
 
 function setActiveResult(resultID, scroll) {
     if (activeResult != -1) {
-        var activeA = document.querySelectorAll('a[resultID="' + activeResult + '"]')[0];
+        var activeA = $('a[resultID="' + activeResult + '"]').get(0);
         if (activeA)
             activeA.removeAttribute("active");
     }
     activeResult = resultID;
     if (activeResult != -1) {
-        var activeA = document.querySelectorAll('a[resultID="' + activeResult + '"]')[0];
+        var activeA = $('a[resultID="' + activeResult + '"]').get(0);
         if (activeA) {
             activeA.setAttribute("active", "true");
             if (scroll)
@@ -626,7 +626,7 @@ function displayResult() {
             + result.note + '</div>';
         })();
     })();
-    var addNoteLink = document.querySelectorAll("a.addNote")[0];
+    var addNoteLink = $("a.addNote").get(0);
     addNoteLink.addEventListener("click", logLinkClick, false);
 }
 
