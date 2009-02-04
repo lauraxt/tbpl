@@ -345,12 +345,15 @@ function updateBoxMatrix() {
             var boxColspan = colspans[os] / boxMatrix[t][os].length;
             boxMatrix[t][os].forEach(function(machineResult) {
                 var status = machineResult.state;
-                row.innerHTML += '<td class="' + status + '" colspan=' + boxColspan + ' resultID="' + machineResult.runID + '"></td>';
+                row.innerHTML += '<td colspan="' + boxColspan + '"><a href="' +
+                                 machineResult.briefLogURL + '" class="' + status +
+                                 '" resultID="' + machineResult.runID + '">' +
+                                 resultTitle(t, status) + '</a></td>';
             });
         });
     });
     table.style.visibility = "visible";
-    Array.forEach(document.querySelectorAll("td[resultID]"), function(cell) {
+    Array.forEach(table.querySelectorAll("a"), function(cell) {
         cell.addEventListener("click", resultLinkClick, false);
     });
 }
@@ -545,13 +548,13 @@ function resultLinkClick(e) {
 
 function setActiveResult(resultID, scroll) {
     if (activeResult != -1) {
-        var activeA = document.querySelectorAll('a[resultID="' + activeResult + '"]')[0];
+        var activeA = document.querySelectorAll('.results a[resultID="' + activeResult + '"]')[0];
         if (activeA)
             activeA.removeAttribute("active");
     }
     activeResult = resultID;
     if (activeResult != -1) {
-        var activeA = document.querySelectorAll('a[resultID="' + activeResult + '"]')[0];
+        var activeA = document.querySelectorAll('.results a[resultID="' + activeResult + '"]')[0];
         if (activeA) {
             activeA.setAttribute("active", "true");
             if (scroll)
