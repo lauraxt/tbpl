@@ -125,7 +125,7 @@ function stripTags(text) {
 }
 function processNote(note) {
     // There are too many line breaks in notes; only use those that make sense.
-    // XXX Unfortunately that's not true for the Tinderbox JSON - those notes have no line breaks at all...
+    // XXX Unfortunately that's not true for the Tinderbox JSON - those notes have no line breaks at all... bug 476872
     return note.replace(/<\/?pre>/g, "")
                .replace(/\n\n/g, "<br>")
                .replace(/\]\n/g, "]<br>")
