@@ -168,7 +168,7 @@ th {
 }
 td, th {
     border: 1px solid white;
-    padding: 1px;
+    padding: 0;
 }
 th:not(:first-child) {
     width: 7em;
@@ -181,23 +181,26 @@ th img {
     width: 1em;
     vertical-align: -10%;
 }
-td.success {
+table a.success {
     background-color: #0C0;
 }
-td.testfailed {
+table a.testfailed {
     background-color: #F90;
 }
-td.busted {
+table a.busted {
     background-color: #D00;
 }
-td[resultID] {
-    cursor: pointer;
+table a {
+    display: block;
     opacity: 0.7;
+    padding: 1px;
+    text-indent: -1000px;
+    overflow: hidden;
 }
-td[resultID]:hover {
+table a:hover {
     opacity: 0.9;
 }
-td[resultID]:active {
+table a:active {
     opacity: 1;
 }
 

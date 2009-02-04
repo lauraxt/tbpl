@@ -9,7 +9,9 @@ var repoNames = {
     "Firefox3.1": "releases/mozilla-1.9.1",
     "TraceMonkey": "tracemonkey",
     "Thunderbird": "comm-central",
-    "SeaMonkey": "comm-central"
+    "Thunderbird3.0": "comm-central",
+    "SeaMonkey": "comm-central",
+    "Sunbird": "comm-central",
 }
 
 var pushlogURL = "http://hg.mozilla.org/" + repoNames[treeName] + "/";
@@ -98,7 +100,7 @@ function getMachineType(name) {
         /(leak|bloat)/i.test(name) ? "Leak Test" :
         /build/i.test(name) ? "Build" :
         /bsmedberg/.test(name) ? "Static Analysis" :
-        /check/.test(name) ? "Unit Test" : ""
+        /(check|test)/.test(name) ? "Unit Test" : ""
     ];
 }
 
@@ -329,12 +331,15 @@ function updateBoxMatrix() {
             var boxColspan = colspans[os] / boxMatrix[t][os].length;
             boxMatrix[t][os].forEach(function(machineResult) {
                 var status = machineResult.state;
-                row.innerHTML += '<td class="' + status + '" colspan=' + boxColspan + ' resultID="' + machineResult.runID + '"></td>';
+                row.innerHTML += '<td colspan="' + boxColspan + '"><a href="' +
+                                 machineResult.briefLogURL + '" class="' + status +
+                                 '" resultID="' + machineResult.runID + '">' +
+                                 resultTitle(t, status) + '</a></td>';
             });
         });
     });
     table.style.visibility = "visible";
-    $("td[resultID]").each(function() {
+    $("a", table).each(function() {
         this.addEventListener("click", resultLinkClick, false);
     });
 }
@@ -529,13 +534,13 @@ function resultLinkClick(e) {
 
 function setActiveResult(resultID, scroll) {
     if (activeResult != -1) {
-        var activeA = $('a[resultID="' + activeResult + '"]').get(0);
+        var activeA = $('.results a[resultID="' + activeResult + '"]').get(0);
         if (activeA)
             activeA.removeAttribute("active");
     }
     activeResult = resultID;
     if (activeResult != -1) {
-        var activeA = $('a[resultID="' + activeResult + '"]').get(0);
+        var activeA = $('.results a[resultID="' + activeResult + '"]').get(0);
         if (activeA) {
             activeA.setAttribute("active", "true");
             if (scroll)
