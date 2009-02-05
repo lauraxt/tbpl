@@ -15,7 +15,6 @@ var repoNames = {
 }
 
 var pushlogURL = "http://hg.mozilla.org/" + repoNames[treeName] + "/";
-var tinderboxURL = "http://tinderbox.mozilla.org/" + treeName + "/json.js";
 var timezone = "-0800";
 var pickupDelay = 1 * 60 * 1000; // number of ms until machine starts building a push
 
@@ -33,21 +32,14 @@ function startStatusRequest() {
     loadStatus = { pushlog: "loading", tinderbox: "loading" };
     updateStatus();
 
-    // Load pushlog
+    // Load tinderbox and pushlog
+    document.getElementById("tinderboxiframe").contentWindow.location.href = "fetchraw.php?site=tinderbox&tree=" + treeName;
     document.getElementById("pushlogiframe").contentWindow.location.href = "fetchraw.php?site=pushlog&tree=" + treeName;
-    document.getElementById("pushlogiframe").onload = pushlogLoaded;
     
-    setTimeout(function() {
-        var s1 = document.createElement("script");
-        s1.src = tinderboxURL;
-        s1.type = "text/javascript";
-        var s2 = document.createElement("script");
-        s2.src = "data:text/javascript,tinderboxLoaded();";
-        s2.type = "text/javascript";
-        document.getElementsByTagName("head")[0].appendChild(s1);
-        document.getElementsByTagName("head")[0].appendChild(s2);
-    }, 0);
+    document.getElementById("tinderboxiframe").onload = tinderboxLoaded;
+    document.getElementById("pushlogiframe").onload = pushlogLoaded;
 }
+
 
 function buildFooter() {
     var innerHTML = "";
@@ -124,16 +116,17 @@ function stripTags(text) {
     div.innerHTML = text;
     return div.textContent.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
-function processNote(note) {
+function saneLineBreakNote(note) {
     // There are too many line breaks in notes; only use those that make sense.
-    // XXX Unfortunately that's not true for the Tinderbox JSON - those notes have no line breaks at all... bug 476872
-    return note.replace(/<\/?pre>/g, "")
+    return note.replace(/\\n/g, "\n")
+               .replace(/\\"/g, "\"")
+               .replace(/<\/?pre>/g, "")
                .replace(/\n\n/g, "<br>")
-               .replace(/\<\/b>]/g, "</b>]<br>")
-               .replace(/\b\*\*\*/g, "<br>***")
-               .replace(/\b\+\+/g, "<br>++")
-               .replace(/\bWARNING/g, "<br>WARNING")
-               .replace(/\b(REF)?TEST/g, "<br>$1TEST");
+               .replace(/\]\n/g, "]<br>")
+               .replace(/\n\*\*\*/g, "<br>***")
+               .replace(/\n\+\+/g, "<br>++")
+               .replace(/\nWARNING/g, "<br>WARNING")
+               .replace(/\n(REF)?TEST/g, "<br>$1TEST");
 }
 function linkBugs(text) {
     return text.replace(/(bug\s*)?\b([0-9]{5,7})\b/ig, '<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=$2">$1$2</a>')
@@ -141,15 +134,15 @@ function linkBugs(text) {
 }
 
 function tinderboxLoaded() {
-    try {
-        parseTinderbox(tinderbox_data);
+    //try {
+        parseTinderbox(this.contentDocument);
         loadStatus.tinderbox = "complete";
         updateBoxMatrix();
         maybeCombineResults();
-    } catch (e) {
-        alert(e);
-        loadStatus.tinderbox = "fail";
-    }
+    //} catch (e) {
+    //    alert(e);
+    //    loadStatus.tinderbox = "fail";
+    //}
     updateStatus();
 }
 
@@ -159,7 +152,7 @@ function getUnitTestResults(reva) {
     while (e && e.nodeType != Node.TEXT_NODE)
         e = e.nextSibling;
 
-    if (!e || e.data.trim() != "TUnit")
+    if (!e || e.data != " TUnit")
         return [];
 
     var testResults = [];
@@ -184,12 +177,12 @@ function getUnitTestResults(reva) {
     return testResults;
 }
 
-function getTalosResults(cell) {
+function getTalosResults(tt) {
     var seriesURLs = {};
-    $("p a", cell).each(function() {
+    $("p a", tt).each(function() {
         seriesURLs[this.textContent] = this.getAttribute("href");
     });
-    return $('a[href^="http://graphs"]', cell).get().map(function(ra) {
+    return $('a[href^="http://graphs"]', tt).get().map(function(ra) {
         var resultURL = ra.getAttribute("href");
         var match = ra.textContent.match(/(.*)\:(.*)/);
         if (!match)
@@ -204,36 +197,14 @@ function getTalosResults(cell) {
     }).filter(function(a) a);
 }
 
+function parseTinderbox(doc) {
+    if (!$("#build_waterfall tr > td:first-child > a", doc).length)
+        throw "I can't parse that";
 
-function getBuildScrape(td, machineIndex, machineRunID) {
-    if (!td.scrape[machineRunID])
-        return null;
-    
-    var cell = document.createElement("td");
-    cell.innerHTML = td.scrape[machineRunID].join("<br>\n");
-    var reva = $('a[href^="http://hg.mozilla.org"]', cell).get(0);
-    if (!reva)
-        return null;
-
-    var rev = reva.textContent.substr(4, 12);
-
-    var testResults = [];
-    // Get individual test results or Talos times.
-    if (machines[machineIndex].type == "Unit Test") {
-        testResults = getUnitTestResults(reva);
-    } else if (machines[machineIndex].type == "Talos") {
-        testResults = getTalosResults(cell);
-    }
-    return {
-        "rev": rev,
-        "testResults": testResults
-    };
-}
-
-function parseTinderbox(td) {
     machines = [];
     boxMatrix = {};
-    td.build_names.forEach(function(name) {
+    $("#build_waterfall th ~ td > font", doc).get().forEach(function(cell) {
+        var name = cell.textContent.replace(/%/, "").trim();
         var [os, type] = getMachineType(name);
         if (!os || !type) {
             alert(name + " failed the name test");
@@ -241,27 +212,72 @@ function parseTinderbox(td) {
         }
         machines.push({ "name": name, "os": os, "type": type, latestFinishedRun: { id: "", startTime: -1 } });
     });
-
-    var notes = td.note_array.map(processNote);
-
+    
+    var todayDate = $("#build_waterfall tr > td:first-child > a", doc).get(0).childNodes[1].data.match(/[0-9\/]+/)[0];
+    function parseTime(str) {
+        if (str.indexOf("/") < 0)
+            str = todayDate + " " + str;
+        return new Date(str + " " + timezone);
+    }
+    
+    var notes = [];
+    var script = $(".script", doc).get(0).textContent;
+    var match = script.match(/notes\[([0-9]+)\] = "(.*)";/g);
+    if (match) {
+        match.forEach(function(m) {
+            var match = m.match(/notes\[([0-9]+)\] = "(.*)";/);
+            notes[match[1]*1] = linkBugs(saneLineBreakNote(match[2]));
+        });
+    }
+    
     machineResults = {};
     var seenMachines = [];
-    td.build_table.forEach(function(row) { row.forEach(function(build, machineIndex) {
-        if (!build.buildstatus || build.buildstatus == "null" || !machines[machineIndex])
-            return;
-        var state = build.buildstatus; /* building, success, testfailed, busted */
-        var rev = "", testResults = [];
-        var startTime = new Date(build.buildtime * 1000);
-        var endTime = (state != "building") ? new Date(build.endtime * 1000) : 0;
-        var machineRunID = build.logfile;
-        var buildScrape = getBuildScrape(td, machineIndex, machineRunID);
-        var rev = buildScrape ? buildScrape.rev : "";
-        var testResults = buildScrape ? buildScrape.testResults : [];
+    $("#build_waterfall td > tt", doc).get().forEach(function(tt) {
+        var td = tt.parentNode;
+        var a = $('a[title]', td).get(0); // should be 'a[onclick^="return log"]', but jQuery doesn't like that
+        if (!a) {
+            console.log(td);
+        }
+        var state = a.title; /* building, success, testfailed, busted */
+        var machineIndex = 0, startTime = 0, endTime = 0, rev = "", machineRunID = "", testResults = [];
+        if (state == "building") {
+            var match = a.getAttribute("onclick").match(/log\(event,([0-9]+),.*,'(.*)','Started ([^,]*),/);
+            machineRunID = match[2];
+            machineIndex = match[1] * 1;
+            if (!machines[machineIndex])
+                return;
+            startTime = parseTime(match[3]);
+        } else {
+            var match = a.getAttribute("onclick").match(/log\(event,([0-9]+),.*,'(.*)','Started ([^,]*), finished ([^']*)'/);
+            machineRunID = match[2];
+            machineIndex = match[1] * 1;
+            if (!machines[machineIndex])
+                return;
+            startTime = parseTime(match[3]);
+            endTime = parseTime(match[4]);
+            var reva = $('a[href^="http://hg.mozilla.org"]', td).get(0);
+            if (reva) {
+                rev = reva.textContent.substr(4, 12);
+
+                // Get individual test results or Talos times.
+                if (machines[machineIndex].type == "Unit Test") {
+                    testResults = getUnitTestResults(reva);
+                } else if (machines[machineIndex].type == "Talos") {
+                    testResults = getTalosResults(tt);
+                }
+            }
+        }
 
         if (machineResults[machineRunID])
             return;
 
-        var note = build.hasnote ? notes[build.noteid * 1] : "";
+        var stars = [];
+        $('a[onclick^="return note"]', td).get().forEach(function(s) {
+            var match = s.getAttribute("onclick").match(/note\(event,([0-9]+),/);
+            if (!match)
+                return;
+            stars.push(notes[match[1]*1]);
+        });
 
         machineResults[machineRunID] = {
             "machine": machines[machineIndex],
@@ -275,7 +291,7 @@ function parseTinderbox(td) {
             "rev": rev,
             "guessedRev": rev,
             "testResults": testResults,
-            "note": note
+            "stars": stars
         };
         if (state != "building") {
             if (startTime.getTime() > machines[machineIndex].latestFinishedRun.startTime) {
@@ -285,7 +301,7 @@ function parseTinderbox(td) {
                 };
             }
         }
-    }); });
+    });
     buildBoxMatrix();
 }
 
@@ -340,8 +356,8 @@ function updateBoxMatrix() {
         });
     });
     table.style.visibility = "visible";
-    $("a", table).each(function() {
-        this.addEventListener("click", resultLinkClick, false);
+    $("a", table).get().forEach(function(cell) {
+        cell.addEventListener("click", resultLinkClick, false);
     });
 }
 
@@ -503,7 +519,7 @@ function buildPushesList() {
                     + '" class="machineResult ' + machineResult.state
                     + '" title="' + resultTitle(machineType, machineResult.state)
                     + '">' + machineType.charAt(0)
-                    + (machineResult.note ? '*' : '')
+                    + (machineResult.stars.length ? '*' : '')
                     + '</a>';
                 }).join(" ");
             }).join("\n")
@@ -593,7 +609,7 @@ function displayResult() {
     if (!result || !box)
         return;
     box.setAttribute("state", result.state);
-    box.className = result.note ? "hasStar" : "";
+    box.className = result.stars.length ? "hasStar" : "";
     box.innerHTML = (function() {
         return '<h3><span class="machineName">' + result.machine.name
         + '</span> [<span class="state">' + result.state + '</span>] '
@@ -626,10 +642,10 @@ function displayResult() {
             }
         })()
         + (function() {
-            if (!result.note)
+            if (!result.stars.length)
                 return '';
             return '<div class="stars">'
-            + result.note + '</div>';
+            + result.stars.map(function (s) '<div>'+s+'</div>').join("") + '</div>';
         })();
     })();
     var addNoteLink = $("a.addNote").get(0);
