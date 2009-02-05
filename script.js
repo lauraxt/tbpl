@@ -21,7 +21,7 @@ var pickupDelay = 1 * 60 * 1000; // number of ms until machine starts building a
 var oss = ["linux", "osx", "windows"];
 var machineTypes = ["Build", "Leak Test", "Unit Test", "Talos", "Nightly", "Static Analysis"];
 var loadStatus = { pushlog: "loading", tinderbox: "loading" };
-var activeResult = -1;
+var activeResult = "";
 var boxMatrix;
 
 startStatusRequest();
@@ -38,6 +38,7 @@ function startStatusRequest() {
     
     document.getElementById("tinderboxiframe").onload = tinderboxLoaded;
     document.getElementById("pushlogiframe").onload = pushlogLoaded;
+    document.getElementById("pushes").onclick = resultLinkClick;
 }
 
 
@@ -413,7 +414,7 @@ function getPushIndexForRev(rev) {
 }
 
 function getRevForResult(machineResult) {
-    if (machineResult.rev != "")
+    if (machineResult.rev)
         return machineResult.rev;
 
     var machineType = machineResult.machine.type;
@@ -546,17 +547,18 @@ function buildPushesList() {
 function resultLinkClick(e) {
     var resultID = this.getAttribute("resultID");
     setActiveResult(resultID, true);
+    e.stopPropagation();
     e.preventDefault();
 }
 
 function setActiveResult(resultID, scroll) {
-    if (activeResult != -1) {
+    if (activeResult) {
         var activeA = $('.results a[resultID="' + activeResult + '"]').get(0);
         if (activeA)
             activeA.removeAttribute("active");
     }
     activeResult = resultID;
-    if (activeResult != -1) {
+    if (activeResult) {
         var activeA = $('.results a[resultID="' + activeResult + '"]').get(0);
         if (activeA) {
             activeA.setAttribute("active", "true");
@@ -606,8 +608,14 @@ function getPSTTime(date) {
 function displayResult() {
     var result = machineResults[activeResult];
     var box = document.getElementById("results");
-    if (!result || !box)
+    if (!box)
         return;
+    if (!result) {
+        box.removeAttribute("state");
+        box.className = "";
+        box.innerHTML = "";
+        return;
+    }
     box.setAttribute("state", result.state);
     box.className = result.stars.length ? "hasStar" : "";
     box.innerHTML = (function() {
