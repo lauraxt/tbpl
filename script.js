@@ -23,6 +23,7 @@ var machineTypes = ["Build", "Leak Test", "Unit Test", "Talos", "Nightly", "Stat
 var loadStatus = { pushlog: "loading", tinderbox: "loading" };
 var activeResult = "";
 var boxMatrix;
+var abortOutstandingSummaryLoadings = function() {};
 
 startStatusRequest();
 setInterval(startStatusRequest, 120 * 1000);
@@ -556,6 +557,8 @@ function resultLinkClick(e) {
 }
 
 function setActiveResult(resultID, scroll) {
+    abortOutstandingSummaryLoadings();
+    abortOutstandingSummaryLoadings = function() {};
     if (activeResult) {
         var activeA = $('.results a[resultID="' + activeResult + '"]').get(0);
         if (activeA)
@@ -724,6 +727,12 @@ function fetchSummary(runID, f, e) {
     }
     // If we don't get a response in 30 seconds, give up.
     errorTimer = setTimeout(function() {
+        req.abort();
         e("timeout");
     }, 30 * 1000);
+    var oldAbort = abortOutstandingSummaryLoadings;
+    abortOutstandingSummaryLoadings = function() {
+        req.abort();
+        oldAbort();
+    }
 }
