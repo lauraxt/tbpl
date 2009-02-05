@@ -134,15 +134,15 @@ function linkBugs(text) {
 }
 
 function tinderboxLoaded() {
-    try {
+    //try {
         parseTinderbox(this.contentDocument);
         loadStatus.tinderbox = "complete";
         updateBoxMatrix();
         maybeCombineResults();
-    } catch (e) {
-        alert(e);
-        loadStatus.tinderbox = "fail";
-    }
+    //} catch (e) {
+    //    alert(e);
+    //    loadStatus.tinderbox = "fail";
+    //}
     updateStatus();
 }
 
@@ -182,7 +182,7 @@ function getTalosResults(tt) {
     $("p a", tt).each(function() {
         seriesURLs[this.textContent] = this.getAttribute("href");
     });
-    return $('a[href^="http://graphs"]', cell).get().map(function(ra) {
+    return $('a[href^="http://graphs"]', tt).get().map(function(ra) {
         var resultURL = ra.getAttribute("href");
         var match = ra.textContent.match(/(.*)\:(.*)/);
         if (!match)
@@ -234,7 +234,10 @@ function parseTinderbox(doc) {
     var seenMachines = [];
     $("#build_waterfall td > tt", doc).get().forEach(function(tt) {
         var td = tt.parentNode;
-        var a = $('a[onclick^="return log"]', td).get(0);
+        var a = $('a[title]', td).get(0); // should be 'a[onclick^="return log"]', but jQuery doesn't like that
+        if (!a) {
+            console.log(td);
+        }
         var state = a.title; /* building, success, testfailed, busted */
         var machineIndex = 0, startTime = 0, endTime = 0, rev = "", machineRunID = "", testResults = [];
         if (state == "building") {
