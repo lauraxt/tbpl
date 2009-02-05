@@ -38,7 +38,7 @@ function startStatusRequest() {
     
     document.getElementById("tinderboxiframe").onload = tinderboxLoaded;
     document.getElementById("pushlogiframe").onload = pushlogLoaded;
-    document.getElementById("pushes").onclick = resultLinkClick;
+    document.getElementById("pushes").onmousedown = clickNowhere;
 }
 
 
@@ -544,10 +544,14 @@ function buildPushesList() {
     setActiveResult(activeResult, false);
 }
 
+function clickNowhere(e) {
+    if (e.originalTarget.tagName.toLowerCase() != "a")
+        setActiveResult("");
+}
+
 function resultLinkClick(e) {
     var resultID = this.getAttribute("resultID");
     setActiveResult(resultID, true);
-    e.stopPropagation();
     e.preventDefault();
 }
 
