@@ -134,15 +134,15 @@ function linkBugs(text) {
 }
 
 function tinderboxLoaded() {
-    //try {
+    try {
         parseTinderbox(this.contentDocument);
         loadStatus.tinderbox = "complete";
         updateBoxMatrix();
         maybeCombineResults();
-    //} catch (e) {
-    //    alert(e);
-    //    loadStatus.tinderbox = "fail";
-    //}
+    } catch (e) {
+        //alert(e);
+        loadStatus.tinderbox = "fail";
+    }
     updateStatus();
 }
 
