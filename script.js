@@ -33,8 +33,8 @@ function startStatusRequest() {
     updateStatus();
 
     // Load tinderbox and pushlog
-    document.getElementById("tinderboxiframe").contentWindow.location.href = "fetchraw.php?site=tinderbox&tree=" + treeName;
-    document.getElementById("pushlogiframe").contentWindow.location.href = "fetchraw.php?site=pushlog&tree=" + treeName;
+    document.getElementById("tinderboxiframe").contentWindow.location.href = "fetchraw.php?site=tinderbox&url=" + treeName + "/";
+    document.getElementById("pushlogiframe").contentWindow.location.href = "fetchraw.php?site=pushlog&url=" + repoNames[treeName] + "/pushloghtml?startdate=14+hours+ago&enddate=now";
     
     document.getElementById("tinderboxiframe").onload = tinderboxLoaded;
     document.getElementById("pushlogiframe").onload = pushlogLoaded;
