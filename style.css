@@ -23,7 +23,7 @@ html {
     font-weight: normal;
     padding: 1px 0 1px 20px;
 }
-#loading.loading {
+.loading {
     background: url(loading_16.png) center left no-repeat transparent;
 }
 
@@ -231,17 +231,21 @@ table a:active {
     position: absolute;
     right: 5px;
 }
-a.briefLog, a.fullLog, a.addNote {
+a.briefLog, a.fullLog, a.addNote, #summaryLoader {
     position: absolute;
     right: 5px;
-    top: 1.8em;
-    margin-top: 1px;
+    bottom: 3.6em;
+    margin-bottom: 2px;
 }
 a.fullLog {
-    top: 3.6em;
+    bottom: 1.8em;
 }
 a.addNote {
-    top: 5.4em;
+    bottom: 0;
+}
+#summaryLoader {
+    bottom: 5.8em;
+    padding: 1px 0 1px 20px;
 }
 
 .unitTestResults, .talosResults {
@@ -263,15 +267,28 @@ em.testfail {
     bottom: 10em;
     right: 0;
     margin-right: -1px;
-    background: #FFFACC;
     border: 1px solid #DDD;
-    padding: 10px;
     z-index: 3;
 }
-.stars {
-  max-height: 30em;
+.stars div {
+  max-height: 15em;
   overflow: auto;
+  padding: 10px;
 }
+.stars .note {
+    background: #FFFACC;
+}
+.stars .summary {
+    background: #CCFAFF;
+}
+#results:not(.hasSummary) .stars .summary {
+    display: none;
+}
+#results:not(.hasSummary) .stars .note,
+#results:not(.hasStar) .stars .summary {
+    max-height: 30em;
+}
+.stars:not()
 #results.hasStar {
     background: url(bigstar.png) 80% 50% no-repeat white;
 }

@@ -627,7 +627,7 @@ function displayResult() {
         + '<a class="briefLog" href="' + result.briefLogURL
         + '">View Brief Log</a> <a class="fullLog" href="'
         + result.fullLogURL + '">View Full Log</a> <a class="addNote" href="'
-        + result.addNoteURL + '">Add a Comment</a>'
+        + result.addNoteURL + '">Add a Comment</a> <span id="summaryLoader"></span>'
         + (function() {
             if (!result.testResults.length)
                 return '';
@@ -650,14 +650,32 @@ function displayResult() {
             }
         })()
         + (function() {
-            if (!result.stars.length)
-                return '';
             return '<div class="stars">'
-            + result.stars.map(function (s) '<div>'+s+'</div>').join("") + '</div>';
+            + result.stars.map(function (s) '<div class="note">'+s+'</div>').join("") + '<div class="summary"></div></div>';
         })();
     })();
     var addNoteLink = $("a.addNote").get(0);
     addNoteLink.addEventListener("click", logLinkClick, false);
+    setupSummaryLoader(result, box);
+
+function setupSummaryLoader(result, box) {
+    if (result.state == "building" || result.state == "success")
+        return;
+
+    var summaryLoader = $("#summaryLoader").get(0);
+    summaryLoader.innerHTML = "Retrieving summary..."
+    summaryLoader.className = "loading";
+    fetchSummary(activeResult, function(summary) {
+        summaryLoader.innerHTML = summary ? "" : "Summary is empty.";
+        summaryLoader.className = "";
+        if (summary)
+            box.className += " hasSummary"
+        $(".stars .summary").get(0).innerHTML = summary.replace(/\n/g, "<br>\n");
+    }, function(errorCause) {
+        summaryLoader.innerHTML = { "onerror": "Fetching summary failed.", "exception": "Fetching summary failed.", "timeout": "Fetching summary timed out."}[errorCause];
+        summaryLoader.className = "";
+    });
+}
 }
 
 function logLinkClick(e) {
@@ -684,4 +702,24 @@ String.prototype.trim = function() {
   x=x.replace(/^\s*(.*?)/, "$1");
   x=x.replace(/(.*?)\s*$/, "$1");
   return x;
+}
+
+/* f gets called with the result, e on error */
+function fetchSummary(runID, f, e) {
+    var url = "summaries/get.php?tree=" + treeName + "&id=" + runID;
+    var errorTimer;
+    var req = new XMLHttpRequest();
+    req.onerror = function() { e("onerror"); };
+    req.onload = function() { clearInterval(errorTimer); f(req.responseText); };
+    try {
+        req.open("GET", url, true); 
+        req.send();
+    } catch (e) {
+        e("exception");
+        return;
+    }
+    // If we don't get a response in 30 seconds, give up.
+    errorTimer = setTimeout(function() {
+        e("timeout");
+    }, 30 * 1000);
 }
