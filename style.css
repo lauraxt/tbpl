@@ -280,6 +280,7 @@ em.testfail {
 }
 .stars .summary {
     background: #CCFAFF;
+    font-size: 10px;
 }
 #results:not(.hasSummary) .stars .summary {
     display: none;
