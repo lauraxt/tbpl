@@ -121,7 +121,7 @@ function stripTags(text) {
 function saneLineBreakNote(note) {
     // There are too many line breaks in notes; only use those that make sense.
     return note.replace(/\\n/g, "\n")
-               .replace(/\\"/g, "\"")
+               .replace(/\\("|'|\\)/g, "$1")
                .replace(/<\/?pre>/g, "")
                .replace(/\n\n/g, "<br>")
                .replace(/\]\n/g, "]<br>")
