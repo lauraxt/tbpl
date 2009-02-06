@@ -680,7 +680,7 @@ function setupSummaryLoader(result, box) {
         summaryLoader.className = "";
         if (summary)
             box.className += " hasSummary"
-        $(".stars .summary").get(0).innerHTML = summary.replace(/\n/g, "<br>\n");
+        $(".stars .summary").get(0).innerHTML = summary.replace(/ALSA.*device\n/g, "").replace(/\n/g, "<br>\n");
     }, function(errorCause) {
         summaryLoader.innerHTML = { "onerror": "Fetching summary failed.", "exception": "Fetching summary failed.", "timeout": "Fetching summary timed out."}[errorCause];
         summaryLoader.className = "";
