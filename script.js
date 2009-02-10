@@ -121,7 +121,7 @@ function stripTags(text) {
 function saneLineBreakNote(note) {
     // There are too many line breaks in notes; only use those that make sense.
     return note.replace(/\\n/g, "\n")
-               .replace(/\\"/g, "\"")
+               .replace(/\\("|'|\\)/g, "$1")
                .replace(/<\/?pre>/g, "")
                .replace(/\n\n/g, "<br>")
                .replace(/\]\n/g, "]<br>")
@@ -274,8 +274,11 @@ function parseTinderbox(doc) {
             return;
 
         var stars = [];
-        $('a[onclick^="return note"]', td).get().forEach(function(s) {
-            var match = s.getAttribute("onclick").match(/note\(event,([0-9]+),/);
+        $('a', td).get().forEach(function(s) {
+            var onclick = s.getAttribute("onclick");
+            if (!onclick)
+                return;
+            var match = onclick.match(/note\(event,([0-9]+),/);
             if (!match)
                 return;
             stars.push(notes[match[1]*1]);

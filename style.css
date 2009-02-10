@@ -281,6 +281,7 @@ em.testfail {
 .stars .summary {
     background: #CCFAFF;
     font-size: 10px;
+    border-top: 1px solid #DDD;
 }
 #results:not(.hasSummary) .stars .summary {
     display: none;
@@ -288,8 +289,8 @@ em.testfail {
 #results:not(.hasSummary) .stars .note,
 #results:not(.hasStar) .stars .summary {
     max-height: 30em;
+    border-top: none;
 }
-.stars:not()
 #results.hasStar {
     background: url(bigstar.png) 80% 50% no-repeat white;
 }
