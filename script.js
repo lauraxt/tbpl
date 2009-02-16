@@ -131,7 +131,7 @@ function saneLineBreakNote(note) {
                .replace(/\n(REF)?TEST/g, "<br>$1TEST");
 }
 function linkBugs(text) {
-    return text.replace(/(bug\s*)?\b([0-9]{5,7})\b/ig, '<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=$2">$1$2</a>')
+    return text.replace(/(bug\s*|b=)([1-9][0-9]*)\b/ig, '<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=$2">$1$2</a>')
                .replace(/(changeset\s*)?([0-9a-f]{12})\b/ig, '<a href="'+revURL('')+'$2">$1$2</a>');
 }
 
