@@ -82,12 +82,14 @@ function updateStatus() {
 }
 
 function getMachineType(name) {
-    return [
+    return {
+        os:
         /Linux/.test(name) ? "linux" :
         /OS\s?X/.test(name) ? "osx" :
         /^WIN/i.test(name) ? "windows" :
         /bsmedberg/.test(name) ? "linux" : "",
 
+        type:
         /talos/i.test(name) ? "Talos" :
         /nightly/i.test(name) ? "Nightly" :
         /unit test/i.test(name) ? "Unit Test" :
@@ -96,7 +98,7 @@ function getMachineType(name) {
         /build/i.test(name) ? "Build" :
         /bsmedberg/.test(name) ? "Static Analysis" :
         /(check|test)/.test(name) ? "Unit Test" : ""
-    ];
+    };
 }
 
 var machines = [];
@@ -196,7 +198,7 @@ function getTalosResults(tt) {
             seriesURL: seriesURLs[testname],
             "resultURL": resultURL
         };
-    }).filter(function(a) a);
+    }).filter(function(a) { return a; });
 }
 
 function parseTinderbox(doc) {
@@ -207,12 +209,12 @@ function parseTinderbox(doc) {
     boxMatrix = {};
     $("#build_waterfall th ~ td > font", doc).get().forEach(function(cell) {
         var name = cell.textContent.replace(/%/, "").trim();
-        var [os, type] = getMachineType(name);
-        if (!os || !type) {
+        var machinetype = getMachineType(name);
+        if (!machinetype.os || !machinetype.type) {
             alert(name + " failed the name test");
             return;
         }
-        machines.push({ "name": name, "os": os, "type": type, latestFinishedRun: { id: "", startTime: -1 } });
+        machines.push({ "name": name, "os": machinetype.os, "type": machinetype.type, latestFinishedRun: { id: "", startTime: -1 } });
     });
     
     var todayDate = $("#build_waterfall tr > td:first-child > a", doc).get(0).childNodes[1].data.match(/[0-9\/]+/)[0];
@@ -661,7 +663,7 @@ function displayResult() {
         })()
         + (function() {
             return '<div class="stars">'
-            + result.stars.map(function (s) '<div class="note">'+s+'</div>').join("") + '<div class="summary"></div></div>';
+            + result.stars.map(function (s) { return '<div class="note">'+s+'</div>'; }).join("") + '<div class="summary"></div></div>';
         })();
     })();
     var addNoteLink = $("a.addNote").get(0);
