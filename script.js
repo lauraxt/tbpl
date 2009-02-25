@@ -211,7 +211,6 @@ function parseTinderbox(doc) {
         var name = cell.textContent.replace(/%/, "").trim();
         var machinetype = getMachineType(name);
         if (!machinetype.os || !machinetype.type) {
-            alert(name + " failed the name test");
             return;
         }
         machines.push({ "name": name, "os": machinetype.os, "type": machinetype.type, latestFinishedRun: { id: "", startTime: -1 } });
