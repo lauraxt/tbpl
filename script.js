@@ -87,7 +87,7 @@ function getMachineType(name) {
         /Linux/.test(name) ? "linux" :
         /OS\s?X/.test(name) ? "osx" :
         /^WIN/i.test(name) ? "windows" :
-        /bsmedberg/.test(name) ? "linux" : "",
+        /static-analysis/.test(name) ? "linux" : "",
 
         type:
         /talos/i.test(name) ? "Talos" :
