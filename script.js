@@ -182,10 +182,10 @@ function getUnitTestResults(reva) {
 
 function getTalosResults(tt) {
     var seriesURLs = {};
-    $("p a", tt).each(function() {
+    $("p a", tt.parentNode).each(function() {
         seriesURLs[this.textContent] = this.getAttribute("href");
     });
-    return $('a[href^="http://graphs"]', tt).get().map(function(ra) {
+    return $('a[href^="http://graphs"]', tt.parentNode).get().map(function(ra) {
         var resultURL = ra.getAttribute("href");
         var match = ra.textContent.match(/(.*)\:(.*)/);
         if (!match)
