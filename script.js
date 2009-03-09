@@ -653,7 +653,7 @@ function displayResult() {
                 + result.testResults.map(function(r) {
                     return '<li>' + r.name + ': <a href="' + r.resultURL.replace(/"/g, "&quot;")
                     + '">' + r.result + '</a>'
-                    + (r.seriesURL ? ' (<a href="' + r.seriesURL
+                    + (r.seriesURL ? ' (<a href="' + r.seriesURL.replace(/"/g, "&quot;")
                     + '">details</a>)' : '') + '</li>';
                 }).join("")
                 + '</ul>';
