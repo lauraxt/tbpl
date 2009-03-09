@@ -144,7 +144,6 @@ function tinderboxLoaded() {
         updateBoxMatrix();
         maybeCombineResults();
     } catch (e) {
-        //alert(e);
         loadStatus.tinderbox = "fail";
     }
     updateStatus();
