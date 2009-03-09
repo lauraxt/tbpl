@@ -651,7 +651,7 @@ function displayResult() {
             if (result.machine.type == "Talos") {
                 return '<ul class="talosResults">\n'
                 + result.testResults.map(function(r) {
-                    return '<li>' + r.name + ': <a href="' + r.resultURL
+                    return '<li>' + r.name + ': <a href="' + r.resultURL.replace(/"/g, "&quot;")
                     + '">' + r.result + '</a>'
                     + (r.seriesURL ? ' (<a href="' + r.seriesURL
                     + '">details</a>)' : '') + '</li>';
