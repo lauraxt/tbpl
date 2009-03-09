@@ -249,14 +249,12 @@ a.addNote {
 }
 
 .unitTestResults, .talosResults {
-    max-width: 40em;
-    margin: 8px 0;
+    margin: 8px 10em 0 0;
+    height: 7em;
+    overflow: hidden;
+    -moz-column-width: 18em;
 }
 
-.unitTestResults > li, .talosResults > li {
-    float: left;
-    width: 18em;
-}
 em.testfail {
     font-style: normal;
     font-weight: bold;
