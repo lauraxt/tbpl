@@ -42,7 +42,6 @@ iframe {
 }
 #pushes > li, .patches > li, .results > li {
     display: block;
-    position: relative;
 }
 #pushes > li::after {
     content: '.';
@@ -59,11 +58,28 @@ iframe {
 }
 .patches {
     margin-right: 36em;
-    overflow: hidden;
     min-height: 5em;
 }
 .patches > li {
+    overflow: hidden;
+}
+.patches > li > div {
     white-space: nowrap;
+    margin-left: 8em;
+}
+.patches > li > .popup.hovering {
+    white-space: normal;
+    position: absolute;
+    margin-right: 6em;
+    display: none;
+}
+.patches > li > .popup.hovering > span {
+    display: block;
+    padding: 2px 5px;
+    margin: -2px -5px;
+    -moz-border-radius: 3px;
+    background: #FFD;
+    -moz-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
 }
 .revlink {
     float: left;

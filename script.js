@@ -535,8 +535,8 @@ function buildPushesList() {
         + push.patches.map(function(patch, patchIndex) {
             return '<li>\n'
             + '<a class="revlink" href="' + revURL(patch.rev) + '">' + patch.rev
-            + '</a>\n<span class="author">' + patch.author + '</span> &ndash; '
-            + '<span class="desc">' + patch.desc.split("\n")[0] + '</span>\n'
+            + '</a>\n<div class="popup"><span><span class="author">' + patch.author + '</span> &ndash; '
+            + '<span class="desc">' + patch.desc.split("\n")[0] + '</span></span></div>\n'
             + '</li>';
         }).join("\n")
         + '</ul>\n'
@@ -544,6 +544,46 @@ function buildPushesList() {
     }).join("\n");
     $("a.machineResult").each(function() {
         this.addEventListener("click", resultLinkClick, false);
+    });
+    $(".patches > li").bind("mouseenter", function startFadeInTimeout() {
+        var div = $(".popup:not(.hovering)", this);
+        if (div.width() - div.children().width() > 10)
+            return; // There's enough space; no need to show the popup.
+
+        var self = $(this);
+        var popup = null;
+        var fadeInTimer = 0, fadeOutTimer = 0;
+        self.unbind("mouseenter", startFadeInTimeout);
+        self.bind("mouseleave", clearFadeInTimeout);
+        function clearFadeInTimeout() {
+            self.unbind("mouseleave", clearFadeInTimeout);
+            self.bind("mouseenter", startFadeInTimeout);
+            clearTimeout(fadeInTimer);
+        }
+        fadeInTimer = setTimeout(function() {
+            self.unbind("mouseleave", clearFadeInTimeout);
+            self.bind("mouseleave", startFadeOutTimeout);
+            popup = div.clone().addClass("hovering").insertBefore(div).fadeIn(200);
+        }, 500);
+        function startFadeOutTimeout() {
+            self.unbind("mouseleave", startFadeOutTimeout);
+            self.bind("mouseenter", clearFadeOutTimeout);
+            fadeOutTimer = setTimeout(function() {
+                popup.fadeOut(200);
+                fadeOutTimer = setTimeout(function() {
+                    self.unbind("mouseenter", clearFadeOutTimeout);
+                    self.bind("mouseenter", startFadeInTimeout);
+                    popup.remove();
+                    popup = null;
+                }, 200);
+            }, 300);
+        }
+        function clearFadeOutTimeout() {
+            self.unbind("mouseenter", clearFadeOutTimeout);
+            self.bind("mouseleave", startFadeOutTimeout);
+            clearTimeout(fadeOutTimer);
+            popup.fadeIn(200);
+        }
     });
     setActiveResult(activeResult, false);
 }
