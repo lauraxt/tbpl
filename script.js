@@ -206,13 +206,13 @@ function parseTinderbox(doc) {
 
     machines = [];
     boxMatrix = {};
-    $("#build_waterfall th ~ td > font", doc).get().forEach(function(cell) {
+    $("#build_waterfall th ~ td > font", doc).each(function(i, cell) {
         var name = cell.textContent.replace(/%/, "").trim();
         var machinetype = getMachineType(name);
         if (!machinetype.os || !machinetype.type) {
             return;
         }
-        machines.push({ "name": name, "os": machinetype.os, "type": machinetype.type, latestFinishedRun: { id: "", startTime: -1 } });
+        machines[i] = { "name": name, "os": machinetype.os, "type": machinetype.type, latestFinishedRun: { id: "", startTime: -1 } };
     });
     
     var todayDate = $("#build_waterfall tr > td:first-child > a", doc).get(0).childNodes[1].data.match(/[0-9\/]+/)[0];
