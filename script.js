@@ -15,7 +15,7 @@ var repoNames = {
 }
 
 var pushlogURL = "http://hg.mozilla.org/" + repoNames[treeName] + "/";
-var timezone = "-0800";
+var timezone = "-0700";
 var pickupDelay = 0; // number of ms until machine starts building a push
 
 var oss = ["linux", "osx", "windows"];
