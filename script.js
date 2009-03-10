@@ -707,6 +707,7 @@ function displayResult() {
     var addNoteLink = $("a.addNote").get(0);
     addNoteLink.addEventListener("click", logLinkClick, false);
     setupSummaryLoader(result, box);
+}
 
 function setupSummaryLoader(result, box) {
     if (result.state == "building" || result.state == "success")
@@ -725,7 +726,6 @@ function setupSummaryLoader(result, box) {
         summaryLoader.innerHTML = { "onerror": "Fetching summary failed.", "exception": "Fetching summary failed.", "timeout": "Fetching summary timed out."}[errorCause];
         summaryLoader.className = "";
     });
-}
 }
 
 function logLinkClick(e) {
