@@ -22,24 +22,52 @@ var oss = ["linux", "osx", "windows"];
 var machineTypes = ["Build", "Leak Test", "Unit Test", "Talos", "Nightly", "Static Analysis"];
 var loadStatus = { pushlog: "loading", tinderbox: "loading" };
 var activeResult = "";
-var boxMatrix;
-var abortOutstandingSummaryLoadings = function() {};
+var abortOutstandingSummaryLoadings = function () {};
+var TinderboxDataLoader = TinderboxHTMLParser;
+var PushlogDataLoader = PushlogHTMLParser;
 
 startStatusRequest();
 setInterval(startStatusRequest, 120 * 1000);
 buildFooter();
+document.getElementById("pushes").onmousedown = clickNowhere;
+
+var machines = [];
+var machineResults = {};
+var pushes = [];
 
 function startStatusRequest() {
     loadStatus = { pushlog: "loading", tinderbox: "loading" };
     updateStatus();
 
-    // Load tinderbox and pushlog
-    document.getElementById("tinderboxiframe").contentWindow.location.href = "fetchraw.php?site=tinderbox&url=" + treeName + "/";
-    document.getElementById("pushlogiframe").contentWindow.location.href = "fetchraw.php?site=pushlog&url=" + repoNames[treeName] + "/pushloghtml?startdate=14+hours+ago&enddate=now";
-    
-    document.getElementById("tinderboxiframe").onload = tinderboxLoaded;
-    document.getElementById("pushlogiframe").onload = pushlogLoaded;
-    document.getElementById("pushes").onmousedown = clickNowhere;
+    PushlogDataLoader.load(
+        repoNames[treeName],
+        function loaded(data) {
+            loadStatus.pushlog = "complete";
+            updateStatus();
+            pushes = data;
+            maybeCombineResults();
+        },
+        function failed() {
+            loadStatus.tinderbox = "fail";
+            updateStatus();
+        }
+    );
+
+    TinderboxDataLoader.load(
+        treeName,
+        function loaded(data) {
+            loadStatus.tinderbox = "complete";
+            updateStatus();
+            machines = data.machines;
+            machineResults = data.machineResults;
+            paintBoxMatrix(generateBoxMatrix());
+            maybeCombineResults();
+        },
+        function failed() {
+            loadStatus.tinderbox = "fail";
+            updateStatus();
+        }
+    );
 }
 
 
@@ -81,236 +109,18 @@ function updateStatus() {
     statusSpan.innerHTML = text;
 }
 
-function getMachineType(name) {
-    return {
-        os:
-        /Linux/.test(name) ? "linux" :
-        /OS\s?X/.test(name) ? "osx" :
-        /^WIN/i.test(name) ? "windows" :
-        /static-analysis/.test(name) ? "linux" : "",
-
-        type:
-        /talos/i.test(name) ? "Talos" :
-        /nightly/i.test(name) ? "Nightly" :
-        /unit test/i.test(name) ? "Unit Test" :
-        /depend/i.test(name) ? "Build" :
-        /(leak|bloat)/i.test(name) ? "Leak Test" :
-        /build/i.test(name) ? "Build" :
-        /static-analysis/.test(name) ? "Static Analysis" :
-        /(check|test)/.test(name) ? "Unit Test" : ""
-    };
-}
-
-var machines = [];
-var machineResults = {};
-
-function nodeIsBR(e) {
-    return e && (e.nodeType == Node.ELEMENT_NODE) && e.tagName.toLowerCase() == "br";
-}
-function getLogURL(id, full, note) {
-    return "http://tinderbox.mozilla.org/" + (note ? "addnote" : "showlog") + ".cgi?log=" + treeName + "/" + id + (full ? "&fulltext=1" : "");
-}
-function getTextWithMarker(e) {
-    if (e.nodeType == Node.TEXT_NODE)
-        return e.data;
-    return '<em class="testfail">' + e.textContent + '</em>';
-}
 function stripTags(text) {
     var div = document.createElement("div");
     div.innerHTML = text;
     return div.textContent.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-function saneLineBreakNote(note) {
-    // There are too many line breaks in notes; only use those that make sense.
-    return note.replace(/\\n/g, "\n")
-               .replace(/\\("|'|\\)/g, "$1")
-               .replace(/<\/?pre>/g, "")
-               .replace(/\n\n/g, "<br>")
-               .replace(/\]\n/g, "]<br>")
-               .replace(/\n\*\*\*/g, "<br>***")
-               .replace(/\n\+\+/g, "<br>++")
-               .replace(/\nWARNING/g, "<br>WARNING")
-               .replace(/\n(REF)?TEST/g, "<br>$1TEST");
 }
 function linkBugs(text) {
     return text.replace(/(bug\s*|b=)([1-9][0-9]*)\b/ig, '<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=$2">$1$2</a>')
                .replace(/(changeset\s*)?([0-9a-f]{12})\b/ig, '<a href="'+revURL('')+'$2">$1$2</a>');
 }
 
-function tinderboxLoaded() {
-    try {
-        parseTinderbox(this.contentDocument);
-        loadStatus.tinderbox = "complete";
-        updateBoxMatrix();
-        maybeCombineResults();
-    } catch (e) {
-        loadStatus.tinderbox = "fail";
-    }
-    updateStatus();
-}
-
-function getUnitTestResults(reva) {
-    var e = reva.nextSibling;
-    if (e) e = e.nextSibling;
-    while (e && e.nodeType != Node.TEXT_NODE)
-        e = e.nextSibling;
-
-    if (!e || e.data != " TUnit")
-        return [];
-
-    var testResults = [];
-    while (e) { 
-        var testname = e.textContent.trim(), testresult = "";
-        e = e.nextSibling;
-        while (e && nodeIsBR(e)) {
-            e = e.nextSibling;
-        }
-        while (e && !nodeIsBR(e)) {
-            testresult += " " + getTextWithMarker(e).trim();
-            e = e.nextSibling;
-        }
-        while (e && nodeIsBR(e)) {
-            e = e.nextSibling;
-        }
-        testResults.push({
-            name: testname.trim(),
-            result: testresult.trim()
-        });
-    }
-    return testResults;
-}
-
-function getTalosResults(tt) {
-    var seriesURLs = {};
-    $('p a[href^="http://graphs-new"]', tt.parentNode).each(function() {
-        seriesURLs[this.textContent] = this.getAttribute("href");
-    });
-    return $('a[href^="http://graphs-new"]', tt.parentNode).get().map(function(ra) {
-        var resultURL = ra.getAttribute("href");
-        var match = ra.textContent.match(/(.*)\:(.*)/);
-        if (!match)
-            return null;
-        var testname = match[1].trim();
-        return {
-            name: testname,
-            result: match[2].trim(),
-            seriesURL: seriesURLs[testname],
-            "resultURL": resultURL
-        };
-    }).filter(function(a) { return a; });
-}
-
-function parseTinderbox(doc) {
-    if (!$("#build_waterfall tr > td:first-child > a", doc).length)
-        throw "I can't parse that";
-
-    machines = [];
-    boxMatrix = {};
-    $("#build_waterfall th ~ td > font", doc).each(function(i, cell) {
-        var name = cell.textContent.replace(/%/, "").trim();
-        var machinetype = getMachineType(name);
-        if (!machinetype.os || !machinetype.type) {
-            return;
-        }
-        machines[i] = { "name": name, "os": machinetype.os, "type": machinetype.type, latestFinishedRun: { id: "", startTime: -1 } };
-    });
-    
-    var todayDate = $("#build_waterfall tr > td:first-child > a", doc).get(0).childNodes[1].data.match(/[0-9\/]+/)[0];
-    function parseTime(str) {
-        if (str.indexOf("/") < 0)
-            str = todayDate + " " + str;
-        return new Date(str + " " + timezone);
-    }
-    
-    var notes = [];
-    var script = $(".script", doc).get(0).textContent;
-    var match = script.match(/notes\[([0-9]+)\] = "(.*)";/g);
-    if (match) {
-        match.forEach(function(m) {
-            var match = m.match(/notes\[([0-9]+)\] = "(.*)";/);
-            notes[match[1]*1] = linkBugs(saneLineBreakNote(match[2]));
-        });
-    }
-    
-    machineResults = {};
-    var seenMachines = [];
-    $("#build_waterfall td > tt", doc).get().forEach(function(tt) {
-        var td = tt.parentNode;
-        var a = $('a[title]', td).get(0); // should be 'a[onclick^="return log"]', but jQuery doesn't like that
-        if (!a) {
-            console.log(td);
-        }
-        var state = a.title; /* building, success, testfailed, busted */
-        var machineIndex = 0, startTime = 0, endTime = 0, rev = "", machineRunID = "", testResults = [];
-        if (state == "building") {
-            var match = a.getAttribute("onclick").match(/log\(event,([0-9]+),.*,'(.*)','Started ([^,]*),/);
-            machineRunID = match[2];
-            machineIndex = match[1] * 1;
-            if (!machines[machineIndex])
-                return;
-            startTime = parseTime(match[3]);
-        } else {
-            var match = a.getAttribute("onclick").match(/log\(event,([0-9]+),.*,'(.*)','Started ([^,]*), finished ([^']*)'/);
-            machineRunID = match[2];
-            machineIndex = match[1] * 1;
-            if (!machines[machineIndex])
-                return;
-            startTime = parseTime(match[3]);
-            endTime = parseTime(match[4]);
-            var reva = $('a[href^="http://hg.mozilla.org"]', td).get(0);
-            if (reva) {
-                rev = reva.textContent.substr(4, 12);
-
-                // Get individual test results or Talos times.
-                if (machines[machineIndex].type == "Unit Test") {
-                    testResults = getUnitTestResults(reva);
-                } else if (machines[machineIndex].type == "Talos") {
-                    testResults = getTalosResults(tt);
-                }
-            }
-        }
-
-        if (machineResults[machineRunID])
-            return;
-
-        var stars = [];
-        $('a', td).get().forEach(function(s) {
-            var onclick = s.getAttribute("onclick");
-            if (!onclick)
-                return;
-            var match = onclick.match(/note\(event,([0-9]+),/);
-            if (!match)
-                return;
-            stars.push(notes[match[1]*1]);
-        });
-
-        machineResults[machineRunID] = {
-            "machine": machines[machineIndex],
-            "runID": machineRunID,
-            "fullLogURL": getLogURL(machineRunID, true, false),
-            "briefLogURL": getLogURL(machineRunID, false, false),
-            "addNoteURL": getLogURL(machineRunID, false, true),
-            "state": state,
-            "startTime": startTime,
-            "endTime": endTime,
-            "rev": rev,
-            "guessedRev": rev,
-            "testResults": testResults,
-            "stars": stars
-        };
-        if (state != "building") {
-            if (startTime.getTime() > machines[machineIndex].latestFinishedRun.startTime) {
-                machines[machineIndex].latestFinishedRun = {
-                    id: machineRunID,
-                    "startTime": startTime.getTime()
-                };
-            }
-        }
-    });
-    buildBoxMatrix();
-}
-
-function buildBoxMatrix() {
+function generateBoxMatrix() {
+    var boxMatrix = {};
     machines.forEach(function(machine) {
         if (!machine.latestFinishedRun.id) {
             // Ignore machines without run information.
@@ -322,9 +132,10 @@ function buildBoxMatrix() {
             boxMatrix[machine.type][machine.os] = [];
         boxMatrix[machine.type][machine.os].push(machineResults[machine.latestFinishedRun.id]);
     });
+    return boxMatrix;
 }
 
-function updateBoxMatrix() {
+function paintBoxMatrix(boxMatrix) {
     var colspans = { "linux": 1, "osx": 1, "windows": 1 };
     for (mt in boxMatrix) {
         for (os in colspans) {
@@ -364,44 +175,6 @@ function updateBoxMatrix() {
     $("a", table).get().forEach(function(cell) {
         cell.addEventListener("click", resultLinkClick, false);
     });
-}
-
-var pushes = [];
-
-function pushlogLoaded() {
-    var doc = this.contentDocument;
-    if (!doc.getElementsByTagName("table").length)
-        return;
-
-    pushes = [];
-    var table = doc.getElementsByTagName("table")[0];
-    $("td[rowspan]:first-child", table).each(function() {
-        var numPatches = this.getAttribute("rowspan") * 1;
-        var patches = [];
-        for (var i = 0, row = this.parentNode; i < numPatches && row; i++, row = row.nextSibling) {
-            var rev = $("td.age", row).get(0).firstChild.firstChild.data;
-            var strong = row.lastChild.firstChild.innerHTML;
-            var dashpos = strong.indexOf(String.fromCharCode(8212));
-            var author = strong.substring(0, dashpos - 1);
-            var desc = strong.substring(dashpos + 2);
-            patches.push({
-               "rev": rev,
-               "author": author,
-               "desc": linkBugs(stripTags(desc))
-            });
-        }
-        var pusher = this.firstChild.firstChild.data;
-        var date = new Date($(".date", this).get(0).innerHTML);
-        pushes.push({
-            "pusher": pusher,
-            "date": date,
-            "toprev": patches[0].rev,
-            "patches": patches
-        });
-    });
-    loadStatus.pushlog = "complete";
-    updateStatus();
-    maybeCombineResults();
 }
 
 function maybeCombineResults() {
@@ -542,7 +315,7 @@ function buildPushesList() {
         + '</ul>\n'
         + '</li>';
     }).join("\n");
-    $("a.machineResult").each(function() {
+    $("a.machineResult").each(function () {
         this.addEventListener("click", resultLinkClick, false);
     });
     $(".patches > li").bind("mouseenter", function startFadeInTimeout() {
@@ -560,7 +333,7 @@ function buildPushesList() {
             self.bind("mouseenter", startFadeInTimeout);
             clearTimeout(fadeInTimer);
         }
-        fadeInTimer = setTimeout(function() {
+        fadeInTimer = setTimeout(function () {
             self.unbind("mouseleave", clearFadeInTimeout);
             self.bind("mouseleave", startFadeOutTimeout);
             popup = div.clone().addClass("hovering").insertBefore(div).fadeIn(200);
@@ -568,9 +341,9 @@ function buildPushesList() {
         function startFadeOutTimeout() {
             self.unbind("mouseleave", startFadeOutTimeout);
             self.bind("mouseenter", clearFadeOutTimeout);
-            fadeOutTimer = setTimeout(function() {
+            fadeOutTimer = setTimeout(function () {
                 popup.fadeOut(200);
-                fadeOutTimer = setTimeout(function() {
+                fadeOutTimer = setTimeout(function () {
                     self.unbind("mouseenter", clearFadeOutTimeout);
                     self.bind("mouseenter", startFadeInTimeout);
                     popup.remove();
@@ -601,7 +374,7 @@ function resultLinkClick(e) {
 
 function setActiveResult(resultID, scroll) {
     abortOutstandingSummaryLoadings();
-    abortOutstandingSummaryLoadings = function() {};
+    abortOutstandingSummaryLoadings = function () {};
     if (activeResult) {
         var activeA = $('.results a[resultID="' + activeResult + '"]').get(0);
         if (activeA)
@@ -633,7 +406,7 @@ function scrollElemIntoView(elem, box, margin) {
 function animateScroll(scrollBox, end, duration) {
     var startTime = Date.now();
     var start = scrollBox.scrollTop;
-    var timer = setInterval(function() {
+    var timer = setInterval(function () {
         var now = Date.now();
         var newpos = 0;
         if (now >= startTime + duration) {
@@ -668,7 +441,7 @@ function displayResult() {
     }
     box.setAttribute("state", result.state);
     box.className = result.stars.length ? "hasStar" : "";
-    box.innerHTML = (function() {
+    box.innerHTML = (function () {
         return '<h3><span class="machineName">' + result.machine.name
         + '</span> [<span class="state">' + result.state + '</span>] '
         + '<span class="duration">Started ' + getPSTTime(result.startTime)
@@ -678,7 +451,7 @@ function displayResult() {
         + '">View Brief Log</a> <a class="fullLog" href="'
         + result.fullLogURL + '">View Full Log</a> <a class="addNote" href="'
         + result.addNoteURL + '">Add a Comment</a> <span id="summaryLoader"></span>'
-        + (function() {
+        + (function () {
             if (!result.testResults.length)
                 return '';
             if (result.machine.type == "Unit Test") {
@@ -699,7 +472,7 @@ function displayResult() {
                 + '</ul>';
             }
         })()
-        + (function() {
+        + (function () {
             return '<div class="stars">'
             + result.stars.map(function (s) { return '<div class="note">'+s+'</div>'; }).join("") + '<div class="summary"></div></div>';
         })();
@@ -747,7 +520,7 @@ function logLinkClick(e) {
     e.preventDefault();
 }
 
-String.prototype.trim = function() {
+String.prototype.trim = function () {
   var x=this;
   x=x.replace(/^\s*(.*?)/, "$1");
   x=x.replace(/(.*?)\s*$/, "$1");
@@ -759,8 +532,8 @@ function fetchSummary(runID, f, e) {
     var url = "summaries/get.php?tree=" + treeName + "&id=" + runID;
     var errorTimer;
     var req = new XMLHttpRequest();
-    req.onerror = function() { e("onerror"); };
-    req.onload = function() { clearInterval(errorTimer); f(req.responseText); };
+    req.onerror = function () { e("onerror"); };
+    req.onload = function () { clearInterval(errorTimer); f(req.responseText); };
     try {
         req.open("GET", url, true); 
         req.send();
@@ -769,12 +542,12 @@ function fetchSummary(runID, f, e) {
         return;
     }
     // If we don't get a response in 30 seconds, give up.
-    errorTimer = setTimeout(function() {
+    errorTimer = setTimeout(function () {
         req.abort();
         e("timeout");
     }, 30 * 1000);
     var oldAbort = abortOutstandingSummaryLoadings;
-    abortOutstandingSummaryLoadings = function() {
+    abortOutstandingSummaryLoadings = function () {
         req.abort();
         oldAbort();
     }
