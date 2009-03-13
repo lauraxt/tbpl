@@ -495,8 +495,11 @@ function setupSummaryLoader(result, box) {
         if (summary)
             box.className += " hasSummary"
         $(".stars .summary").get(0).innerHTML = summary.replace(/ALSA.*device\n/g, "").replace(/\n/g, "<br>\n");
-    }, function(errorCause) {
-        summaryLoader.innerHTML = { "onerror": "Fetching summary failed.", "exception": "Fetching summary failed.", "timeout": "Fetching summary timed out."}[errorCause];
+    }, function() {
+        summaryLoader.innerHTML = "Fetching summary failed.";
+        summaryLoader.className = "";
+    }, function() {
+        summaryLoader.innerHTML = "Fetching summary timed out.";
         summaryLoader.className = "";
     });
 }
@@ -527,25 +530,8 @@ String.prototype.trim = function () {
   return x;
 }
 
-/* f gets called with the result, e on error */
-function fetchSummary(runID, f, e) {
-    var url = "summaries/get.php?tree=" + treeName + "&id=" + runID;
-    var errorTimer;
-    var req = new XMLHttpRequest();
-    req.onerror = function () { e("onerror"); };
-    req.onload = function () { clearInterval(errorTimer); f(req.responseText); };
-    try {
-        req.open("GET", url, true); 
-        req.send();
-    } catch (e) {
-        e("exception");
-        return;
-    }
-    // If we don't get a response in 30 seconds, give up.
-    errorTimer = setTimeout(function () {
-        req.abort();
-        e("timeout");
-    }, 30 * 1000);
+function fetchSummary(runID, loadCallback, failCallback, timeoutCallback) {
+    var req = NetUtils.loadText("summaries/get.php?tree=" + treeName + "&id=" + runID, loadCallback, failCallback, timeoutCallback);
     var oldAbort = abortOutstandingSummaryLoadings;
     abortOutstandingSummaryLoadings = function () {
         req.abort();
