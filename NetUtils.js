@@ -5,7 +5,7 @@ var NetUtils = {
         iframe.onload = function() {
             callback(this.contentDocument);
             $(this).remove();
-        }
+        };
     },
     loadText: function(url, loadCallback, failCallback, timeoutCallback, timeout) {
         if (timeout === undefined) {

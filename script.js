@@ -23,7 +23,7 @@ var machineTypes = ["Build", "Leak Test", "Unit Test", "Talos", "Nightly", "Stat
 var loadStatus = { pushlog: "loading", tinderbox: "loading" };
 var activeResult = "";
 var abortOutstandingSummaryLoadings = function () {};
-var TinderboxDataLoader = TinderboxHTMLParser;
+var TinderboxDataLoader = TinderboxJSONUser;
 var PushlogDataLoader = PushlogHTMLParser;
 
 startStatusRequest();
@@ -297,7 +297,7 @@ function buildPushesList() {
                     + '" class="machineResult ' + machineResult.state
                     + '" title="' + resultTitle(machineType, machineResult.state)
                     + '">' + machineType.charAt(0)
-                    + (machineResult.stars.length ? '*' : '')
+                    + (machineResult.note ? '*' : '')
                     + '</a>';
                 }).join(" ");
             }).join("\n")
@@ -440,7 +440,7 @@ function displayResult() {
         return;
     }
     box.setAttribute("state", result.state);
-    box.className = result.stars.length ? "hasStar" : "";
+    box.className = result.note ? "hasStar" : "";
     box.innerHTML = (function () {
         return '<h3><span class="machineName">' + result.machine.name
         + '</span> [<span class="state">' + result.state + '</span>] '
@@ -474,7 +474,12 @@ function displayResult() {
         })()
         + (function () {
             return '<div class="stars">'
-            + result.stars.map(function (s) { return '<div class="note">'+s+'</div>'; }).join("") + '<div class="summary"></div></div>';
+            + (function() {
+                if (!result.note)
+                    return '';
+                return '<div class="note">'
+                + result.note + '</div>';
+            })() + '<div class="summary"></div></div>';
         })();
     })();
     var addNoteLink = $("a.addNote").get(0);
