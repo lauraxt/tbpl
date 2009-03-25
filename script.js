@@ -274,51 +274,6 @@ function resultTitle(type, status) {
     }[status];
 }
 
-function patchMouseEnter() {
-    var div = $(".popup:not(.hovering)", this);
-    if (div.width() - div.children().width() > 10)
-        return; // There's enough space; no need to show the popup.
-
-    var self = $(this);
-    var popup = null;
-    var fadeInTimer = 0, fadeOutTimer = 0;
-    self.unbind("mouseenter", patchMouseEnter);
-    self.bind("mouseleave", clearFadeInTimeout);
-    function clearFadeInTimeout() {
-        self.unbind("mouseleave", clearFadeInTimeout);
-        self.bind("mouseenter", startFadeInTimeout);
-        clearTimeout(fadeInTimer);
-    }
-    fadeInTimer = setTimeout(function () {
-        self.unbind("mouseleave", clearFadeInTimeout);
-        self.bind("mouseleave", startFadeOutTimeout);
-        popup = div.clone().addClass("hovering").insertBefore(div).fadeIn(200);
-    }, 500);
-    function startFadeOutTimeout() {
-        self.unbind("mouseleave", startFadeOutTimeout);
-        self.bind("mouseenter", clearFadeOutTimeout);
-        fadeOutTimer = setTimeout(function () {
-            popup.fadeOut(200);
-            fadeOutTimer = setTimeout(function () {
-                self.unbind("mouseenter", clearFadeOutTimeout);
-                self.bind("mouseenter", startFadeInTimeout);
-                popup.remove();
-                popup = null;
-            }, 200);
-        }, 300);
-    }
-    function clearFadeOutTimeout() {
-        self.unbind("mouseenter", clearFadeOutTimeout);
-        self.bind("mouseleave", startFadeOutTimeout);
-        clearTimeout(fadeOutTimer);
-        popup.fadeIn(200);
-    }
-}
-
-function patchMouseLeave(e) {
-    
-}
-
 function buildPushesList() {
     var ul = document.getElementById("pushes");
     ul.innerHTML = pushes.map(function(push, pushIndex) {
@@ -363,8 +318,47 @@ function buildPushesList() {
     $("a.machineResult").each(function () {
         this.addEventListener("click", resultLinkClick, false);
     });
-    $(".patches > li").bind("mouseenter", patchMouseEnter);
-    setActiveResult(activeResult, false);
+    $(".patches > li").bind("mouseenter", function startFadeInTimeout() {
+        var div = $(".popup:not(.hovering)", this);
+        if (div.width() - div.children().width() > 10)
+            return; // There's enough space; no need to show the popup.
+
+        var self = $(this);
+        var popup = null;
+        var fadeInTimer = 0, fadeOutTimer = 0;
+        self.unbind("mouseenter", startFadeInTimeout);
+        self.bind("mouseleave", clearFadeInTimeout);
+        function clearFadeInTimeout() {
+            self.unbind("mouseleave", clearFadeInTimeout);
+            self.bind("mouseenter", startFadeInTimeout);
+            clearTimeout(fadeInTimer);
+        }
+        fadeInTimer = setTimeout(function () {
+            self.unbind("mouseleave", clearFadeInTimeout);
+            self.bind("mouseleave", startFadeOutTimeout);
+            popup = div.clone().addClass("hovering").insertBefore(div).fadeIn(200);
+        }, 500);
+        function startFadeOutTimeout() {
+            self.unbind("mouseleave", startFadeOutTimeout);
+            self.bind("mouseenter", clearFadeOutTimeout);
+            fadeOutTimer = setTimeout(function () {
+                popup.fadeOut(200);
+                fadeOutTimer = setTimeout(function () {
+                    self.unbind("mouseenter", clearFadeOutTimeout);
+                    self.bind("mouseenter", startFadeInTimeout);
+                    popup.remove();
+                    popup = null;
+                }, 200);
+            }, 300);
+        }
+        function clearFadeOutTimeout() {
+            self.unbind("mouseenter", clearFadeOutTimeout);
+            self.bind("mouseleave", startFadeOutTimeout);
+            clearTimeout(fadeOutTimer);
+            popup.fadeIn(200);
+        }
+    });
+   setActiveResult(activeResult, false);
 }
 
 function clickNowhere(e) {
