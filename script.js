@@ -36,6 +36,8 @@ var machineResults = {};
 var pushes = [];
 
 function startStatusRequest() {
+    if (!checkPreqs())
+        return;
     loadStatus = { pushlog: "loading", tinderbox: "loading" };
     updateStatus();
 

@@ -2,6 +2,9 @@ html {
     font-family: "Lucida Grande", Verdana, sans-serif;
     line-height: 1.5;
 }
+p {
+    font-size: 0.8em;
+}
 
 /* Chooser */
 #chooser {
