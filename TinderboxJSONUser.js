@@ -4,7 +4,7 @@ var TinderboxJSONUser = {};
 
 TinderboxJSONUser.load = function(tree, loadCallback, failCallback) {
     delete tinderbox_data;
-    NetUtils.loadScript("http://tinderbox.mozilla.org/" + treeName + "/json.js", function () {
+    $.getScript("http://tinderbox.mozilla.org/" + treeName + "/json.js", function () {
         try {
             if (!tinderbox_data) throw "tinderbox_data is invalid";
             loadCallback(parseTinderbox(tinderbox_data));

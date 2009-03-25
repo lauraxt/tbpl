@@ -32,11 +32,4 @@ var NetUtils = {
         }, timeout * 1000);
         return req;
     },
-    loadScript: function(url, callback) {
-        var s = document.createElement("script");
-        s.type = "text/javascript";
-        s.onload = callback;
-        s.src = url;
-        document.getElementsByTagName("head")[0].appendChild(s);
-    },
 };
