@@ -1,18 +1,18 @@
-// Allow specifying a tree name in the URL (http://foo/?tree=Firefox3.0)
-var treeName = "Firefox";
-var match = /[?&]tree=([^&]+)/.exec(document.location.search);
-if (match)
-    treeName = match[1];
-
 var repoNames = {
     "Firefox": "mozilla-central",
-    "Firefox3.1": "releases/mozilla-1.9.1",
+    "Firefox3.5": "releases/mozilla-1.9.1",
     "TraceMonkey": "tracemonkey",
     "Thunderbird": "comm-central",
     "Thunderbird3.0": "comm-central",
     "SeaMonkey": "comm-central",
     "Sunbird": "comm-central",
-}
+};
+
+// Allow specifying a tree name in the URL (http://foo/?tree=Firefox3.0)
+var treeName = "Firefox";
+var match = /[?&]tree=([^&]+)/.exec(document.location.search);
+if (match && repoNames[match[1]])
+    treeName = match[1];
 
 var pushlogURL = "http://hg.mozilla.org/" + repoNames[treeName] + "/";
 var timezone = "-0700";
@@ -73,15 +73,15 @@ function startStatusRequest() {
 
 function buildFooter() {
     var innerHTML = "";
-    if (treeName == "Firefox3.1")
-        innerHTML += "FF3.1 | ";
+    if (treeName == "Firefox3.5")
+        innerHTML += "FF3.5 | ";
     else
-        innerHTML += "<a href='?tree=Firefox3.1'>FF3.1<" + "/a> | ";
+        innerHTML += "<a href='?tree=Firefox3.5'>FF3.5<" + "/a> | ";
 
     if (treeName == "Firefox")
-        innerHTML += "FF3.2";
+        innerHTML += "FF3.6";
     else
-        innerHTML += "<a href='./'>FF3.2<" + "/a>";
+        innerHTML += "<a href='./'>FF3.6<" + "/a>";
 
     var chooser = document.getElementById("treechooser");
     chooser.innerHTML = innerHTML;
@@ -274,6 +274,51 @@ function resultTitle(type, status) {
     }[status];
 }
 
+function patchMouseEnter() {
+    var div = $(".popup:not(.hovering)", this);
+    if (div.width() - div.children().width() > 10)
+        return; // There's enough space; no need to show the popup.
+
+    var self = $(this);
+    var popup = null;
+    var fadeInTimer = 0, fadeOutTimer = 0;
+    self.unbind("mouseenter", patchMouseEnter);
+    self.bind("mouseleave", clearFadeInTimeout);
+    function clearFadeInTimeout() {
+        self.unbind("mouseleave", clearFadeInTimeout);
+        self.bind("mouseenter", startFadeInTimeout);
+        clearTimeout(fadeInTimer);
+    }
+    fadeInTimer = setTimeout(function () {
+        self.unbind("mouseleave", clearFadeInTimeout);
+        self.bind("mouseleave", startFadeOutTimeout);
+        popup = div.clone().addClass("hovering").insertBefore(div).fadeIn(200);
+    }, 500);
+    function startFadeOutTimeout() {
+        self.unbind("mouseleave", startFadeOutTimeout);
+        self.bind("mouseenter", clearFadeOutTimeout);
+        fadeOutTimer = setTimeout(function () {
+            popup.fadeOut(200);
+            fadeOutTimer = setTimeout(function () {
+                self.unbind("mouseenter", clearFadeOutTimeout);
+                self.bind("mouseenter", startFadeInTimeout);
+                popup.remove();
+                popup = null;
+            }, 200);
+        }, 300);
+    }
+    function clearFadeOutTimeout() {
+        self.unbind("mouseenter", clearFadeOutTimeout);
+        self.bind("mouseleave", startFadeOutTimeout);
+        clearTimeout(fadeOutTimer);
+        popup.fadeIn(200);
+    }
+}
+
+function patchMouseLeave(e) {
+    
+}
+
 function buildPushesList() {
     var ul = document.getElementById("pushes");
     ul.innerHTML = pushes.map(function(push, pushIndex) {
@@ -318,46 +363,7 @@ function buildPushesList() {
     $("a.machineResult").each(function () {
         this.addEventListener("click", resultLinkClick, false);
     });
-    $(".patches > li").bind("mouseenter", function startFadeInTimeout() {
-        var div = $(".popup:not(.hovering)", this);
-        if (div.width() - div.children().width() > 10)
-            return; // There's enough space; no need to show the popup.
-
-        var self = $(this);
-        var popup = null;
-        var fadeInTimer = 0, fadeOutTimer = 0;
-        self.unbind("mouseenter", startFadeInTimeout);
-        self.bind("mouseleave", clearFadeInTimeout);
-        function clearFadeInTimeout() {
-            self.unbind("mouseleave", clearFadeInTimeout);
-            self.bind("mouseenter", startFadeInTimeout);
-            clearTimeout(fadeInTimer);
-        }
-        fadeInTimer = setTimeout(function () {
-            self.unbind("mouseleave", clearFadeInTimeout);
-            self.bind("mouseleave", startFadeOutTimeout);
-            popup = div.clone().addClass("hovering").insertBefore(div).fadeIn(200);
-        }, 500);
-        function startFadeOutTimeout() {
-            self.unbind("mouseleave", startFadeOutTimeout);
-            self.bind("mouseenter", clearFadeOutTimeout);
-            fadeOutTimer = setTimeout(function () {
-                popup.fadeOut(200);
-                fadeOutTimer = setTimeout(function () {
-                    self.unbind("mouseenter", clearFadeOutTimeout);
-                    self.bind("mouseenter", startFadeInTimeout);
-                    popup.remove();
-                    popup = null;
-                }, 200);
-            }, 300);
-        }
-        function clearFadeOutTimeout() {
-            self.unbind("mouseenter", clearFadeOutTimeout);
-            self.bind("mouseleave", startFadeOutTimeout);
-            clearTimeout(fadeOutTimer);
-            popup.fadeIn(200);
-        }
-    });
+    $(".patches > li").bind("mouseenter", patchMouseEnter);
     setActiveResult(activeResult, false);
 }
 
