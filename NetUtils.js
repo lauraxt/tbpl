@@ -1,10 +1,10 @@
 var NetUtils = {
     loadDom: function(url, callback) {
-        var iframe = $("<iframe/>").hide().appendTo(document.documentElement).get(0);
+        var iframe = $("<iframe/>").hide().appendTo(document.body).get(0);
         iframe.contentWindow.location.href = url;
         iframe.onload = function() {
             callback(this.contentDocument);
-            $(this).remove();
+            setTimeout(function() { $(iframe).remove(); }, 0);
         };
     },
     loadText: function(url, loadCallback, failCallback, timeoutCallback, timeout) {
