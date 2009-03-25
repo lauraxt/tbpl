@@ -14,6 +14,8 @@ var match = /[?&]tree=([^&]+)/.exec(document.location.search);
 if (match && repoNames[match[1]])
     treeName = match[1];
 
+document.title = treeName + " - Tinderboxpushlog";
+
 var pushlogURL = "http://hg.mozilla.org/" + repoNames[treeName] + "/";
 var timezone = "-0700";
 var pickupDelay = 0; // number of ms until machine starts building a push
