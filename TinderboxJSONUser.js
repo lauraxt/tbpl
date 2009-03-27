@@ -185,7 +185,8 @@ function parseTinderbox(td) {
       "rev": rev,
       "guessedRev": rev,
       "testResults": testResults,
-      "note": linkBugs(note)
+      "note": linkBugs(note),
+      "errorParser": build.errorparser,
     };
     if (state != "building") {
       if (startTime.getTime() > machines[machineIndex].latestFinishedRun.startTime) {

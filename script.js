@@ -32,6 +32,9 @@ startStatusRequest();
 setInterval(startStatusRequest, 120 * 1000);
 buildFooter();
 document.getElementById("pushes").onmousedown = clickNowhere;
+$(".machineResult").live("click", resultLinkClick);
+AddCommentUI.init(treeName, "http://tinderbox.mozilla.org/addnote.cgi");
+AddCommentUI.registerNumSendingCommentChangedCallback(updateStatus);
 
 var machines = [];
 var machineResults = {};
@@ -99,18 +102,24 @@ function updateStatus() {
       loading.push({ tinderbox: "Tinderbox", pushlog: "pushlog" }[i]);
   }
   var text = loading.join(" and ");
-  var statusSpan = document.getElementById("loading");
-  statusSpan.className = "";
+  var statusSpan = $("#loading");
+  statusSpan.removeClass("loading");
+  statusSpan.removeClass("fail");
   if (loading.length) {
     text = "Loading " + text + "...";
-    statusSpan.className = "loading";
+    statusSpan.addClass("loading");
   }
   if (loadStatus.tinderbox == "fail") {
     text += " Parsing Tinderbox failed. :-(";
-    statusSpan.className = "fail";
+    statusSpan.addClass("fail");
   }
-  statusSpan.style.visibility = text ? "visible" : "hidden";
-  statusSpan.innerHTML = text;
+  var numComments = AddCommentUI.numSendingComments;
+  if (numComments) {
+    text += " Sending " + numComments + " " + (numComments == 1 ? "comment" : "comments") + "...";
+    statusSpan.addClass("loading");
+  }
+  statusSpan.css("visibility", text ? "visible" : "hidden");
+  statusSpan.html(text);
 }
 
 function stripTags(text) {
@@ -278,6 +287,16 @@ function resultTitle(type, status) {
   }[status];
 }
 
+function machineResultLink(machineResult) {
+  return '<a href="' + machineResult.briefLogURL +
+  '" resultID="' + machineResult.runID +
+  '" class="machineResult ' + machineResult.state +
+  '" title="' + resultTitle(machineResult.machine.type, machineResult.state) +
+  '">' + machineResult.machine.type.charAt(0) +
+  (machineResult.note ? '*' : '') +
+  '</a>';
+}
+
 function buildPushesList() {
   var ul = document.getElementById("pushes");
   ul.innerHTML = pushes.map(function(push, pushIndex) {
@@ -295,15 +314,7 @@ function buildPushesList() {
       machineTypes.map(function(machineType) {
         if (!results[machineType])
           return '';
-        return results[machineType].map(function(machineResult) {
-          return '<a href="' + machineResult.briefLogURL +
-          '" resultID="' + machineResult.runID +
-          '" class="machineResult ' + machineResult.state +
-          '" title="' + resultTitle(machineType, machineResult.state) +
-          '">' + machineType.charAt(0) +
-          (machineResult.note ? '*' : '') +
-          '</a>';
-        }).join(" ");
+        return results[machineType].map(machineResultLink).join(" ");
       }).join("\n") +
       '</span></li>';
     }).join("\n") +
@@ -319,9 +330,6 @@ function buildPushesList() {
     '</ul>\n' +
     '</li>';
   }).join("\n");
-  $("a.machineResult").each(function () {
-    this.addEventListener("click", resultLinkClick, false);
-  });
   $(".patches > li").bind("mouseenter", function startFadeInTimeout() {
     var div = $(".popup:not(.hovering)", this);
     if (div.width() - div.children().width() > 10)
@@ -376,21 +384,23 @@ function resultLinkClick(e) {
   e.preventDefault();
 }
 
+function markActiveResultLinks() {
+  if (activeResult)
+    $('.machineResult[resultID="' + activeResult + '"]').attr("active", "true");
+}
+
 function setActiveResult(resultID, scroll) {
   abortOutstandingSummaryLoadings();
   abortOutstandingSummaryLoadings = function () {};
   if (activeResult) {
-    var activeA = $('.results a[resultID="' + activeResult + '"]').get(0);
-    if (activeA)
-      activeA.removeAttribute("active");
+    $('.machineResult[resultID="' + activeResult + '"]').removeAttr("active");
   }
   activeResult = resultID;
+  markActiveResultLinks();
   if (activeResult) {
-    var activeA = $('.results a[resultID="' + activeResult + '"]').get(0);
-    if (activeA) {
-      activeA.setAttribute("active", "true");
-      if (scroll)
-        scrollElemIntoView(activeA, document.getElementById("pushes"), 20);
+    var activeA = $('.results .machineResult[resultID="' + activeResult + '"]').get(0);
+    if (activeA && scroll) {
+      scrollElemIntoView(activeA, document.getElementById("pushes"), 20);
     }
   }
   displayResult();
@@ -486,8 +496,7 @@ function displayResult() {
       })() + '<div class="summary"></div></div>';
     })();
   })();
-  var addNoteLink = $("a.addNote").get(0);
-  addNoteLink.addEventListener("click", logLinkClick, false);
+  AddCommentUI.updateUI();
   setupSummaryLoader(result, box);
 }
 
@@ -511,25 +520,6 @@ function setupSummaryLoader(result, box) {
     summaryLoader.innerHTML = "Fetching summary timed out.";
     summaryLoader.className = "";
   });
-}
-
-function logLinkClick(e) {
-  var div = document.getElementById("addNotePopup");
-
-  // Recreate iframe to keep it transparent while loading.
-  var iframe = div.getElementsByTagName("iframe")[0];
-  if (iframe)
-    div.removeChild(iframe);
-  var iframe = document.createElement("iframe");
-  iframe.setAttribute("src", this.getAttribute("href"));
-  div.appendChild(iframe);
-
-  div.getElementsByTagName("a")[0].onclick = function(e2) {
-    div.className = '';
-    e2.preventDefault();
-  };
-  div.className = "open";
-  e.preventDefault();
 }
 
 String.prototype.trim = function () {

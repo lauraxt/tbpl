@@ -134,15 +134,13 @@ iframe {
 a {
   text-decoration: none;
 }
-a:visited {
+a:visited, a:focus {
   color: #528;
+  outline: none;
 }
 a:hover {
   text-decoration: underline;
-}
-a:hover, a:focus {
   color: #D00;
-  outline: none;
 }
 a:active {
   color: #800;
@@ -177,7 +175,7 @@ a:active {
 
 
 /* Current tree state table */
-table {
+#matrix {
   font-size: 0.8em;
   margin: 10px 20px 0 0;
   float: right;
@@ -190,28 +188,28 @@ td, th {
   border: 0;
   padding: 0;
 }
-th:not(:first-child) {
+#matrix th:not(:first-child) {
   width: 7em;
 }
-th:first-child {
+#matrix th:first-child {
   text-align: right;
   font-size: 0.9em;
   padding-right: 2px;
 }
-th img {
+#matrix th img {
   width: 1em;
   vertical-align: -10%;
 }
-table a.success {
+#matrix a.success {
   background-color: #0C0;
 }
-table a.testfailed {
+#matrix a.testfailed {
   background-color: #F90;
 }
-table a.busted {
+#matrix a.busted {
   background-color: #D00;
 }
-table a {
+#matrix a {
   display: block;
   opacity: 0.7;
   padding: 1px;
@@ -220,10 +218,10 @@ table a {
   border-right: 1px solid white;
   border-bottom: 1px solid white;
 }
-table a:hover {
+#matrix a:hover {
   opacity: 0.9;
 }
-table a:active {
+#matrix a:active {
   opacity: 1;
 }
 
@@ -280,7 +278,7 @@ em.testfail {
   font-weight: bold;
   color: #F00;
 }
-.stars, #addNotePopup {
+.stars {
   position: absolute;
   bottom: 10em;
   right: 0;
@@ -314,36 +312,108 @@ em.testfail {
 }
 
 #addNotePopup {
-  display: none;
-  right: 24em;
-  z-index: 4;
-  background: url(loading_16.png) center center no-repeat white;
-  padding: 0;
-}
-#addNotePopup a {
   position: absolute;
-  left: -1px;
-  bottom: 100%;
-  border: 1px solid #DDD;
-  border-bottom: 0;
-  background: white;
-  padding: 1px 5px 2px;
-  color: #00F;
+  top: 40%;
+  margin-top: -15em;
+  left: 50%;
+  margin-left: -18em;
+  display: none;
+  z-index: 4;
+  color: white;
+  padding: 0;
+  font-size: 0.72em;
+  cursor: default;
+  background: rgba(0, 0, 0, 0.75);
+  -moz-border-radius: 10px;
+  border: solid transparent;
+  border-width: 10px 18px 25px;
 }
-#addNotePopup a:hover,
-#addNotePopup a:focus {
-  color: #D00;
+#addNotePopup:nth-child(1n) {
+  -moz-border-image: url(hudborderimage.png) 10 18 25 repeat;
+  background: transparent;
 }
-#addNotePopup a:active {
-  color: #800;
+#closeAddNotePopup {
+  position: absolute;
+  top: -5px;
+  left: -7px;
+  width: 13px;
+  height: 13px;
+  background: url(closebutton.png) top left no-repeat;
+  opacity: 0.5;
+  text-indent: -1000px;
+  overflow: hidden;
 }
-#addNotePopup iframe {
-  display: block;
-  width: 40em;
-  height: 30em;
-  border: 0;
+#closeAddNotePopup:hover {
+  opacity: 0.7;
 }
-#addNotePopup.open {
-  display: block;
+#closeAddNotePopup:active {
+  opacity: 0.9;
+}
+#addNotePopup h2 {
+  font-size: 1em;
+  font-weight: normal;
+  text-align: center;
   margin: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  line-height: 19px;
+}
+#addNotePopup form {
+  margin: -8px -13px -15px;
+}
+#addNotePopup table,
+#addNotePopup p {
+  padding: 8px 10px;
+  margin: 0;
+}
+#addNotePopup th,
+#addNotePopup td {
+  padding: 2px;
+  vertical-align: top;
+}
+#addNotePopup th,
+#addNotePopup p {
+  text-align: right;
+}
+#addNotePopup th {
+  padding-bottom: 4px;
+  text-shadow: 0 1px #000;
+}
+#addNotePopup .machineResult {
+  padding: 0 5px;
+  -moz-border-radius: 4px;
+}
+#addNotePopup .machineResult[active=true] {
+  -moz-box-shadow: 0 1px rgba(0, 0, 0, 0.6);
+}
+#addNotePopup input[type=text],
+#addNotePopup textarea {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  -moz-box-shadow: 0pt 1px 1px rgba(0, 0, 0, 0.4) inset;
+  padding: 2px;
+  color: white;
+  -moz-user-select: text;
+}
+#addNotePopup input[type=text]:focus,
+#addNotePopup textarea:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.7);
+  -moz-outline-radius: 2px;
+}
+#addNotePopup input[type=submit] {
+  -moz-border-radius: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  -moz-box-shadow: inset 0 12px 16px -4px rgba(255, 255, 255, 0.3), 0 1px #000;
+  padding: 1px 10px;
+  margin: 0 5px 5px 0;
+}
+#addNotePopup input[type=submit][disabled] {
+  opacity: 0.5;
+}
+#addNotePopup input[type=submit]:not([disabled]):active:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+#addNotePopup input[type=submit]::-moz-focus-inner {
+  border: 0;
 }
