@@ -533,7 +533,8 @@ function fetchSummary(runID, loadCallback, failCallback, timeoutCallback) {
   var req = NetUtils.loadText("summaries/get.php?tree=" + treeName + "&id=" + runID, loadCallback, failCallback, timeoutCallback);
   var oldAbort = abortOutstandingSummaryLoadings;
   abortOutstandingSummaryLoadings = function () {
-    req.abort();
+    if (req)
+      req.abort();
     oldAbort();
   }
 }
