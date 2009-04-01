@@ -468,13 +468,6 @@ function displayResult() {
     (function () {
       if (!result.testResults.length)
         return '';
-      if (result.machine.type == "Unit Test") {
-        return '<ul class="unitTestResults">\n' +
-        result.testResults.map(function(r) {
-          return '<li>' + r.name + ': ' + r.result + '</li>';
-        }).join("") +
-        '</ul>';
-      }
       if (result.machine.type == "Talos") {
         return '<ul class="talosResults">\n' +
         result.testResults.map(function(r) {
@@ -485,6 +478,12 @@ function displayResult() {
         }).join("") +
         '</ul>';
       }
+      // else: may be Unit Test, Leak Test or Build with codesize numbers
+      return '<ul class="unitTestResults">\n' +
+      result.testResults.map(function(r) {
+        return '<li>' + r.name + ': ' + r.result + '</li>';
+      }).join("") +
+      '</ul>';
     })() +
     (function () {
       return '<div class="stars">' +
@@ -533,7 +532,8 @@ function fetchSummary(runID, loadCallback, failCallback, timeoutCallback) {
   var req = NetUtils.loadText("summaries/get.php?tree=" + treeName + "&id=" + runID, loadCallback, failCallback, timeoutCallback);
   var oldAbort = abortOutstandingSummaryLoadings;
   abortOutstandingSummaryLoadings = function () {
-    req.abort();
+    if (req)
+      req.abort();
     oldAbort();
   }
 }
