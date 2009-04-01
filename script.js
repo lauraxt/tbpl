@@ -14,6 +14,9 @@ var match = /[?&]tree=([^&]+)/.exec(document.location.search);
 if (match && repoNames[match[1]])
   treeName = match[1];
 
+var match = /[?&]tz=([^&]+)/.exec(document.location.search);
+var nativetime = match ? true : false;
+
 document.title = treeName + " - Tinderboxpushlog";
 
 var pushlogURL = "http://hg.mozilla.org/" + repoNames[treeName] + "/";
@@ -83,15 +86,27 @@ function buildFooter() {
   if (treeName == "Firefox3.5")
     innerHTML += "FF3.5 | ";
   else
-    innerHTML += "<a href='?tree=Firefox3.5'>FF3.5<" + "/a> | ";
+    innerHTML += "<a href='?tree=Firefox3.5" +
+      (nativetime ? "&amp;tz=native" : "") + "'>FF3.5<" + "/a> | ";
 
   if (treeName == "Firefox")
     innerHTML += "FF3.6";
   else
-    innerHTML += "<a href='./'>FF3.6<" + "/a>";
+    innerHTML += "<a href='" + (nativetime ? "?tz=native" : "./") +
+      "'>FF3.6<" + "/a>";
 
   var chooser = document.getElementById("treechooser");
   chooser.innerHTML = innerHTML;
+
+  var tzinner = "Timezone: ";
+  if (nativetime)
+    tzinner += "native | <a href='" +
+      (treeName == "Firefox3.5" ? "?tree=Firefox3.5" : "./") + "'>PST<" + "/a>";
+  else
+    tzinner += "<a href='?tz=native" +
+      (treeName == "Firefox3.5" ? "&amp;tree=Firefox3.5" : "") + "'>native<" +
+      "/a> | PST";
+  document.getElementById("tzchooser").innerHTML = tzinner;
 }
 
 
@@ -270,8 +285,18 @@ function combineResults() {
 }
 
 function getPSTDate(date) {
-  var d = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000 + timezone/100 * 60 * 60 * 1000);
-  return d.toLocaleString() + ' ' + timezone;
+  var d = date;
+  var timediff = '';
+  if (!nativetime) {
+    var hoursdiff = date.getTimezoneOffset()/60 + timezone/100;
+    d = new Date(date.getTime() + hoursdiff * 60 * 60 * 1000);
+    // properly display half-hour timezones with sign and leading zero
+    var absdiff = Math.abs(hoursdiff);
+    timediff = ' ' + (hoursdiff < 0 ? '-' : '') +
+      (absdiff < 10 ? '0' : '') + (Math.floor(absdiff) * 100 + 60 * (absdiff -
+      Math.floor(absdiff)));
+  }
+  return d.toLocaleString() + timediff;
 }
 
 function revURL(rev) {
@@ -438,7 +463,9 @@ function animateScroll(scrollBox, end, duration) {
 function getPSTTime(date) {
   if (!date.getTime)
     return '';
-  var d = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000 + timezone/100 * 60 * 60 * 1000);
+  var d = date;
+  if (!nativetime)
+    d = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000 + timezone/100 * 60 * 60 * 1000);
   return d.toLocaleFormat('%H:%M');
 }
 
