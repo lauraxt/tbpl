@@ -147,6 +147,11 @@ function getBuildScrape(td, machine, machineRunID) {
     testResults = getTalosResults(cell);
   } else if (machine.type == "Leak Test") {
     testResults = getLeakResults(cell);
+  } else if (machine.type == "Build") {
+    if (td.scrape[machineRunID].length == 2) {
+      var match = td.scrape[machineRunID][1].match(/(.*)\:(.*)/);
+      testResults = [{ name: "Codesize", result: match[2] }];
+    }
   }
   return {
     "rev": rev,
