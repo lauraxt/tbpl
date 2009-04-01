@@ -118,6 +118,15 @@ function getTalosResults(tt) {
   }).filter(function(a) { return a; });
 }
 
+function getLeakResults(tt) {
+  return $('abbr', tt).get().map(function(ra) {
+    return {
+      name: ra.textContent,
+      result: ra.nextSibling.textContent.substr(1)
+    };
+  }).filter(function(a) { return a; });
+}
+
 function getBuildScrape(td, machine, machineRunID) {
   if (!td.scrape[machineRunID])
     return null;
@@ -136,6 +145,8 @@ function getBuildScrape(td, machine, machineRunID) {
     testResults = getUnitTestResults(reva);
   } else if (machine.type == "Talos") {
     testResults = getTalosResults(cell);
+  } else if (machine.type == "Leak Test") {
+    testResults = getLeakResults(cell);
   }
   return {
     "rev": rev,
