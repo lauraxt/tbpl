@@ -374,7 +374,7 @@ function buildPushesList() {
 }
 
 function clickNowhere(e) {
-  if (e.originalTarget.tagName.toLowerCase() != "a")
+  if (!$(e.target).is("a, #pushes"))
     setActiveResult("");
 }
 
