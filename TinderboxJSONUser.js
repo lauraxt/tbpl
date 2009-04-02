@@ -127,7 +127,7 @@ function getLeakResults(tt) {
   }).filter(function(a) { return a; });
 }
 function getBuildResults(scrape) {
-  testResults = [];
+  var testResults = [];
   // 1 -> Z; 2+3 -> Zdiff
   if (scrape.length >= 2) {
     var match = scrape[1].match(/(.*)\:(.*)/);
