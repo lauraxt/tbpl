@@ -101,10 +101,10 @@ function buildFooter() {
   var tzinner = "Timezone: ";
   if (useLocalTime)
     tzinner += "local | <a href='" +
-      (treeName == "Firefox3.5" ? "?tree=Firefox3.5" : "./") + "'>PST<" + "/a>";
+      (treeName != "Firefox" ? "?tree=" + treeName : "./") + "'>PST<" + "/a>";
   else
     tzinner += "<a href='?tz=local" +
-      (treeName == "Firefox3.5" ? "&amp;tree=Firefox3.5" : "") + "'>local<" +
+      (treeName != "Firefox" ? "&amp;tree=" + treeName : "") + "'>local<" +
       "/a> | PST";
   document.getElementById("tzchooser").innerHTML = tzinner;
 }
