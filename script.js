@@ -15,7 +15,7 @@ if (match && repoNames[match[1]])
   treeName = match[1];
 
 var match = /[?&]tz=([^&]+)/.exec(document.location.search);
-var nativetime = match ? true : false;
+var useLocalTime = match ? true : false;
 
 document.title = treeName + " - Tinderboxpushlog";
 
@@ -87,24 +87,24 @@ function buildFooter() {
     innerHTML += "FF3.5 | ";
   else
     innerHTML += "<a href='?tree=Firefox3.5" +
-      (nativetime ? "&amp;tz=native" : "") + "'>FF3.5<" + "/a> | ";
+      (useLocalTime ? "&amp;tz=local" : "") + "'>FF3.5<" + "/a> | ";
 
   if (treeName == "Firefox")
     innerHTML += "FF3.6";
   else
-    innerHTML += "<a href='" + (nativetime ? "?tz=native" : "./") +
+    innerHTML += "<a href='" + (useLocalTime ? "?tz=local" : "./") +
       "'>FF3.6<" + "/a>";
 
   var chooser = document.getElementById("treechooser");
   chooser.innerHTML = innerHTML;
 
   var tzinner = "Timezone: ";
-  if (nativetime)
-    tzinner += "native | <a href='" +
+  if (useLocalTime)
+    tzinner += "local | <a href='" +
       (treeName == "Firefox3.5" ? "?tree=Firefox3.5" : "./") + "'>PST<" + "/a>";
   else
-    tzinner += "<a href='?tz=native" +
-      (treeName == "Firefox3.5" ? "&amp;tree=Firefox3.5" : "") + "'>native<" +
+    tzinner += "<a href='?tz=local" +
+      (treeName == "Firefox3.5" ? "&amp;tree=Firefox3.5" : "") + "'>local<" +
       "/a> | PST";
   document.getElementById("tzchooser").innerHTML = tzinner;
 }
@@ -287,7 +287,7 @@ function combineResults() {
 function getPSTDate(date) {
   var d = date;
   var timediff = '';
-  if (!nativetime) {
+  if (!useLocalTime) {
     var hoursdiff = date.getTimezoneOffset()/60 + timezone/100;
     d = new Date(date.getTime() + hoursdiff * 60 * 60 * 1000);
     // properly display half-hour timezones with sign and leading zero
@@ -464,7 +464,7 @@ function getPSTTime(date) {
   if (!date.getTime)
     return '';
   var d = date;
-  if (!nativetime)
+  if (!useLocalTime)
     d = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000 + timezone/100 * 60 * 60 * 1000);
   return d.toLocaleFormat('%H:%M');
 }
