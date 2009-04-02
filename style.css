@@ -29,6 +29,10 @@ p {
 .loading {
   background: url(loading_16.png) center left no-repeat transparent;
 }
+#tzchooser {
+  position: absolute;
+  right: 4px;
+}
 
 
 iframe {

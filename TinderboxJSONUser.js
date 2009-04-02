@@ -126,6 +126,20 @@ function getLeakResults(tt) {
     };
   }).filter(function(a) { return a; });
 }
+function getBuildResults(scrape) {
+  testResults = [];
+  // 1 -> Z; 2+3 -> Zdiff
+  if (scrape.length >= 2) {
+    var match = scrape[1].match(/(.*)\:(.*)/);
+    testResults.push({ name: "Codesize", result: match[2] });
+  }
+  if (scrape.length >= 3) {
+  	var match = scrape[2].match(/(.*)\:(.*)/);
+  	testResults.push({ name: "Difference", result: match[2] +
+  	  (scrape[3] ? scrape[3] : '' ) });
+  }
+  return testResults;
+}
 
 function getBuildScrape(td, machine, machineRunID) {
   if (!td.scrape[machineRunID])
@@ -148,10 +162,7 @@ function getBuildScrape(td, machine, machineRunID) {
   } else if (machine.type == "Leak Test") {
     testResults = getLeakResults(cell);
   } else if (machine.type == "Build") {
-    if (td.scrape[machineRunID].length == 2) {
-      var match = td.scrape[machineRunID][1].match(/(.*)\:(.*)/);
-      testResults = [{ name: "Codesize", result: match[2] }];
-    }
+    testResults = getBuildResults(td.scrape[machineRunID]);
   }
   return {
     "rev": rev,
