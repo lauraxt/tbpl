@@ -47,7 +47,7 @@ $("#localTime").bind("click", function () {
   return false;
 });
 
-$("#pstTime").bind("click", function () {
+$("#mvtTime").bind("click", function () {
   delete globalStorage[location.host].useLocalTime;
   updateTimezone();
   buildPushesList();
@@ -59,7 +59,7 @@ updateTimezone();
 function updateTimezone() {
   document.getElementById('localTime').className =
     globalStorage[location.host].useLocalTime ? 'selected' : '';
-  document.getElementById('pstTime').className =
+  document.getElementById('mvtTime').className =
     !globalStorage[location.host].useLocalTime ? 'selected' : '';
 }
 
@@ -292,7 +292,7 @@ function combineResults() {
   buildPushesList();
 }
 
-function getPSTDate(date) {
+function getMVTDate(date) {
   var d = date;
   var timediff = '';
   if (!globalStorage[location.host].useLocalTime) {
@@ -335,7 +335,7 @@ function buildPushesList() {
   ul.innerHTML = pushes.map(function(push, pushIndex) {
     return '<li>\n' +
     '<h2><span class="pusher">' + push.pusher + '</span> &ndash; ' +
-    '<span class="date">' + getPSTDate(push.date) + '</span></h2>\n' +
+    '<span class="date">' + getMVTDate(push.date) + '</span></h2>\n' +
     '<ul class="results">\n' +
     oss.map(function(os) {
       if (!push.results || !push.results[os])
@@ -468,7 +468,7 @@ function animateScroll(scrollBox, end, duration) {
   }, 16);
 }
 
-function getPSTTime(date) {
+function getMVTTime(date) {
   if (!date.getTime)
     return '';
   var d = date;
@@ -493,9 +493,9 @@ function displayResult() {
   box.innerHTML = (function () {
     return '<h3><span class="machineName">' + result.machine.name +
     '</span> [<span class="state">' + result.state + '</span>] ' +
-    '<span class="duration">Started ' + getPSTTime(result.startTime) +
+    '<span class="duration">Started ' + getMVTTime(result.startTime) +
     ', ' + (result.state == "building" ? 'still running...' :
-    'finished ') + getPSTTime(result.endTime) + '</span></h3>\n' +
+    'finished ') + getMVTTime(result.endTime) + '</span></h3>\n' +
     '<a class="briefLog" href="' + result.briefLogURL +
     '">View Brief Log</a> <a class="fullLog" href="' +
     result.fullLogURL + '">View Full Log</a> <a class="addNote" href="' +
