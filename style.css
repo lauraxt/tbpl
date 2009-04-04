@@ -33,6 +33,9 @@ p {
   position: absolute;
   right: 4px;
 }
+#tzchooser a.selected {
+  font-weight: bold;
+}
 
 
 iframe {

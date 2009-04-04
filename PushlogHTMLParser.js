@@ -17,12 +17,14 @@ var PushlogHTMLParser = {
     var self = this;
     var pushes = [];
     var table = doc.getElementsByTagName("table")[0];
-    $("td[rowspan]:first-child", table).each(function () {
-      var numPatches = this.getAttribute("rowspan") * 1;
+    $("td:first-child cite", table).each(function () {
+      var matches = /.*id([0-9]*)/.exec(this.parentNode.parentNode.className);
+      var pusher = this.firstChild.data;
+      var date = new Date($(".date", this).get(0).innerHTML);
       var patches = [];
-      for (var i = 0, row = this.parentNode; i < numPatches && row; i++, row = row.nextSibling) {
-        var rev = $("td.age", row).get(0).firstChild.firstChild.data;
-        var strong = row.lastChild.firstChild.innerHTML;
+      $("tr.id"+matches[1], table).each(function () {
+        var rev = $("td.age a", this).get(0).textContent;
+        var strong = this.lastChild.firstChild.innerHTML;
         var dashpos = strong.indexOf(String.fromCharCode(8212));
         var author = strong.substring(0, dashpos - 1);
         var desc = strong.substring(dashpos + 2);
@@ -31,9 +33,7 @@ var PushlogHTMLParser = {
           "author": author,
           "desc": linkBugs(self._stripTags(desc))
         });
-      }
-      var pusher = this.firstChild.firstChild.data;
-      var date = new Date($(".date", this).get(0).innerHTML);
+      });
       pushes.push({
         "pusher": pusher,
         "date": date,

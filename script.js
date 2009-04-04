@@ -14,9 +14,6 @@ var match = /[?&]tree=([^&]+)/.exec(document.location.search);
 if (match && repoNames[match[1]])
   treeName = match[1];
 
-var match = /[?&]tz=([^&]+)/.exec(document.location.search);
-var useLocalTime = match ? true : false;
-
 document.title = treeName + " - Tinderboxpushlog";
 
 var pushlogURL = "http://hg.mozilla.org/" + repoNames[treeName] + "/";
@@ -42,6 +39,29 @@ AddCommentUI.registerNumSendingCommentChangedCallback(updateStatus);
 var machines = [];
 var machineResults = {};
 var pushes = [];
+
+$("#nativetime").bind("click", function () {
+  globalStorage[location.host].nativetime = true;
+  updateTimezone();
+  buildPushesList();
+  return false;
+});
+
+$("#psttime").bind("click", function () {
+  delete globalStorage[location.host].nativetime;
+  updateTimezone();
+  buildPushesList();
+  return false;
+});
+
+updateTimezone();
+
+function updateTimezone() {
+  document.getElementById('nativetime').className =
+    globalStorage[location.host].nativetime ? 'selected' : '';
+  document.getElementById('psttime').className =
+    !globalStorage[location.host].nativetime ? 'selected' : '';
+}
 
 function startStatusRequest() {
   if (!checkPreqs())
@@ -86,27 +106,15 @@ function buildFooter() {
   if (treeName == "Firefox3.5")
     innerHTML += "FF3.5 | ";
   else
-    innerHTML += "<a href='?tree=Firefox3.5" +
-      (useLocalTime ? "&amp;tz=local" : "") + "'>FF3.5<" + "/a> | ";
+    innerHTML += "<a href='?tree=Firefox3.5'>FF3.5<" + "/a> | ";
 
   if (treeName == "Firefox")
     innerHTML += "FF3.6";
   else
-    innerHTML += "<a href='" + (useLocalTime ? "?tz=local" : "./") +
-      "'>FF3.6<" + "/a>";
+    innerHTML += "<a href='./'>FF3.6<" + "/a>";
 
   var chooser = document.getElementById("treechooser");
   chooser.innerHTML = innerHTML;
-
-  var tzinner = "Timezone: ";
-  if (useLocalTime)
-    tzinner += "local | <a href='" +
-      (treeName != "Firefox" ? "?tree=" + treeName : "./") + "'>PST<" + "/a>";
-  else
-    tzinner += "<a href='?tz=local" +
-      (treeName != "Firefox" ? "&amp;tree=" + treeName : "") + "'>local<" +
-      "/a> | PST";
-  document.getElementById("tzchooser").innerHTML = tzinner;
 }
 
 
@@ -287,7 +295,7 @@ function combineResults() {
 function getPSTDate(date) {
   var d = date;
   var timediff = '';
-  if (!useLocalTime) {
+  if (!globalStorage[location.host].nativetime) {
     var hoursdiff = date.getTimezoneOffset()/60 + timezone/100;
     d = new Date(date.getTime() + hoursdiff * 60 * 60 * 1000);
     // properly display half-hour timezones with sign and leading zero
@@ -464,7 +472,7 @@ function getPSTTime(date) {
   if (!date.getTime)
     return '';
   var d = date;
-  if (!useLocalTime)
+  if (!globalStorage[location.host].nativetime)
     d = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000 + timezone/100 * 60 * 60 * 1000);
   return d.toLocaleFormat('%H:%M');
 }
