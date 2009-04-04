@@ -75,7 +75,7 @@ function startStatusRequest() {
       loadStatus.pushlog = "complete";
       updateStatus();
       pushes = data;
-      maybeCombineResults();
+      combineResults();
       buildPushesList();
     },
     function failed() {
@@ -92,7 +92,7 @@ function startStatusRequest() {
       machines = data.machines;
       machineResults = data.machineResults;
       paintBoxMatrix(generateBoxMatrix());
-      maybeCombineResults();
+      combineResults();
       buildPushesList();
     },
     function failed() {
@@ -213,11 +213,6 @@ function paintBoxMatrix(boxMatrix) {
   $("a", table).get().forEach(function(cell) {
     cell.addEventListener("click", resultLinkClick, false);
   });
-}
-
-function maybeCombineResults() {
-  if (loadStatus.pushlog == "complete" && loadStatus.tinderbox == "complete")
-    combineResults();
 }
 
 function getPushIndexForRev(rev) {
