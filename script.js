@@ -40,15 +40,15 @@ var machines = [];
 var machineResults = {};
 var pushes = [];
 
-$("#nativetime").bind("click", function () {
-  globalStorage[location.host].nativetime = true;
+$("#localTime").bind("click", function () {
+  globalStorage[location.host].useLocalTime = true;
   updateTimezone();
   buildPushesList();
   return false;
 });
 
-$("#psttime").bind("click", function () {
-  delete globalStorage[location.host].nativetime;
+$("#pstTime").bind("click", function () {
+  delete globalStorage[location.host].useLocalTime;
   updateTimezone();
   buildPushesList();
   return false;
@@ -57,10 +57,10 @@ $("#psttime").bind("click", function () {
 updateTimezone();
 
 function updateTimezone() {
-  document.getElementById('nativetime').className =
-    globalStorage[location.host].nativetime ? 'selected' : '';
-  document.getElementById('psttime').className =
-    !globalStorage[location.host].nativetime ? 'selected' : '';
+  document.getElementById('localTime').className =
+    globalStorage[location.host].useLocalTime ? 'selected' : '';
+  document.getElementById('pstTime').className =
+    !globalStorage[location.host].useLocalTime ? 'selected' : '';
 }
 
 function startStatusRequest() {
@@ -295,7 +295,7 @@ function combineResults() {
 function getPSTDate(date) {
   var d = date;
   var timediff = '';
-  if (!globalStorage[location.host].nativetime) {
+  if (!globalStorage[location.host].useLocalTime) {
     var hoursdiff = date.getTimezoneOffset()/60 + timezone/100;
     d = new Date(date.getTime() + hoursdiff * 60 * 60 * 1000);
     // properly display half-hour timezones with sign and leading zero
@@ -472,7 +472,7 @@ function getPSTTime(date) {
   if (!date.getTime)
     return '';
   var d = date;
-  if (!globalStorage[location.host].nativetime)
+  if (!globalStorage[location.host].useLocalTime)
     d = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000 + timezone/100 * 60 * 60 * 1000);
   return d.toLocaleFormat('%H:%M');
 }
