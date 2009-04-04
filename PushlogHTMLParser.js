@@ -21,7 +21,6 @@ var PushlogHTMLParser = {
       var matches = /.*id([0-9]*)/.exec(this.parentNode.parentNode.className);
       var pusher = this.firstChild.data;
       var date = new Date($(".date", this).get(0).innerHTML);
-      var numPatches = this.getAttribute("rowspan") * 1;
       var patches = [];
       $("tr.id"+matches[1], table).each(function () {
         var rev = $("td.age a", this).get(0).textContent;
