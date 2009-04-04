@@ -21,7 +21,7 @@ var timezone = "-0700";
 var pickupDelay = 0; // number of ms until machine starts building a push
 
 var oss = ["linux", "osx", "windows"];
-var machineTypes = ["Build", "Leak Test", "Unit Test", "Talos", "Nightly", "Static Analysis"];
+var machineTypes = ["Build", "Leak Test", "Unit Test", "Nightly", "Talos", "Static Analysis"];
 var loadStatus = { pushlog: "loading", tinderbox: "loading" };
 var activeResult = "";
 var abortOutstandingSummaryLoadings = function () {};
@@ -188,7 +188,7 @@ function paintBoxMatrix(boxMatrix) {
   table.removeChild(document.getElementsByTagName("tbody")[0]);
   var tbody = document.createElement("tbody");
   table.appendChild(tbody);
-  ["Build", "Leak Test", "Unit Test", "Talos", "Nightly"].forEach(function(t) {
+  ["Build", "Leak Test", "Unit Test", "Nightly", "Talos"].forEach(function(t) {
     if (!boxMatrix[t])
       return;
     var row = document.createElement("tr");
