@@ -76,6 +76,7 @@ function startStatusRequest() {
       updateStatus();
       pushes = data;
       maybeCombineResults();
+      buildPushesList();
     },
     function failed() {
       loadStatus.tinderbox = "fail";
@@ -92,6 +93,7 @@ function startStatusRequest() {
       machineResults = data.machineResults;
       paintBoxMatrix(generateBoxMatrix());
       maybeCombineResults();
+      buildPushesList();
     },
     function failed() {
       loadStatus.tinderbox = "fail";
@@ -288,8 +290,6 @@ function combineResults() {
       });
     }
   });
-
-  buildPushesList();
 }
 
 function getMVTDate(date) {
@@ -403,7 +403,7 @@ function buildPushesList() {
       popup.fadeIn(200);
     }
   });
-   setActiveResult(activeResult, false);
+  setActiveResult(activeResult, false);
 }
 
 function clickNowhere(e) {
