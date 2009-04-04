@@ -35,6 +35,8 @@ p {
 }
 #tzchooser a.selected {
   font-weight: bold;
+  color: black !important;
+  text-decoration: none !important;
 }
 
 
