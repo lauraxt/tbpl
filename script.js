@@ -561,8 +561,18 @@ String.prototype.trim = function () {
   return x;
 }
 
+var cachedSummaries = {};
+
 function fetchSummary(runID, loadCallback, failCallback, timeoutCallback) {
-  var req = NetUtils.loadText("summaries/get.php?tree=" + treeName + "&id=" + runID, loadCallback, failCallback, timeoutCallback);
+  if (cachedSummaries[runID]) {
+    loadCallback(cachedSummaries[runID]);
+    return;
+  }
+  var onLoad = function(summary) {
+    cachedSummaries[runID] = summary;
+    loadCallback(summary);
+  };
+  var req = NetUtils.loadText("summaries/get.php?tree=" + treeName + "&id=" + runID, onLoad, failCallback, timeoutCallback);
   var oldAbort = abortOutstandingSummaryLoadings;
   abortOutstandingSummaryLoadings = function () {
     if (req)
