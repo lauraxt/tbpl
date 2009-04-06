@@ -259,6 +259,9 @@ function getRevForResult(machineResult) {
 }
 
 function combineResults() {
+  $(pushes).each(function() {
+    delete this.results;
+  });
   machineTypes.forEach(function (machineType) {
     for (var i in machineResults) {
       var machineResult = machineResults[i];
