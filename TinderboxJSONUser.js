@@ -47,15 +47,8 @@ function getTextWithMarker(e) {
   return '<em class="testfail">' + e.textContent + '</em>';
 }
 function processNote(note) {
-  // There are too many line breaks in notes; only use those that make sense.
-  // XXX Unfortunately that's not true for the Tinderbox JSON - those notes have no line breaks at all... bug 476872
   return note.replace(/<\/?pre>/g, "")
-             .replace(/\n\n/g, "<br>")
-             .replace(/\<\/b>]/g, "</b>]<br>")
-             .replace(/\b\*\*\*/g, "<br>***")
-             .replace(/\b\+\+/g, "<br>++")
-             .replace(/\bWARNING/g, "<br>WARNING")
-             .replace(/\b(REF)?TEST/g, "<br>$1TEST");
+             .replace(/\n/g, "<br>");
 }
 
 function linkBugs(text) {
