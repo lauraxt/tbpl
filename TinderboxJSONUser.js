@@ -105,7 +105,7 @@ function getTalosResults(tt) {
     return {
       name: testname,
       result: match[2].trim(),
-      seriesURL: seriesURLs[testname],
+      detailsURL: seriesURLs[testname],
       "resultURL": resultURL
     };
   }).filter(function(a) { return a; });
