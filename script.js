@@ -175,8 +175,8 @@ function generateBoxMatrix() {
 
 function paintBoxMatrix(boxMatrix) {
   var colspans = { "linux": 1, "osx": 1, "windows": 1 };
-  for (mt in boxMatrix) {
-    for (os in colspans) {
+  for (var mt in boxMatrix) {
+    for (var os in colspans) {
       colspans[os] *= boxMatrix[mt][os] ? boxMatrix[mt][os].length : 1;
     }
   }
@@ -205,7 +205,7 @@ function paintBoxMatrix(boxMatrix) {
         row.innerHTML += '<td colspan="' + boxColspan + '"><a href="' +
                  machineResult.briefLogURL + '" class="' + status +
                  '" resultID="' + machineResult.runID + '">' +
-                 resultTitle(t, status) + '</a></td>';
+                 resultTitle(machineResult) + '</a></td>';
       });
     });
   });
@@ -309,20 +309,32 @@ function revURL(rev) {
   return pushlogURL + "rev/" + rev;
 }
 
-function resultTitle(type, status) {
+function resultTitle(result) {
+  var type = result.machine.type;
   return {
-    "building": type + ' is still running',
+    "building": type + ' is still running, ' + etaString(result),
     "success": type + ' was successful',
     "testfailed": 'Tests failed on ' + type,
     "busted": type + ' is burning'
-  }[status];
+  }[result.state];
+}
+
+function etaString(result) {
+  if (!result.machine.averageCycleTime)
+    return 'ETA unknown';
+  var elapsed = Math.ceil(((new Date()).getTime() - result.startTime.getTime())
+    / 1000);
+  if (elapsed > result.machine.averageCycleTime)
+    return 'ETA any minute now';
+  return 'ETA ~' + Math.ceil((result.machine.averageCycleTime - elapsed) / 60)
+    + 'mins';
 }
 
 function machineResultLink(machineResult) {
   return '<a href="' + machineResult.briefLogURL +
   '" resultID="' + machineResult.runID +
   '" class="machineResult ' + machineResult.state +
-  '" title="' + resultTitle(machineResult.machine.type, machineResult.state) +
+  '" title="' + resultTitle(machineResult) +
   '">' + machineResult.machine.type.charAt(0) +
   (machineResult.note ? '*' : '') +
   '</a>';
@@ -492,8 +504,8 @@ function displayResult() {
     return '<h3><span class="machineName">' + result.machine.name +
     '</span> [<span class="state">' + result.state + '</span>] ' +
     '<span class="duration">Started ' + getMVTTime(result.startTime) +
-    ', ' + (result.state == "building" ? 'still running...' :
-    'finished ') + getMVTTime(result.endTime) + '</span></h3>\n' +
+    ', ' + (result.state == "building" ? 'still running... ' + etaString(result)
+    : 'finished ') + getMVTTime(result.endTime) + '</span></h3>\n' +
     '<a class="briefLog" href="' + result.briefLogURL +
     '">View Brief Log</a> <a class="fullLog" href="' +
     result.fullLogURL + '">View Full Log</a> <a class="addNote" href="' +

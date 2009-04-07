@@ -170,7 +170,8 @@ function parseTinderbox(td) {
     if (!machinetype.os || !machinetype.type) {
       return;
     }
-    machines[i] = { "name": name, "os": machinetype.os, "type": machinetype.type, latestFinishedRun: { id: "", startTime: -1 } };
+    machines[i] = { "name": name, "os": machinetype.os, "type": machinetype.type,
+      latestFinishedRun: { id: "", startTime: -1 }, "runs": 0, "runtime": 0 };
   });
 
   var notes = td.note_array.map(processNote);
@@ -192,6 +193,12 @@ function parseTinderbox(td) {
       return;
 
     var note = build.hasnote ? notes[build.noteid * 1] : "";
+
+    if (endTime) {
+      machines[machineIndex].runs++;
+      machines[machineIndex].runtime+=
+        (endTime.getTime() - startTime.getTime())/1000;
+    }
 
     machineResults[machineRunID] = {
       "machine": machines[machineIndex],
@@ -217,6 +224,14 @@ function parseTinderbox(td) {
       }
     }
   }); });
+
+  machines.forEach(function(machine) {
+    if (machine.runs) {
+      machine.averageCycleTime = Math.ceil(machine.runtime/machine.runs);
+    }
+    delete machine.runs;
+    delete machine.runtime;
+  });
 
   return { "machines": machines, "machineResults": machineResults };
 }
