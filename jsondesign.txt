@@ -47,7 +47,8 @@ results.
 				"notes": [
 					{
 						"email": "email@address",
-						"text": "note text"
+						"text": "note text",
+						"date": int as unix timestamp
 					},
 					... more notes
 				],
