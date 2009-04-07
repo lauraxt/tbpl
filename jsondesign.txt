@@ -24,6 +24,10 @@ results.
 	{
 		"pusher": "email@address",
 		"date": int as unix timestamp,
+		"parentrev": "if this is a derived repo like comm-central, this field is the mozilla-central rev\
+		Problem: the m-c rev may change during machine runs, with the c-c rev unchanged.\
+		May need a better concept to show this to the user, or may need to make sure that one push only\
+		corresponds to one parent rev.",
 		"patches": [
 			{
 				"author": "User Name",
