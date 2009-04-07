@@ -275,7 +275,7 @@ a.addNote {
   padding: 1px 0 1px 20px;
 }
 
-.unitTestResults, .talosResults {
+.testResults {
   margin: 8px 10em 0 0;
   height: 7em;
   overflow: hidden;

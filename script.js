@@ -501,20 +501,12 @@ function displayResult() {
     (function () {
       if (!result.testResults.length)
         return '';
-      if (result.machine.type == "Talos") {
-        return '<ul class="talosResults">\n' +
-        result.testResults.map(function(r) {
-          return '<li>' + r.name + ': <a href="' + r.resultURL.replace(/"/g, "&quot;") +
-          '">' + r.result + '</a>' +
-          (r.seriesURL ? ' (<a href="' + r.seriesURL.replace(/"/g, "&quot;") +
-          '">details</a>)' : '') + '</li>';
-        }).join("") +
-        '</ul>';
-      }
-      // else: may be Unit Test, Leak Test or Build with codesize numbers
-      return '<ul class="unitTestResults">\n' +
+      return '<ul class="testResults">\n' +
       result.testResults.map(function(r) {
-        return '<li>' + r.name + ': ' + r.result + '</li>';
+        return '<li>' + r.name + ': ' + ( r.resultURL ? '<a href="' +
+        r.resultURL.replace(/"/g, "&quot;") + '">' + r.result + '</a>' :
+        r.result ) + (r.seriesURL ? ' (<a href="' +
+        r.seriesURL.replace(/"/g, "&quot;") + '">details</a>)' : '') + '</li>';
       }).join("") +
       '</ul>';
     })() +
