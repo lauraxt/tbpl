@@ -47,8 +47,7 @@ function getTextWithMarker(e) {
   return '<em class="testfail">' + e.textContent + '</em>';
 }
 function processNote(note) {
-  return note.replace(/<\/?pre>/g, "")
-             .replace(/\n/g, "<br>");
+  return note.replace(/<\/?pre>/g, "").trim().replace(/\n/g, "<br>");
 }
 
 function linkBugs(text) {
