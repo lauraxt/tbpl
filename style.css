@@ -341,6 +341,9 @@ em.testfail {
   -moz-border-image: url(hudborderimage.png) 10 18 25 repeat;
   background: transparent;
 }
+#bar:nth-child(1n) { /* Preload the border image (XXX hack) */
+  background: url(hudborderimage.png) -1000px -1000px no-repeat white;
+}
 #closeAddNotePopup {
   position: absolute;
   top: -5px;
