@@ -39,6 +39,19 @@ p {
   text-decoration: none !important;
 }
 
+#goForward, #goBack {
+  display: block;
+  width: 16px;
+  height: 16px;
+  margin: auto;
+  background: url(tango-updown.png) no-repeat;
+}
+#goForward {
+  background-position: top left;
+}
+#goBack {
+  background-position: bottom left;
+}
 
 iframe {
   display: none;

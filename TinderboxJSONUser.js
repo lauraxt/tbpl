@@ -4,7 +4,15 @@ var TinderboxJSONUser = {};
 
 TinderboxJSONUser.load = function(tree, loadCallback, failCallback) {
   delete tinderbox_data;
-  $.getScript("http://tinderbox.mozilla.org/" + treeName + "/json.js", function () {
+  /**
+   * tinderbox is a little quirky with maxdate, so get 24 hours with maxdate
+   * 12 hours in the future
+   */
+  var scriptURL = timeOffset ?
+    'http://tinderbox.mozilla.org/showbuilds.cgi?tree=' + treeName +
+    '&maxdate=' + (timeOffset + 12 * 3600) + '&hours=24&json=1' :
+    "http://tinderbox.mozilla.org/" + treeName + "/json.js"
+  $.getScript(scriptURL, function () {
     try {
       if (!tinderbox_data) throw "tinderbox_data is invalid";
       loadCallback(parseTinderbox(tinderbox_data));

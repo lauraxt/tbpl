@@ -1,7 +1,12 @@
 var PushlogHTMLParser = {
   load: function (repoName, loadCallback, failCallback) {
     var self = this;
-    NetUtils.loadDom("fetchraw.php?site=pushlog&url=" + repoNames[treeName] + "/pushloghtml?startdate=14+hours+ago&enddate=now", function (doc) {
+    var logURL = "fetchraw.php?site=pushlog&url=" + repoNames[treeName] +
+      "/pushloghtml%3Fstartdate=" + (timeOffset ? (new Date((timeOffset - 12 *
+      3600) * 1000)).toLocaleFormat('%Y-%m-%d %T') : '12+hours+ago') +
+      "%26enddate=" + (timeOffset ? (new Date(timeOffset *
+      1000)).toLocaleFormat('%Y-%m-%d %T') : 'now');
+    NetUtils.loadDom(logURL, function (doc) {
       try {
         loadCallback(self._parsePushlog(doc));
       } catch (e) {

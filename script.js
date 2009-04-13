@@ -28,8 +28,14 @@ var abortOutstandingSummaryLoadings = function () {};
 var TinderboxDataLoader = TinderboxJSONUser;
 var PushlogDataLoader = PushlogHTMLParser;
 
+/**
+ * Used to browse the history. This is a timestamp from which we go 12 hours
+ * into the past. Or zero if we want to show the most recent changes.
+ */
+var timeOffset = 0;
+
 startStatusRequest();
-setInterval(startStatusRequest, 120 * 1000);
+var loadInterval = setInterval(startStatusRequest, 120 * 1000);
 buildFooter();
 document.getElementById("pushes").onmousedown = clickNowhere;
 $(".machineResult").live("click", resultLinkClick);
@@ -244,6 +250,9 @@ function getRevForResult(machineResult) {
   }
 
   // Try to find out the rev by comparing times.
+  // this breaks when going back in time. Just return nothing when doing so.
+  if (timeOffset)
+   return '';
   var latestPushRev = "", latestPushTime = -1;
   var machineTime = machineResult.startTime.getTime();
   pushes.forEach(function (push) {
@@ -342,7 +351,8 @@ function machineResultLink(machineResult) {
 
 function buildPushesList() {
   var ul = document.getElementById("pushes");
-  ul.innerHTML = pushes.map(function(push, pushIndex) {
+  ul.innerHTML = timeOffset ? '<li><a id="goForward" href="#" title="go forward by 12 hours"></a></li>' : '';
+  ul.innerHTML+= pushes.map(function(push, pushIndex) {
     return '<li>\n' +
     '<h2><span class="pusher">' + push.pusher + '</span> &ndash; ' +
     '<span class="date">' + getMVTDate(push.date) + '</span></h2>\n' +
@@ -372,7 +382,34 @@ function buildPushesList() {
     }).join("\n") +
     '</ul>\n' +
     '</li>';
-  }).join("\n");
+  }).join("\n") || '<li>There were no pushes between <em>' + 
+    getMVTDate(timeOffset ? new Date((timeOffset-12*3600)*1000) :
+    new Date((new Date.getTime()-12*3600*1000)))+'</em> and <em>' +
+    getMVTDate(timeOffset ? new Date(timeOffset*1000) : new Date())+'</em></li>';
+  ul.innerHTML+= '<li><a id="goBack" href="#" title="go back by 12 hours"></a></li>';
+  
+  if (timeOffset) {
+    $('#goForward').bind('click', function goForward() {
+      if (!timeOffset)
+        return false;
+      if (timeOffset + 12 * 3600 > (new Date()).getTime() / 1000) {
+        timeOffset = 0;
+        loadInterval = setInterval(startStatusRequest, 120 * 1000)
+      }
+      else
+        timeOffset = timeOffset + 12 * 3600;
+      startStatusRequest();
+      return false;
+    });
+  }
+  $('#goBack').bind('click', function goBack() {
+    timeOffset = timeOffset ? timeOffset - 12 * 3600 :
+      Math.round((new Date()).getTime() / 1000) - 12 * 3600;
+    clearInterval(loadInterval); // don't bother refreshing a date in the past
+    startStatusRequest();
+    return false;
+  });
+  
   $(".patches > li").bind("mouseenter", function startFadeInTimeout() {
     var div = $(".popup:not(.hovering)", this);
     if (div.width() - div.children().width() > 10)
