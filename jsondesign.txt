@@ -16,8 +16,20 @@ results.
 		"name": "Long machine name",
 		"os": "OS name, as in linux, tiger, leopard, xp, vista. maybe even ubuntu and centos",
 		"architecture": "as in x86, x64, arm, (ppc?)",
+/********/
 		"type": "one of 'Build', 'Leak Test', 'Unit Test', 'Nightly', 'Talos', 'Static Analysis'",
 		"averageCycleTime": int as seconds. Used to display an estimated time of arrival
+/* or alternatively, using the pool-of-slaves instead of pseudo-machines: */
+		"lastJob": {
+			"rev": "mercurial changeset",
+			"type": "one of 'Build', 'Leak Test', 'Unit Test', 'Nightly', 'Talos', 'Static Analysis'",
+			"result": "one of 'success', 'busted', 'testfailed'"
+		},
+		"averageCycleTimes": {
+			"Build": int as seconds,
+			/* key/value pairs for all the other types */
+		}
+/********/
 	},
 	... more machines
 ],
