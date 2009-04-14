@@ -201,7 +201,7 @@ function parseTinderbox(td) {
 
     var note = build.hasnote ? notes[build.noteid * 1] : "";
 
-    if (endTime) {
+    if (state == 'success' && endTime) {
       machines[machineIndex].runs++;
       machines[machineIndex].runtime+=
         (endTime.getTime() - startTime.getTime())/1000;
