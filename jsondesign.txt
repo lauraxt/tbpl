@@ -11,36 +11,40 @@ results.
 "status": "tree status, as in 'open' or 'closed'",
 "description": "a description why the tree is closed",
 "sheriff": "User Name (ircnick)",
-"machines": [
-	{
-		"name": "Long machine name",
-		"os": "OS name, as in linux, tiger, leopard, xp, vista. maybe even ubuntu and centos",
+"machines": {
+	"Long machine name": {
+		"os": "OS name, as in linux, tiger, leopard, xp, vista. maybe even gutsy and centos",
 		"architecture": "as in x86, x64, arm, (ppc?)",
-/********/
-		"type": "one of 'Build', 'Leak Test', 'Unit Test', 'Nightly', 'Talos', 'Static Analysis'",
-		"averageCycleTime": int as seconds. Used to display an estimated time of arrival
-/* or alternatively, using the pool-of-slaves instead of pseudo-machines: */
 		"lastJob": {
-			"rev": "mercurial changeset",
+			"revisions": {
+				"comm-central": "mercurial changeset",
+				"mozilla-central": "mercurial changeset",
+				"dom-inspector": "mercurial changeset",
+				... other revs
+			},
 			"type": "one of 'Build', 'Leak Test', 'Unit Test', 'Nightly', 'Talos', 'Static Analysis'",
 			"result": "one of 'success', 'busted', 'testfailed'"
 		},
+		"currentJob": {
+			"revisions": {
+				"comm-central": "mercurial changeset",
+				"mozilla-central": "mercurial changeset",
+				"dom-inspector": "mercurial changeset",
+				... other revs
+			},
+			"type": "one of 'Build', 'Leak Test', 'Unit Test', 'Nightly', 'Talos', 'Static Analysis'",
+		} or null if the slave is idle,
 		"averageCycleTimes": {
 			"Build": int as seconds,
 			/* key/value pairs for all the other types */
 		}
-/********/
 	},
 	... more machines
-],
+},
 "pushes": [
 	{
 		"pusher": "email@address",
 		"date": int as unix timestamp,
-		"parentrev": "if this is a derived repo like comm-central, this field is the mozilla-central rev\
-		Problem: the m-c rev may change during machine runs, with the c-c rev unchanged.\
-		May need a better concept to show this to the user, or may need to make sure that one push only\
-		corresponds to one parent rev.",
 		"patches": [
 			{
 				"author": "User Name",
@@ -52,10 +56,15 @@ results.
 		"results": [
 			{
 				"runID": "Tinderbox run ID e.g. '1239087413.1239088568.13818.gz'",
-				"machine": int as array index to look up in the machines array,
+				"machine": "long machine name",
 				"state": "as in 'running', 'success', 'testfailed', 'busted'",
 				"startTime": int as unix timestamp,
 				"endTime": int as unix timestamp or zero on running,
+				"revisions": {
+					"mozilla-central": "mercurial changeset",
+					"dom-inspector": "mercurial changeset",
+					... other revs
+				} or null if the build only depends on one repository,
 				"notes": [
 					{
 						"email": "email@address",
