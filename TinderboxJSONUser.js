@@ -69,7 +69,7 @@ function getUnitTestResults(reva) {
   while (e && e.nodeType != Node.TEXT_NODE)
     e = e.nextSibling;
 
-  if (!e || e.data.trim() != "TUnit")
+  if (!e || e.data.trim() != "check")
     return [];
 
   var testResults = [];

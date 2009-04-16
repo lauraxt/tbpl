@@ -15,6 +15,7 @@ left by default.
 If we are displaying pushes between Monday 13:00 and Tuesday 01:00, and there
 is a machine testing one of those pushes Tuesday at 03:00, we display that
 result as well.
+
 *** Needs discussion:
 ** If we only display pushes between Monday 13:00 and Tuesday 01:00 and there
 ** is a machine that is testing the following revisions Tuesday at 03:00:
@@ -101,7 +102,6 @@ right) and is reloaded every 2 minutes and only has the most recent data
 		},
 		// no currentJob -> the slave is idle
 		"averageCycleTimes": {
-			// this is on a per-machine/build type/branch basis
 			"Firefox" : {
 				"Talos": 1200 // the slave is only doing talos runs
 			} // only on the Firefox tree
@@ -126,29 +126,33 @@ the JSON is not reloaded automatically.
 {
 "pushes": [
 	"comm-central": [
-		"pusher": "email@address",
-		"date": int as unix timestamp,
-		"patches": [
-			{
-				"author": "User Name",
-				"description": "commit message",
-				"rev": "mercurial changeset"
-			},
-			... more revs
-		],
+		{
+			"pusher": "email@address",
+			"date": int as unix timestamp,
+			"patches": [
+				{
+					"author": "User Name",
+					"description": "commit message",
+					"rev": "mercurial changeset"
+				},
+				... more revs
+			],
+		},
 		... more pushes
 	],
 	"mozilla-central": [
-		"pusher": "arpad.borsos@googlemail.com",
-		"date": 1234567890,
-		"patches": [
-			{
-				"author": "Arpad Borsos",
-				"description": "Bug 123456 - get rid of nsISupportsArray",
-				"rev": "abcd"
-			}
-			// only one rev was pushed
-		],
+		{
+			"pusher": "arpad.borsos@googlemail.com",
+			"date": 1234567890,
+			"patches": [
+				{
+					"author": "Arpad Borsos",
+					"description": "Bug 123456 - get rid of nsISupportsArray",
+					"rev": "abcd"
+				}
+				// only one rev was pushed
+			],
+		},
 		... more pushes
 	],
 	... more branches
