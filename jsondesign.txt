@@ -39,6 +39,7 @@ right) and is reloaded every 2 minutes and only has the most recent data
 		"involvedBranches": [
 			"mozilla-central" // the first branch is display by default
 		],
+		"usedPool": "one of 'production', 'try', 'community', ...",
 		"sheriff": "User Name (ircnick)"
 	},
 	"SeaMonkey" : {
@@ -49,6 +50,7 @@ right) and is reloaded every 2 minutes and only has the most recent data
 			"releases/mozilla-1.9.1", // can change branch to display on-thy-fly
 			...
 		],
+		"usedPool": "production",
 		"sheriff": "User Name (ircnick)"
 	},
 	...
@@ -57,6 +59,7 @@ right) and is reloaded every 2 minutes and only has the most recent data
 	"slavename1": {
 		"os": "OS name, as in linux, tiger, leopard, xp, vista. maybe even gutsy and centos",
 		"architecture": "as in x86, x64, arm, (ppc?)",
+		"pool": "one of 'production', 'try', 'community', ...",
 		"lastJob": {
 			"tree": "Firefox",
 			"revisions": {
@@ -92,6 +95,7 @@ right) and is reloaded every 2 minutes and only has the most recent data
 	"slavename2": {
 		"os": "gutsy",
 		"architecture": "x86",
+		"pool": "production",
 		"lastJob": {
 			"tree": "Firefox",
 			"revisions": {
