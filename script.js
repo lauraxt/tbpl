@@ -384,7 +384,7 @@ function buildPushesList() {
     '</li>';
   }).join("\n") || '<li>There were no pushes between <em>' + 
     getMVTDate(timeOffset ? new Date((timeOffset-12*3600)*1000) :
-    new Date((new Date.getTime()-12*3600*1000)))+'</em> and <em>' +
+    new Date(((new Date()).getTime()-12*3600*1000)))+'</em> and <em>' +
     getMVTDate(timeOffset ? new Date(timeOffset*1000) : new Date())+'</em></li>';
   ul.innerHTML+= '<li><a id="goBack" href="#" title="go back by 12 hours"></a></li>';
   
