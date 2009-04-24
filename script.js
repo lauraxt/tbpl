@@ -45,6 +45,7 @@ AddCommentUI.registerNumSendingCommentChangedCallback(updateStatus);
 var machines = [];
 var machineResults = {};
 var pushes = [];
+var everLoadedPushes = false;
 
 $("#localTime").bind("click", function () {
   globalStorage[location.host].useLocalTime = true;
@@ -79,6 +80,7 @@ function startStatusRequest() {
     repoNames[treeName],
     function loaded(data) {
       loadStatus.pushlog = "complete";
+      everLoadedPushes = true;
       updateStatus();
       pushes = data;
       combineResults();
@@ -382,10 +384,10 @@ function buildPushesList() {
     }).join("\n") +
     '</ul>\n' +
     '</li>';
-  }).join("\n") || '<li>There were no pushes between <em>' + 
+  }).join("\n") || (everLoadedPushes ? '<li>There were no pushes between <em>' + 
     getMVTDate(timeOffset ? new Date((timeOffset-12*3600)*1000) :
     new Date(((new Date()).getTime()-12*3600*1000)))+'</em> and <em>' +
-    getMVTDate(timeOffset ? new Date(timeOffset*1000) : new Date())+'</em></li>';
+    getMVTDate(timeOffset ? new Date(timeOffset*1000) : new Date())+'</em></li>' : '');
   ul.innerHTML+= '<li><a id="goBack" href="#" title="go back by 12 hours"></a></li>';
   
   if (timeOffset) {
