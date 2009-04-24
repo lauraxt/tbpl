@@ -49,11 +49,6 @@ function nodeIsBR(e) {
 function getLogURL(id, full, note) {
   return "http://tinderbox.mozilla.org/" + (note ? "addnote" : "showlog") + ".cgi?log=" + treeName + "/" + id + (full ? "&fulltext=1" : "");
 }
-function getTextWithMarker(e) {
-  if (e.nodeType == Node.TEXT_NODE)
-    return e.data;
-  return '<em class="testfail">' + e.textContent + '</em>';
-}
 function processNote(note) {
   return note.replace(/<\/?pre>/g, "").trim().replace(/\n/g, "<br>");
 }
@@ -63,45 +58,41 @@ function linkBugs(text) {
              .replace(/(changeset\s*)?([0-9a-f]{12})\b/ig, '<a href="'+revURL('')+'$2">$1$2</a>');
 }
 
-function getUnitTestResults(reva) {
-  var e = reva.nextSibling;
-  if (e) e = e.nextSibling;
-  while (e && e.nodeType != Node.TEXT_NODE)
-    e = e.nextSibling;
-
-  if (!e || e.data.trim() != "check")
-    return [];
-
-  var testResults = [];
-  while (e) { 
-    var testname = e.textContent.trim(), testresult = "";
-    e = e.nextSibling;
-    while (e && nodeIsBR(e)) {
-      e = e.nextSibling;
-    }
-    while (e && !nodeIsBR(e)) {
-      testresult += " " + getTextWithMarker(e).trim();
-      e = e.nextSibling;
-    }
-    while (e && nodeIsBR(e)) {
-      e = e.nextSibling;
-    }
-    testResults.push({
-      name: testname.trim(),
-      result: testresult.trim()
-    });
-  }
-  return testResults;
+function getScrapeResults(scrape) {
+  return $(scrape).map(function() {
+    if (this.match(/rev\:/))
+      return null;
+    var match = this.match(/(.*)\:(.*)/);
+    return (match ? { name: match[1], result: match[2]} : { name: this });
+  }).filter(function(a) { return a; }).get();
 }
 
-function getTalosResults(tt) {
+function getUnitTestResults(scrape) {
+  return $(scrape).map(function() {
+    var match = this.match(/(.*)<br\/>(.*)/);
+    return match && {
+      name: match[1],
+      result: match[2]
+    };
+  }).filter(function (a) { return a; }).get();
+}
+
+function getTalosResults(scrape) {
   var seriesURLs = {};
-  $('p a', tt).each(function() {
+  var foundSomething = false;
+  var cell = document.createElement("td");
+  cell.innerHTML = scrape.join("<br>\n");
+  $('p a', cell).each(function() {
     if (this.getAttribute("href").indexOf("http://graphs-new") != 0)
       return;
     seriesURLs[this.textContent] = this.getAttribute("href");
+    foundSomething = true;
   });
-  return $('a', tt).get().map(function(ra) {
+
+  if (!foundSomething)
+    return getScrapeResults(scrape);
+
+  return $('a', cell).get().map(function(ra) {
     var resultURL = ra.getAttribute("href");
     if (resultURL.indexOf("http://graphs-new") != 0)
       return;
@@ -118,55 +109,51 @@ function getTalosResults(tt) {
   }).filter(function(a) { return a; });
 }
 
-function getLeakResults(tt) {
-  return $('abbr', tt).get().map(function(ra) {
-    return {
-      name: ra.textContent,
-      result: ra.nextSibling.textContent.substr(1)
-    };
-  }).filter(function(a) { return a; });
-}
 function getBuildResults(scrape) {
   var testResults = [];
   // 1 -> Z; 2+3 -> Zdiff
   if (scrape.length >= 2) {
     var match = scrape[1].match(/(.*)\:(.*)/);
-    testResults.push({ name: "Codesize", result: match[2] });
+    testResults.push({
+      name: "Codesize",
+      result: match[2]
+    });
   }
   if (scrape.length >= 3) {
   	var match = scrape[2].match(/(.*)\:(.*)/);
-  	testResults.push({ name: "Difference", result: match[2] +
-  	  (scrape[3] ? scrape[3] : '' ) });
+  	testResults.push({
+      name: "Difference",
+      result: match[2] + (scrape[3] ? scrape[3] : '' )
+    });
   }
   return testResults;
 }
 
-function getBuildScrape(td, machine, machineRunID) {
-  if (!td.scrape[machineRunID])
-    return null;
-  
+function findRevInScrape(scrape) {
   var cell = document.createElement("td");
-  cell.innerHTML = td.scrape[machineRunID].join("<br>\n");
+  cell.innerHTML = scrape.join("<br>\n");
   var reva = $('a[href^="http://hg.mozilla.org"]', cell).get(0);
   if (!reva)
     return null;
 
-  var rev = reva.textContent.substr(4, 12);
+  return reva.textContent.substr(4, 12);
+}
 
-  var testResults = [];
-  // Get individual test results or Talos times.
-  if (machine.type == "Unit Test") {
-    testResults = getUnitTestResults(reva);
-  } else if (machine.type == "Talos") {
-    testResults = getTalosResults(cell);
-  } else if (machine.type == "Leak Test") {
-    testResults = getLeakResults(cell);
-  } else if (machine.type == "Build") {
-    testResults = getBuildResults(td.scrape[machineRunID]);
-  }
+function getBuildScrape(td, machine, machineRunID) {
+  var scrape = td.scrape[machineRunID];
+  if (!scrape)
+    return null;
   return {
-    "rev": rev,
-    "testResults": testResults
+    "rev": findRevInScrape(scrape),
+    "testResults": (function (fun) {
+        return fun[machine.type] ? fun[machine.type](scrape) : fun.generic(scrape);
+      })({
+        "Unit Test": getUnitTestResults,
+        "Talos": getTalosResults,
+        "Leak Test": getScrapeResults,
+        "Build": getBuildResults,
+        "generic": getScrapeResults
+      })
   };
 }
 

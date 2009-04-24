@@ -550,14 +550,35 @@ function displayResult() {
     (function () {
       if (!result.testResults.length)
         return '';
-      return '<ul class="testResults">\n' +
-      result.testResults.map(function(r) {
-        return '<li>' + r.name + ': ' + ( r.resultURL ? '<a href="' +
-        r.resultURL.replace(/"/g, "&quot;") + '">' + r.result + '</a>' :
-        r.result ) + (r.detailsURL ? ' (<a href="' +
-        r.detailsURL.replace(/"/g, "&quot;") + '">details</a>)' : '') + '</li>';
-      }).join("") +
-      '</ul>';
+      if (!result.testResults.map)
+        console.log(result.testResults);
+      try {
+        return '<ul class="testResults">\n' +
+        result.testResults.map(function(r) {
+          return '<li>' + r.name +
+            (r.result ? ': ' + (r.resultURL ? '<a href="' + r.resultURL.replace(/"/g, "&quot;") +
+                                              '">' + r.result + '</a>'
+                                            : r.result)
+                      : '') +
+            (r.detailsURL ? ' (<a href="' + r.detailsURL.replace(/"/g, "&quot;") +
+                            '">details</a>)'
+                          : '') +
+            '</li>';
+        }).join("") +
+        '</ul>';
+      } catch (e) {
+        console.log(result.testResults.map(function(r) {
+          return '<li>' + r.name +
+            (r.result ? ': ' + (r.resultURL ? '<a href="' + r.resultURL.replace(/"/g, "&quot;") +
+                                              '">' + r.result + '</a>'
+                                            : r.result)
+                      : '') +
+            (r.detailsURL ? ' (<a href="' + r.detailsURL.replace(/"/g, "&quot;") +
+                            '">details</a>)'
+                          : '') +
+            '</li>';
+        }));
+      }
     })() +
     (function () {
       return '<div class="stars">' +
