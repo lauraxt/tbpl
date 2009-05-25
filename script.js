@@ -8,15 +8,12 @@ document.title = treeName + " - Tinderboxpushlog";
 
 var pushlogURL = "http://hg.mozilla.org/" + Config.repoNames[treeName] + "/";
 var timezone = "-0700";
-var pickupDelay = 0; // number of ms until machine starts building a push
 
-var oss = ["linux", "osx", "windows"];
-var machineTypes = ["Build", "Leak Test", "Unit Test", "Nightly", "Talos", "Static Analysis"];
+var oss = Config.tinderboxDataLoader.oss;
+var machineTypes = Config.tinderboxDataLoader.machineTypes;
 var loadStatus = { pushlog: "loading", tinderbox: "loading" };
 var activeResult = "";
 var abortOutstandingSummaryLoadings = function () {};
-var TinderboxDataLoader = TinderboxJSONUser;
-var PushlogDataLoader = PushlogHTMLParser;
 
 /**
  * Used to browse the history. This is a timestamp from which we go 12 hours
@@ -66,7 +63,7 @@ function startStatusRequest() {
   loadStatus = { pushlog: "loading", tinderbox: "loading" };
   updateStatus();
 
-  PushlogDataLoader.load(
+  Config.pushlogDataLoader.load(
     Config.repoNames[treeName],
     function loaded(data) {
       loadStatus.pushlog = "complete";
@@ -82,7 +79,7 @@ function startStatusRequest() {
     }
   );
 
-  TinderboxDataLoader.load(
+  Config.tinderboxDataLoader.load(
     treeName,
     function loaded(data) {
       loadStatus.tinderbox = "complete";
@@ -249,7 +246,7 @@ function getRevForResult(machineResult) {
   var machineTime = machineResult.startTime.getTime();
   pushes.forEach(function (push) {
     var pushTime = push.date.getTime();
-    if (pushTime + pickupDelay < machineTime) {
+    if (pushTime < machineTime) {
       if (latestPushTime < pushTime) {
         latestPushRev = push.toprev;
         latestPushTime = pushTime;

@@ -1,5 +1,8 @@
 var TinderboxJSONUser = {
 
+  oss: ["linux", "osx", "windows"],
+  machineTypes: ["Build", "Leak Test", "Unit Test", "Nightly", "Talos", "Static Analysis"],
+
   load: function(tree, loadCallback, failCallback) {
     delete tinderbox_data;
     var self = this;
