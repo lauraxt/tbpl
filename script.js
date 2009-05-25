@@ -1,22 +1,12 @@
-var repoNames = {
-  "Firefox": "mozilla-central",
-  "Firefox3.5": "releases/mozilla-1.9.1",
-  "TraceMonkey": "tracemonkey",
-  "Thunderbird": "comm-central",
-  "Thunderbird3.0": "comm-central",
-  "SeaMonkey": "comm-central",
-  "Sunbird": "comm-central",
-};
-
 // Allow specifying a tree name in the URL (http://foo/?tree=Firefox3.0)
 var treeName = "Firefox";
 var match = /[?&]tree=([^&]+)/.exec(document.location.search);
-if (match && repoNames[match[1]])
+if (match && Config.repoNames[match[1]])
   treeName = match[1];
 
 document.title = treeName + " - Tinderboxpushlog";
 
-var pushlogURL = "http://hg.mozilla.org/" + repoNames[treeName] + "/";
+var pushlogURL = "http://hg.mozilla.org/" + Config.repoNames[treeName] + "/";
 var timezone = "-0700";
 var pickupDelay = 0; // number of ms until machine starts building a push
 
@@ -77,7 +67,7 @@ function startStatusRequest() {
   updateStatus();
 
   PushlogDataLoader.load(
-    repoNames[treeName],
+    Config.repoNames[treeName],
     function loaded(data) {
       loadStatus.pushlog = "complete";
       everLoadedPushes = true;
@@ -333,8 +323,7 @@ function resultTitle(result) {
 function etaString(result) {
   if (!result.machine.averageCycleTime)
     return 'ETA unknown';
-  var elapsed = Math.ceil(((new Date()).getTime() - result.startTime.getTime())
-    / 1000);
+  var elapsed = Math.ceil(((new Date()).getTime() - result.startTime.getTime()) / 1000);
   if (elapsed > result.machine.averageCycleTime)
     return 'ETA any minute now';
   return 'ETA ~' + Math.ceil((result.machine.averageCycleTime - elapsed) / 60)

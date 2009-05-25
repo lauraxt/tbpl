@@ -1,7 +1,7 @@
 var PushlogHTMLParser = {
   load: function (repoName, loadCallback, failCallback) {
     var self = this;
-    var logURL = "fetchraw.php?site=pushlog&url=" + repoNames[treeName] +
+    var logURL = "fetchraw.php?site=pushlog&url=" + repoName +
       "/pushloghtml%3Fstartdate=" + (timeOffset ? (new Date((timeOffset - 12 *
       3600) * 1000)).toLocaleFormat('%Y-%m-%d %T') : '12+hours+ago') +
       "%26enddate=" + (timeOffset ? (new Date(timeOffset *
