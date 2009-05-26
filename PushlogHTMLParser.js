@@ -10,7 +10,8 @@ var PushlogHTMLParser = {
       try {
         loadCallback(self._parsePushlog(doc));
       } catch (e) {
-        console.log(e);
+        if (console && console.log)
+          console.log(e);
         failCallback();
       }
     });
