@@ -1,21 +1,23 @@
 var PushlogHTMLParser = {
-  load: function (repoName, loadCallback, failCallback) {
+
+  load: function (repoName, timeOffset, loadCallback, failCallback) {
     var self = this;
-    var logURL = "fetchraw.php?site=pushlog&url=" + repoName +
-      "/pushloghtml%3Fstartdate=" + (timeOffset ? (new Date((timeOffset - 12 *
-      3600) * 1000)).toLocaleFormat('%Y-%m-%d %T') : '12+hours+ago') +
-      "%26enddate=" + (timeOffset ? (new Date(timeOffset *
-      1000)).toLocaleFormat('%Y-%m-%d %T') : 'now');
+    var logURL = this._getLogUrl(repoName, timeOffset);
     NetUtils.loadDom(logURL, function (doc) {
       try {
         loadCallback(self._parsePushlog(doc));
       } catch (e) {
-        if (console && console.log)
-          console.log(e);
         failCallback();
       }
     });
   },
+
+  _getLogUrl: function(repoName, timeOffset) {
+    var startDate = timeOffset ? (new Date((timeOffset - 12 * 3600) * 1000)).toLocaleFormat('%Y-%m-%d %T') : '12+hours+ago';
+    var endDate = timeOffset ? (new Date(timeOffset * 1000)).toLocaleFormat('%Y-%m-%d %T') : 'now';
+    return "fetchraw.php?site=pushlog&url=" + repoName + "/pushloghtml%3Fstartdate=" + startDate + "%26enddate=" + endDate;
+  },
+
   _parsePushlog: function (doc) {
     if (!doc.getElementsByTagName("table").length)
       throw "Parsing pushlog failed.";
@@ -49,9 +51,11 @@ var PushlogHTMLParser = {
     });
     return pushes;
   },
+
   _stripTags: function (text) {
     var div = document.createElement("div");
     div.innerHTML = text;
     return div.textContent.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   },
+
 };

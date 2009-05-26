@@ -1,9 +1,6 @@
 var TinderboxJSONUser = {
 
-  oss: ["linux", "osx", "windows"],
-  machineTypes: ["Build", "Leak Test", "Unit Test", "Nightly", "Talos", "Static Analysis"],
-
-  load: function(tree, loadCallback, failCallback) {
+  load: function(tree, timeOffset, loadCallback, failCallback) {
     delete tinderbox_data;
     var self = this;
     /**
@@ -146,8 +143,14 @@ var TinderboxJSONUser = {
       if (!machinetype.os || !machinetype.type) {
         return;
       }
-      machines[i] = { "name": name, "os": machinetype.os, "type": machinetype.type,
-        latestFinishedRun: { id: "", startTime: -1 }, "runs": 0, "runtime": 0 };
+      machines[i] = {
+        "name": name,
+        "os": machinetype.os,
+        "type": machinetype.type,
+        latestFinishedRun: { id: "", startTime: -1 },
+        "runs": 0,
+        "runtime": 0
+      };
     });
   
     var notes = td.note_array.map(self.processNote);

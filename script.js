@@ -1,19 +1,20 @@
-// Allow specifying a tree name in the URL (http://foo/?tree=Firefox3.0)
-var treeName = "Firefox";
+// Allow specifying a tree name in the URL (http://foo/?tree=Firefox3.5)
+var treeName = Config.defaultTreeName;
 var match = /[?&]tree=([^&]+)/.exec(document.location.search);
 if (match && Config.repoNames[match[1]])
   treeName = match[1];
 
 document.title = treeName + " - Tinderboxpushlog";
 
-var pushlogURL = "http://hg.mozilla.org/" + Config.repoNames[treeName] + "/";
-var timezone = "-0700";
+var timezone = Config.mvtTimezone;
 
-var oss = Config.tinderboxDataLoader.oss;
-var machineTypes = Config.tinderboxDataLoader.machineTypes;
 var loadStatus = { pushlog: "loading", tinderbox: "loading" };
 var activeResult = "";
 var abortOutstandingSummaryLoadings = function () {};
+
+var data = new Data(treeName, Config);
+var oss = data.getOss();
+var machineTypes = data.getMachineTypes();
 
 /**
  * Used to browse the history. This is a timestamp from which we go 12 hours
@@ -63,8 +64,8 @@ function startStatusRequest() {
   loadStatus = { pushlog: "loading", tinderbox: "loading" };
   updateStatus();
 
-  Config.pushlogDataLoader.load(
-    Config.repoNames[treeName],
+  data.loadPushes(
+    timeOffset,
     function loaded(data) {
       loadStatus.pushlog = "complete";
       everLoadedPushes = true;
@@ -79,7 +80,7 @@ function startStatusRequest() {
     }
   );
 
-  Config.tinderboxDataLoader.load(
+  data.loadMachineResults(
     treeName,
     function loaded(data) {
       loadStatus.tinderbox = "complete";
@@ -304,7 +305,7 @@ function getMVTDate(date) {
 }
 
 function revURL(rev) {
-  return pushlogURL + "rev/" + rev;
+  return data.getRevUrl(rev);
 }
 
 function resultTitle(result) {
