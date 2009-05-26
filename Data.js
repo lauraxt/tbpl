@@ -1,6 +1,6 @@
 function Data(treeName, config) {
   this._treeName = treeName;
-  this._tinderboxData = new TinderboxData(this._treeName, config.tinderboxDataLoader);
+  this._tinderboxData = new TinderboxData(this._treeName, config.tinderboxDataLoader, config.repoNames);
   this._hgData = new HgData(this._tinderboxData.getRepoName(), config.pushlogDataLoader);
 };
 

@@ -1,6 +1,7 @@
-function TinderboxData(treeName, dataLoader) {
+function TinderboxData(treeName, dataLoader, repoNames) {
   this._treeName = treeName;
   this._dataLoader = dataLoader;
+  this._repoNames = repoNames;
   this._normalData = { machines: [], machineResults: [] };
   this._unittestData = { machines: [], machineResults: [] };
 }
@@ -9,17 +10,7 @@ TinderboxData.prototype = {
 
   oss: ["linux", "osx", "windows"],
   machineTypes: ["Build", "Leak Test", "Unit Test", "Nightly", "Talos", "Static Analysis"],
-  _repoNames: {
-    "Firefox": "mozilla-central",
-    "Firefox3.5": "releases/mozilla-1.9.1",
-    "TraceMonkey": "tracemonkey",
-    "Thunderbird": "comm-central",
-    "Thunderbird3.0": "comm-central",
-    "SeaMonkey": "comm-central",
-    "Sunbird": "comm-central",
-  },
   _treesWithUnittest: ["Firefox", "Firefox3.5", "TraceMonkey"],
-
 
   getRepoName: function() {
     return this._repoNames[this._treeName];

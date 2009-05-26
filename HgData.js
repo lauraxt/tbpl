@@ -10,7 +10,7 @@ HgData.prototype = {
   },
 
   getRepoUrl: function() {
-    return "http://hg.mozilla.org/" + this._repoName; + "/";
+    return "http://hg.mozilla.org/" + this._repoName + "/";
   },
 
   getRevUrl: function(rev) {
