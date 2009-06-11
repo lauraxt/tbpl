@@ -290,15 +290,15 @@ var UserInterface = {
         if (!timeOffset)
           return false;
         if (timeOffset + 12 * 3600 > (new Date()).getTime() / 1000) {
-          this._controller.setTimeOffset(0);
+          self._controller.setTimeOffset(0);
         }
         else
-          this._controller.setTimeOffset(timeOffset + 12 * 3600);
+          self._controller.setTimeOffset(timeOffset + 12 * 3600);
         return false;
       });
     }
     $('#goBack').bind('click', function goBack() {
-      self._controller.setTimeOffset(timeOffset - 12 * 3600);
+      self._controller.setTimeOffset(timeOffset ? timeOffset - 12 * 3600 : Math.round((new Date()).getTime() / 1000) - 12 * 3600);
       return false;
     });
     
@@ -425,7 +425,7 @@ var UserInterface = {
       return '<h3><span class="machineName">' + result.machine.name +
       '</span> [<span class="state">' + result.state + '</span>] ' +
       '<span class="duration">Started ' + self._getDisplayTime(result.startTime) +
-      ', ' + (result.state == "building" ? 'still running... ' + etaString(result)
+      ', ' + (result.state == "building" ? 'still running... ' + self._etaString(result)
       : 'finished ') + self._getDisplayTime(result.endTime) + '</span></h3>\n' +
       '<a class="briefLog" href="' + result.briefLogURL +
       '">View Brief Log</a> <a class="fullLog" href="' +

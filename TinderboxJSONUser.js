@@ -16,9 +16,8 @@ var TinderboxJSONUser = {
         if (!tinderbox_data) throw "tinderbox_data is invalid";
         loadCallback(self.parseTinderbox(tree, tinderbox_data));
       } catch (e) {
-        if (console && console.log)
-          console.log(e);
-        failCallback();
+        window.tinderboxException = e;
+        failCallback(e);
       }
     });
   },

@@ -7,8 +7,8 @@ var PushlogHTMLParser = {
       try {
         loadCallback(self._parsePushlog(doc));
       } catch (e) {
-        console.log(e);
-        failCallback();
+        window.pushlogException = e;
+        failCallback(e);
       }
     });
   },
