@@ -3,10 +3,9 @@ var AddCommentUI = {
   addToBuilds: {},
   numSendingComments: 0,
   numSendingCommentChangedCallback: function () {},
-  _treeName: "",
   _submitURL: "",
 
-  init: function (treeName, submitURL) {
+  init: function (submitURL) {
     var self = this;
     $("a.addNote").live("click", function () {
       self.logLinkClick();
@@ -30,7 +29,6 @@ var AddCommentUI = {
       });
       return false;
     });
-    this._treeName = treeName;
     this._submitURL = submitURL;
   },
 
@@ -48,6 +46,7 @@ var AddCommentUI = {
 
   submit: function () {
     var self = this;
+    var machineResults = UserInterface._data.getMachineResults(); // XXX hack
     var email = $("#logNoteEmail").get(0).value;
     var comment = $("#logNoteText").get(0).value;
     for (var i in this.addToBuilds) {
@@ -115,7 +114,7 @@ var AddCommentUI = {
       buildtime: machineResult.startTime.getTime() / 1000,
       errorparser: machineResult.errorParser,
       logfile: machineResult.runID,
-      tree: this._treeName,
+      tree: machineResult.tree,
       who: email,
       note: comment,
     }, callback);

@@ -33,7 +33,7 @@ var UserInterface = {
       e.preventDefault();
     });
 
-    AddCommentUI.init(this._treeName, "http://tinderbox.mozilla.org/addnote.cgi");
+    AddCommentUI.init("http://tinderbox.mozilla.org/addnote.cgi");
     AddCommentUI.registerNumSendingCommentChangedCallback(function() {
       self.updateStatus();
     });

@@ -174,6 +174,7 @@ var TinderboxJSONUser = {
       }
   
       machineResults[machineRunID] = {
+        "tree" : tree,
         "machine": machines[machineIndex],
         "runID": machineRunID,
         "fullLogURL": self.getLogURL(tree, machineRunID, true, false),
