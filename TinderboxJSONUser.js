@@ -210,3 +210,12 @@ var TinderboxJSONUser = {
     return { "machines": machines, "machineResults": machineResults };
   }
 };
+
+if (!String.prototype.trim) {
+  String.prototype.trim = function () {
+    var x=this;
+    x=x.replace(/^\s*(.*?)/, "$1");
+    x=x.replace(/(.*?)\s*$/, "$1");
+    return x;
+  }
+}
