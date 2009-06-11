@@ -2,8 +2,8 @@ function TinderboxData(treeName, dataLoader, repoNames) {
   this._treeName = treeName;
   this._dataLoader = dataLoader;
   this._repoNames = repoNames;
-  this._normalData = { machines: [], machineResults: [] };
-  this._unittestData = { machines: [], machineResults: [] };
+  this._normalData = { machines: [], machineResults: {} };
+  this._unittestData = { machines: [], machineResults: {} };
 }
 
 TinderboxData.prototype = {

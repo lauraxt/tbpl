@@ -7,6 +7,7 @@ var PushlogHTMLParser = {
       try {
         loadCallback(self._parsePushlog(doc));
       } catch (e) {
+        console.log(e);
         failCallback();
       }
     });
@@ -39,7 +40,7 @@ var PushlogHTMLParser = {
         patches.push({
           "rev": rev,
           "author": author,
-          "desc": linkBugs(self._stripTags(desc))
+          "desc": self._stripTags(desc)
         });
       });
       pushes.push({

@@ -59,12 +59,13 @@ var AddCommentUI = {
   },
 
   logLinkClick: function () {
+    // XXX fix activeResult
     var div = $("#addNotePopup").fadeIn('fast');
-    if (!this.addToBuilds[activeResult]) {
-      this.addToBuilds[activeResult] = true;
+    if (!this.addToBuilds[UserInterface._activeResult]) {
+      this.addToBuilds[UserInterface._activeResult] = true;
       ($("#logNoteEmail").get(0).value ? $("#logNoteText") : $("#logNoteEmail")).get(0).focus();
     } else {
-      delete this.addToBuilds[activeResult];
+      delete this.addToBuilds[UserInterface._activeResult];
     }
     this.updateUI();
   },
@@ -85,16 +86,16 @@ var AddCommentUI = {
   _updateBuildList: function () {
     var html = "";
     for (var i in this.addToBuilds) {
-      html += machineResultLink(machineResults[i])
+      html += UserInterface._machineResultLink(Controller.getData().getMachineResults()[i])
     }
     $("#logNoteRuns").html(html ? html : "(none selected)");
-    markActiveResultLinks();
+    UserInterface._markActiveResultLinks(); // XXX fix this
   },
 
   _updateLogLinkText: function () {
     $("a.addNote").text(
       !this._popupIsOpen() ? "Add a comment" :
-        (this.addToBuilds[activeResult] ? "Don't add the comment to this build" :
+        (this.addToBuilds[UserInterface._activeResult] ? "Don't add the comment to this build" :
                                           "Add the comment to this build, too"));
   },
 

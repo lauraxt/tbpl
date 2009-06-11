@@ -50,11 +50,6 @@ var TinderboxJSONUser = {
     return note.replace(/<\/?pre>/g, "").trim().replace(/\n/g, "<br>");
   },
   
-  linkBugs: function(text) {
-    return text.replace(/(bug\s*|b=)([1-9][0-9]*)\b/ig, '<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=$2">$1$2</a>')
-               .replace(/(changeset\s*)?([0-9a-f]{12})\b/ig, '<a href="'+revURL('')+'$2">$1$2</a>');
-  },
-  
   getScrapeResults: function(scrape) {
     return $(scrape).map(function() {
       if (this.match(/rev\:/))
@@ -191,7 +186,7 @@ var TinderboxJSONUser = {
         "rev": rev,
         "guessedRev": rev,
         "testResults": testResults,
-        "note": self.linkBugs(note),
+        "note": note,
         "errorParser": build.errorparser,
       };
       if (state != "building") {
