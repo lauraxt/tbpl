@@ -119,7 +119,7 @@ var TinderboxJSONUser = {
     return {
       "rev": self.findRevInScrape(scrape),
       "testResults": (function (fun) {
-          return fun[machine.type] ? fun[machine.type](scrape) : fun.generic(scrape);
+          return (fun[machine.type] ? fun[machine.type] : fun.generic).call(self, scrape);
         })({
           "Unit Test": self.getUnitTestResults,
           "Talos": self.getTalosResults,
