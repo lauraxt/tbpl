@@ -242,6 +242,7 @@ var UserInterface = {
   },
 
   _buildPushesList: function() {
+    $(".patches > li").unbind();
     var self = this;
     var ul = document.getElementById("pushes");
     ul.innerHTML = this._controller.getTimeOffset() ? '<li><a id="goForward" href="#" title="go forward by 12 hours"></a></li>' : '';
