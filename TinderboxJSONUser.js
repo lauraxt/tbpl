@@ -51,11 +51,14 @@ var TinderboxJSONUser = {
   
   getScrapeResults: function(scrape) {
     return $(scrape).map(function() {
-      if (this.match(/rev\:/))
+      if (this.match(/rev\:/) || this.match(/s\:/))
         return null;
       var match = this.match(/(.*)\:(.*)/);
-      return (match ? { name: match[1], result: match[2]} : { name: this });
-    }).filter(function(a) { return a; }).get();
+      return match && {
+        name: match[1],
+        result: match[2]
+      };
+    }).get();
   },
   
   getUnitTestResults: function(scrape) {
@@ -65,7 +68,7 @@ var TinderboxJSONUser = {
         name: match[1],
         result: match[2]
       };
-    }).filter(function (a) { return a; }).get();
+    }).get();
   },
   
   getTalosResults: function(scrape) {
