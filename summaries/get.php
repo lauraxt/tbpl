@@ -12,7 +12,7 @@ function getSummary($tree, $id) {
 
   $host = "tinderbox.mozilla.org";
   $page = "/showlog.cgi?log=" . $tree . "/" . $id; // . 1233853948.1233859186.27458.gz";
-  $fp = fsockopen($host, 80, &$errno, &$errdesc);
+  $fp = fsockopen($host, 80, $errno, $errdesc);
   if (!$fp)
     return "Couldn't connect to $host:\nError: $errno\nDesc: $errdesc\n";
   $request = "GET $page HTTP/1.0\r\n";
