@@ -54,10 +54,7 @@ var TinderboxJSONUser = {
       if (this.match(/rev\:/) || this.match(/s\:/))
         return null;
       var match = this.match(/(.*)\:(.*)/);
-      return match && {
-        name: match[1],
-        result: match[2]
-      };
+      return (match ? { name: match[1], result: match[2]} : { name: this });
     }).get();
   },
   
@@ -100,7 +97,7 @@ var TinderboxJSONUser = {
         detailsURL: seriesURLs[testname],
         "resultURL": resultURL
       };
-    }).filter(function(a) { return a; });
+    });
   },
   
   findRevInScrape: function(scrape) {
