@@ -103,7 +103,7 @@ var UserInterface = {
     else
       delete globalStorage[location.host].useLocalTime;
 
-    this._updateTimezone();
+    this._updateTimezoneDisplay();
     this._buildPushesList();
   },
 
