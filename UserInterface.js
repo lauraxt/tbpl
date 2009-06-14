@@ -28,10 +28,6 @@ var UserInterface = {
     document.getElementById("pushes").onmousedown = function(e) {
       self._clickNowhere(e);
     };
-    $(".machineResult").live("click", function(e) {
-      self._resultLinkClick(this);
-      e.preventDefault();
-    });
 
     AddCommentUI.init("http://tinderbox.mozilla.org/addnote.cgi");
     AddCommentUI.registerNumSendingCommentChangedCallback(function() {
@@ -243,6 +239,9 @@ var UserInterface = {
 
   _buildPushesList: function() {
     $(".patches > li").unbind();
+    $(".machineResult").unbind();
+    $("#goForward").unbind();
+    $("#goBack").unbind();
     var self = this;
     var ul = document.getElementById("pushes");
     ul.innerHTML = this._controller.getTimeOffset() ? '<li><a id="goForward" href="#" title="go forward by 12 hours"></a></li>' : '';
@@ -303,6 +302,11 @@ var UserInterface = {
       return false;
     });
     
+    $(".machineResult").bind("click", function(e) {
+      self._resultLinkClick(this);
+      e.preventDefault();
+    });
+
     $(".patches > li").bind("mouseenter", function startFadeInTimeout() {
       var div = $(".popup:not(.hovering)", this);
       if (div.width() - div.children().width() > 10)
