@@ -55,7 +55,7 @@ var TinderboxJSONUser = {
         return null;
       var match = this.match(/(.*)\:(.*)/);
       return (match ? { name: match[1], result: match[2]} : { name: this });
-    }).get();
+    }).filter(function() { return this; }).get();
   },
   
   getUnitTestResults: function(scrape) {
@@ -65,7 +65,7 @@ var TinderboxJSONUser = {
         name: match[1],
         result: match[2]
       };
-    }).get();
+    }).filter(function() { return this; }).get();
   },
   
   getTalosResults: function(scrape) {
@@ -83,11 +83,11 @@ var TinderboxJSONUser = {
     if (!foundSomething)
       return this.getScrapeResults(scrape);
   
-    return $('a', cell).get().map(function(ra) {
-      var resultURL = ra.getAttribute("href");
+    return $('a', cell).map(function() {
+      var resultURL = $(this).attr("href");
       if (resultURL.indexOf("http://graphs-new") != 0)
         return;
-      var match = ra.textContent.match(/(.*)\:(.*)/);
+      var match = this.textContent.match(/(.*)\:(.*)/);
       if (!match)
         return null;
       var testname = match[1].trim();
@@ -97,7 +97,7 @@ var TinderboxJSONUser = {
         detailsURL: seriesURLs[testname],
         "resultURL": resultURL
       };
-    });
+    }).filter(function() { return this; }).get();
   },
   
   findRevInScrape: function(scrape) {
