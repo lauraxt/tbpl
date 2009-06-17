@@ -33,6 +33,8 @@ var TinderboxJSONUser = {
       type:
       /talos/i.test(name) ? "Talos" :
       /nightly/i.test(name) ? "Nightly" :
+      /mochitest/i.test(name) ? "Mochitest" :
+      /everythingelse/i.test(name) ? "Everythingelse Test" :
       /unit test/i.test(name) ? "Unit Test" :
       /depend/i.test(name) ? "Build" :
       /(leak|bloat)/i.test(name) ? "Leak Test" :
@@ -121,6 +123,8 @@ var TinderboxJSONUser = {
           return (fun[machine.type] ? fun[machine.type] : fun.generic).call(self, scrape);
         })({
           "Unit Test": self.getUnitTestResults,
+          "Mochitest": self.getUnitTestResults,
+          "Everythingelse Test": self.getUnitTestResults,
           "Talos": self.getTalosResults,
           "Leak Test": self.getScrapeResults,
           "Build": self.getScrapeResults,

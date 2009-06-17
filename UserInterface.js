@@ -139,11 +139,24 @@ var UserInterface = {
   _paintBoxMatrix: function(boxMatrix) {
     var self = this;
     var colspans = { "linux": 1, "osx": 1, "windows": 1 };
-    for (var mt in boxMatrix) {
+    var groupedMachineTypes = [
+      ["Build"],
+      ["Leak Test"],
+      ["Unit Test", "Mochitest", "Everythingelse Test"],
+      ["Nightly"],
+      ["Talos"]
+    ];
+    groupedMachineTypes.forEach(function(types) {
       for (var os in colspans) {
-        colspans[os] *= boxMatrix[mt][os] ? boxMatrix[mt][os].length : 1;
+        var colspan = 0;
+        types.forEach(function(t) {
+          if (!boxMatrix[t])
+            return;
+          colspan += boxMatrix[t][os].length;
+        });
+        colspans[os] *= colspan ? colspan : 1;
       }
-    }
+    });
 
     var oss = this._data.getOss();
     oss.forEach(function(os) {
@@ -153,26 +166,40 @@ var UserInterface = {
     var table = $("#matrix");
     table.find("tbody").remove();
     var tbody = $("<tbody></tbody>").appendTo(table);
-    ["Build", "Leak Test", "Unit Test", "Nightly", "Talos"].forEach(function(t) {
-      if (!boxMatrix[t])
-        return;
-      var row = $("<tr></tr>").appendTo(tbody);
-      var innerHTML = '<th>' + t + '</th>';
+    groupedMachineTypes.forEach(function(types) {
+      var row = $("<tr></tr>");
+      var innerHTML = '<th>' + types[0] + '</th>';
+      var haveAnyOfType = false;
+      var typeColspan = {};
+      for (var os in colspans) {
+        typeColspan[os] = 0;
+        types.forEach(function(t) {
+          if (!boxMatrix[t])
+            return;
+          typeColspan[os] += boxMatrix[t][os].length;
+        });
+      }
       oss.forEach(function(os) {
-        if (!boxMatrix[t][os]) {
-          innerHTML += '<td class="empty" colspan=' + colspans[os] + '></td>';
-          return;
-        }
-        var boxColspan = colspans[os] / boxMatrix[t][os].length;
-        boxMatrix[t][os].forEach(function(machineResult) {
-          var status = machineResult.state;
-          innerHTML += '<td colspan="' + boxColspan + '"><a href="' +
-                   machineResult.briefLogURL + '" class="' + status +
-                   '" resultID="' + machineResult.runID + '">' +
-                   self._resultTitle(machineResult) + '</a></td>';
+        types.forEach(function(t) {
+          if (!boxMatrix[t])
+            return;
+          haveAnyOfType = true;
+          if (!boxMatrix[t][os]) {
+            innerHTML += '<td class="empty" colspan=' + colspans[os] + '></td>';
+            return;
+          }
+          var boxColspan = colspans[os] / typeColspan[os];
+          boxMatrix[t][os].forEach(function(machineResult) {
+            var status = machineResult.state;
+            innerHTML += '<td colspan="' + boxColspan + '"><a href="' +
+                     machineResult.briefLogURL + '" class="' + status +
+                     '" resultID="' + machineResult.runID + '">' +
+                     self._resultTitle(machineResult) + '</a></td>';
+          });
         });
       });
-      row.html(innerHTML);
+      if (haveAnyOfType)
+        row.html(innerHTML).appendTo(tbody);
     });
     table.css("visibility", "visible");
     $("a", table).get().forEach(function(cell) {
