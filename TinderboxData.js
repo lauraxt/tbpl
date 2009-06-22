@@ -27,7 +27,7 @@ TinderboxData.prototype = {
       },
       failCallback
     );
-    if (this._hasUnittestTree) {
+    if (this._hasUnittestTree()) {
       this._dataLoader.load(
         this._getUnittestTreeName(),
         timeOffset,
