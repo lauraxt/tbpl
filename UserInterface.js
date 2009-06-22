@@ -150,7 +150,7 @@ var UserInterface = {
       for (var os in colspans) {
         var colspan = 0;
         types.forEach(function(t) {
-          if (!boxMatrix[t])
+          if (!boxMatrix[t] || !boxMatrix[t][os])
             return;
           colspan += boxMatrix[t][os].length;
         });
@@ -174,7 +174,7 @@ var UserInterface = {
       for (var os in colspans) {
         typeColspan[os] = 0;
         types.forEach(function(t) {
-          if (!boxMatrix[t])
+          if (!boxMatrix[t] || !boxMatrix[t][os])
             return;
           typeColspan[os] += boxMatrix[t][os].length;
         });
