@@ -10,7 +10,7 @@ TinderboxData.prototype = {
 
   oss: ["linux", "osx", "windows"],
   machineTypes: ["Build", "Leak Test", "Unit Test", "Mochitest", "Everythingelse Test", "Nightly", "Talos", "Static Analysis"],
-  _treesWithUnittest: ["Firefox", "Firefox3.5", "TraceMonkey"],
+  _treesWithUnittest: ["Firefox", "TraceMonkey"],
 
   getRepoName: function() {
     return this._repoNames[this._treeName];
