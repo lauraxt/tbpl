@@ -11,7 +11,9 @@ var Config = {
     "Thunderbird": "comm-central",
     "Thunderbird3.0": "comm-central",
     "SeaMonkey": "comm-central",
+    "SeaMonkey2.0": "comm-central",
     "Sunbird": "comm-central",
-    "MozillaTry" : "try",
+    "MozillaTry": "try",
+    "Places": "projects/places/",
   },
 };
