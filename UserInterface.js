@@ -192,7 +192,8 @@ var UserInterface = {
           boxMatrix[t][os].forEach(function(machineResult) {
             var status = machineResult.state;
             innerHTML += '<td colspan="' + boxColspan + '"><a href="' +
-                     machineResult.briefLogURL + '" class="' + status +
+                     machineResult.briefLogURL + '" class="machineResult ' + status +
+                     (machineResult.note ? " hasNote" : "") +
                      '" resultID="' + machineResult.runID + '">' +
                      self._resultTitle(machineResult) + '</a></td>';
           });
