@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tinderboxpushlog</title>
+<link rel="stylesheet" type="text/css" href="style.css">
+<!-- Favicon courtesy of FAMFAMFAM silk - http://famfamfam.com/ -->
+<link rel="shortcut icon" href="favicon.png"/>
+</head>
+<body>
+<script type="application/javascript">
+window.onload = function() {
+  var match = /[?&]tree=([^&]+)/.exec(document.location.search);
+  if (!match) {
+    document.body.innerHTML = "Oops.";
+    return;
+  }
+  document.body.innerHTML =
+  "<p>The tree “" + match[1] + "” does not exist in Tinderboxpushlog. Please choose a tree from " +
+  "the list below:" +
+  '<ul style="font-size: 0.8em">' + (function() {
+    var rc = "";
+    for (var name in Config.repoNames) {
+      rc += '<li><a href="./?tree=' + name + '">' + name + '<' + '/a><' + '/li>';
+    }
+    return rc;
+  })() + "<" + "/ul>";
+}
+
+// for Config.js:
+var TinderboxJSONUser = 0, PushlogHTMLParser = 0;
+</script>
+<script type="application/javascript" src="Config.js"></script>
