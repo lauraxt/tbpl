@@ -193,7 +193,7 @@ var UserInterface = {
             var status = machineResult.state;
             innerHTML += '<td colspan="' + boxColspan + '"><a href="' +
                      machineResult.briefLogURL + '" class="machineResult ' + status +
-                     (machineResult.note ? " hasNote" : "") +
+                     (machineResult.note ? ' hasNote" title="(starred)' : '') +
                      '" resultID="' + machineResult.runID + '">' +
                      self._resultTitle(machineResult) + '</a></td>';
           });

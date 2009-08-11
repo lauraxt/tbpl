@@ -15,5 +15,6 @@ var Config = {
     "Sunbird": "comm-central",
     "MozillaTry": "try",
     "Places": "projects/places/",
+    "Mobile": "mozilla-cental",
   },
 };
