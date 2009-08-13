@@ -6,6 +6,7 @@ var Config = {
   loadInterval: 120, // seconds
   repoNames: {
     "Firefox": "mozilla-central",
+    "Firefox3.6": "releases/mozilla-1.9.2",
     "Firefox3.5": "releases/mozilla-1.9.1",
     "TraceMonkey": "tracemonkey",
     "Thunderbird": "comm-central",
