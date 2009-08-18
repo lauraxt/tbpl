@@ -1,2 +1,4 @@
-ExpiresActive on
-ExpiresDefault "access plus 15 minutes"
+<IfModule mod_expires.c>
+	ExpiresActive on
+	ExpiresDefault "access plus 15 minutes"
+</IfModule>
