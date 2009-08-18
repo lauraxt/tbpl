@@ -72,18 +72,15 @@ var UserInterface = {
   },
   
   _buildTreeSwitcher: function() {
-    var innerHTML = "";
-    if (this._treeName == "Firefox3.5")
-      innerHTML += "FF3.5 | ";
-    else
-      innerHTML += "<a href='?tree=Firefox3.5'>FF3.5<" + "/a> | ";
-  
-    if (this._treeName == "Firefox")
-      innerHTML += "FF3.6";
-    else
-      innerHTML += "<a href='./'>FF3.6<" + "/a>";
-  
-    $("#treechooser").html(innerHTML);
+    var labels = [];
+    var numTrees = 3, i = 0;
+    for (var tree in Config.repoNames) {
+      if (i >= numTrees)
+        break;
+      labels.push(this._treeName == tree ? tree : "<a href='" + (i == 0 ? "./" : "?tree=" + tree) + "'>" + tree + "<" + "/a>");
+      i++;
+    }
+    $("#treechooser").html(labels.join(" | "));
   },
 
   _updateTimezoneDisplay: function() {
@@ -188,7 +185,8 @@ var UserInterface = {
           boxMatrix[t][os].forEach(function(machineResult) {
             var status = machineResult.state;
             innerHTML += '<td colspan="' + boxColspan + '"><a href="' +
-                     machineResult.briefLogURL + '" class="' + status +
+                     machineResult.briefLogURL + '" class="machineResult ' + status +
+                     (machineResult.note ? ' hasNote" title="(starred)' : '') +
                      '" resultID="' + machineResult.runID + '">' +
                      self._resultTitle(machineResult) + '</a></td>';
           });

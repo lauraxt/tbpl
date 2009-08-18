@@ -16,8 +16,11 @@ var Controller = {
   init: function() {
     // Allow specifying a tree name in the URL (http://foo/?tree=Firefox3.5)
     var match = /[?&]tree=([^&]+)/.exec(document.location.search);
-    if (match && Config.repoNames[match[1]])
+    if (match) {
+      if (!Config.repoNames[match[1]])
+        throw "wrongtree"; // er, hm.
       this.treeName = match[1];
+    } 
 
     this._data = new Data(this.treeName, Config);
     this._oss = this._data.getOss();
