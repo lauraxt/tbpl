@@ -53,7 +53,7 @@ var TinderboxJSONUser = {
   
   getScrapeResults: function(scrape) {
     return $(scrape).map(function() {
-      if (this.match(/rev\:/) || this.match(/s\:/))
+      if (this.match(/rev\:/) || this.match(/s\:/) || this.match(/try\-/))
         return null;
       var match = this.match(/(.*)\:(.*)/);
       return (match ? { name: match[1], result: match[2]} : { name: this });
@@ -106,10 +106,12 @@ var TinderboxJSONUser = {
     var cell = document.createElement("td");
     cell.innerHTML = scrape.join("<br>\n");
     var reva = $('a[href^="http://hg.mozilla.org"]', cell).get(0);
-    if (!reva)
-      return null;
-  
-    return reva.textContent.substr(4, 12);
+    if (reva)
+      return reva.textContent.substr(4, 12);
+
+    // Tryserver uses try-c49054c95eba instead
+    match = scrape.join("").match(/try\-([0-9a-f]{12})/);
+    return match ? match[1] : null;
   },
   
   getBuildScrape: function(td, machine, machineRunID) {
