@@ -14,8 +14,9 @@ var Config = {
     "SeaMonkey": "comm-central",
     "SeaMonkey2.0": "comm-central",
     "Sunbird": "comm-central",
-    "MozillaTry": "try",
     "Places": "projects/places/",
     "Mobile": "mozilla-cental",
+    "MozillaTry": "try",
+    "ThunderbirdTry": "try",
   },
 };
