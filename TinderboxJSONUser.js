@@ -105,9 +105,13 @@ var TinderboxJSONUser = {
   findRevInScrape: function(scrape) {
     var cell = document.createElement("td");
     cell.innerHTML = scrape.join("<br>\n");
-    var reva = $('a[href^="http://hg.mozilla.org"]', cell).get(0);
-    if (reva)
-      return reva.textContent.substr(4, 12);
+    var revLinks = $('a[href^="http://hg.mozilla.org"]', cell).get();
+    for (var i = 0; i < revLinks.length; i++) {
+      var linkText = revLinks[i].textContent;
+      if (linkText.indexOf("mobile") == -1) {
+        return linkText.substr(4, 12);
+      }
+    }
 
     // Tryserver uses try-c49054c95eba instead
     match = scrape.join("").match(/try\-([0-9a-f]{12})/);
