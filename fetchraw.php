@@ -6,6 +6,10 @@ $url = isset($_GET["url"]) ? preg_replace("/ /", "+", $_GET["url"]) : "";
 $url = ($site == "tinderbox" ? "http://tinderbox.mozilla.org/" : "http://hg.mozilla.org/") . $url;
 header("Content-Type: text/html,charset=utf-8");
 
+// Disable caching in the way suggested by php.net/header
+header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
+header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
+
 $code = file_get_contents($url);
 $code = preg_replace("/<link.*>/Ui", "", 
         preg_replace("/<img.*>/Ui", "",
