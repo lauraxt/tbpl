@@ -33,7 +33,11 @@ var TinderboxJSONUser = {
       type:
       /talos/i.test(name) ? "Talos" :
       /nightly/i.test(name) ? "Nightly" :
+      /opt.*mochitest/i.test(name) ? "Opt Mochitest" :
+      /debug.*mochitest/i.test(name) ? "Debug Mochitest" :
       /mochitest/i.test(name) ? "Mochitest" :
+      /opt.*everythingelse/i.test(name) ? "Opt Everythingelse Test" :
+      /debug.*everythingelse/i.test(name) ? "Opt Everythingelse Test" :
       /everythingelse/i.test(name) ? "Everythingelse Test" :
       /unit test/i.test(name) ? "Unit Test" :
       /depend/i.test(name) ? "Build" :
@@ -130,6 +134,10 @@ var TinderboxJSONUser = {
         })({
           "Unit Test": self.getUnitTestResults,
           "Mochitest": self.getUnitTestResults,
+          "Opt Mochitest": self.getUnitTestResults,
+          "Debug Mochitest": self.getUnitTestResults,
+          "Opt Everythingelse Test": self.getUnitTestResults,
+          "Debug Everythingelse Test": self.getUnitTestResults,
           "Everythingelse Test": self.getUnitTestResults,
           "Talos": self.getTalosResults,
           "Leak Test": self.getScrapeResults,

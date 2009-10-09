@@ -135,7 +135,7 @@ var UserInterface = {
     var groupedMachineTypes = [
       ["Build"],
       ["Leak Test"],
-      ["Unit Test", "Mochitest", "Everythingelse Test"],
+      ["Unit Test", "Mochitest", "Opt Mochitest", "Debug Mochitest", "Everythingelse Test", "Opt Everythingelse Test", "Debug Everythingelse Test"],
       ["Nightly"],
       ["Talos"]
     ];
@@ -178,7 +178,9 @@ var UserInterface = {
             return;
           haveAnyOfType = true;
           if (!boxMatrix[t][os]) {
-            innerHTML += '<td class="empty" colspan=' + colspans[os] + '></td>';
+            if(typeColspan[os] == 0) {
+              innerHTML += '<td class="empty" colspan=' + colspans[os] + '></td>';
+            }
             return;
           }
           var boxColspan = colspans[os] / typeColspan[os];
@@ -252,12 +254,27 @@ var UserInterface = {
       + 'mins';
   },
   
+  _shortNameForMachine: function(machine) {
+    switch (machine.type) {
+      case "Opt Mochitest":
+        return "Mo";
+      case "Debug Mochitest":
+        return "Md";
+      case "Opt Everythingelse Test":
+        return "Eo";
+      case "Debug Everythingelse Test":
+        return "Ed";
+      default:
+        return machine.type.charAt(0);
+    }
+  },
+  
   _machineResultLink: function(machineResult) {
     return '<a href="' + machineResult.briefLogURL +
     '" resultID="' + machineResult.runID +
     '" class="machineResult ' + machineResult.state +
     '" title="' + this._resultTitle(machineResult) +
-    '">' + machineResult.machine.type.charAt(0) +
+    '">' + this._shortNameForMachine(machineResult.machine) +
     (machineResult.note ? '*' : '') +
     '</a>';
   },
