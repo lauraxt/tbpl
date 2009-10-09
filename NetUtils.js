@@ -25,10 +25,12 @@ var NetUtils = {
       req.open("GET", url, true); 
       req.send();
     } catch (e) {
-      failCallback();
+      window.tinderboxException = e;
+      failCallback(e);
       return;
     }
     errorTimer = setTimeout(function () {
+      window.tinderboxException = "timed out";
       req.abort();
       timeoutCallback();
     }, timeout * 1000);
