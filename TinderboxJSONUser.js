@@ -175,6 +175,9 @@ var TinderboxJSONUser = {
       if (machineResults[machineRunID])
         return;
   
+      if (state != "building" && !rev)
+        return;
+  
       var note = build.hasnote ? notes[build.noteid * 1] : "";
   
       if (state == 'success' && endTime) {
