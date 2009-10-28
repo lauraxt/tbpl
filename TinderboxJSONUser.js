@@ -37,7 +37,7 @@ var TinderboxJSONUser = {
       /debug.*mochitest/i.test(name) ? "Debug Mochitest" :
       /mochitest/i.test(name) ? "Mochitest" :
       /opt.*everythingelse/i.test(name) ? "Opt Everythingelse Test" :
-      /debug.*everythingelse/i.test(name) ? "Opt Everythingelse Test" :
+      /debug.*everythingelse/i.test(name) ? "Debug Everythingelse Test" :
       /everythingelse/i.test(name) ? "Everythingelse Test" :
       /unit test/i.test(name) ? "Unit Test" :
       /depend/i.test(name) ? "Build" :

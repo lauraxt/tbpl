@@ -9,7 +9,7 @@ function TinderboxData(treeName, dataLoader, repoNames) {
 TinderboxData.prototype = {
 
   oss: ["linux", "osx", "windows"],
-  machineTypes: ["Build", "Leak Test", "Unit Test", "Mochitest", "Opt Mochitest", "Debug Mochitest", "Everythingelse Test", "Opt Everythingelse Test", "Debg Everythingelse Test", "Nightly", "Talos", "Static Analysis"],
+  machineTypes: ["Build", "Leak Test", "Unit Test", "Mochitest", "Opt Mochitest", "Debug Mochitest", "Everythingelse Test", "Opt Everythingelse Test", "Debug Everythingelse Test", "Nightly", "Talos", "Static Analysis"],
   _treesWithUnittest: ["Firefox", "Firefox3.5", "Firefox3.6", "TraceMonkey"],
 
   getRepoName: function() {
