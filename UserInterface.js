@@ -255,6 +255,10 @@ var UserInterface = {
   },
   
   _shortNameForMachine: function(machine) {
+    return this._shortNameForMachineWithoutNumber(machine) + this._numberForMachine(machine);
+  },
+
+  _shortNameForMachineWithoutNumber: function (machine) {
     switch (machine.type) {
       case "Opt Mochitest":
         return "Mo";
@@ -268,7 +272,12 @@ var UserInterface = {
         return machine.type.charAt(0);
     }
   },
-  
+
+  _numberForMachine: function(machine) {
+    var match = /([0-9]+)\/[0-9]/.exec(machine.name);
+    return match ? match[1] : "";
+  },
+
   _machineResultLink: function(machineResult) {
     return '<a href="' + machineResult.briefLogURL +
     '" resultID="' + machineResult.runID +
