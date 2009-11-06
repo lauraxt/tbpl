@@ -4,6 +4,7 @@ var UserInterface = {
   _treeName: "",
   _data: null,
   _activeResult: "",
+  _lastNumber: 6,
 
   init: function(controller) {
     var self = this;
@@ -255,7 +256,8 @@ var UserInterface = {
   },
   
   _shortNameForMachine: function(machine) {
-    return this._shortNameForMachineWithoutNumber(machine) + this._numberForMachine(machine);
+    var thisNumber = this._numberForMachine(machine);
+    return (this._lastNumber >= thisNumber ? this._shortNameForMachineWithoutNumber(machine) : '') + (this._lastNumber = thisNumber);
   },
 
   _shortNameForMachineWithoutNumber: function (machine) {
@@ -315,6 +317,7 @@ var UserInterface = {
         machineTypes.map(function(machineType) {
           if (!results[machineType])
             return '';
+          self._lastNumber = 6;
           return results[machineType].map(function (a) { return self._machineResultLink(a); }).join(" ");
         }).join("\n") +
         '</span></li>';
