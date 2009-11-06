@@ -146,8 +146,17 @@ Data.prototype = {
       for (var j in self._pushes[i].results)
         for (var k in self._pushes[i].results[j])
           self._pushes[i].results[j][k].sort(function(a, b) {
-            var aTime = a.startTime.getTime(), bTime = b.startTime.getTime();
-            return aTime < bTime ? -1 : aTime > bTime ? 1 : 0;
+            // if the start time of two Mochitests does not differ by more than
+            // 5 minutes, they probably belong together so sort them by their
+            // number.
+            var timeDiff = a.startTime.getTime() - b.startTime.getTime();
+            if (Math.abs(timeDiff) < 5*60*1000) {
+              var matchA = /([0-9]+)\/[0-9]/.exec(a.machine.name);
+              var matchB = /([0-9]+)\/[0-9]/.exec(b.machine.name);
+              if (matchA && matchB)
+                return matchA[1] - matchB[1];
+            }
+            return timeDiff;
           });
     }
   },
