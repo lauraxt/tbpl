@@ -138,12 +138,18 @@ Data.prototype = {
         if (!push.results[machineResult.machine.os][machineResult.machine.type])
           push.results[machineResult.machine.os][machineResult.machine.type] = [];
         push.results[machineResult.machine.os][machineResult.machine.type].push(machineResult);
-        push.results[machineResult.machine.os][machineResult.machine.type].sort(function(a, b) {
-          var aTime = a.startTime.getTime(), bTime = b.startTime.getTime();
-          return aTime < bTime ? -1 : aTime > bTime ? 1 : 0;
-        });
       }
     });
+    for (var i in self._pushes) {
+      if(!self._pushes[i].results)
+        continue;
+      for (var j in self._pushes[i].results)
+        for (var k in self._pushes[i].results[j])
+          self._pushes[i].results[j][k].sort(function(a, b) {
+            var aTime = a.startTime.getTime(), bTime = b.startTime.getTime();
+            return aTime < bTime ? -1 : aTime > bTime ? 1 : 0;
+          });
+    }
   },
 
 }
