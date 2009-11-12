@@ -140,12 +140,13 @@ Data.prototype = {
         push.results[machineResult.machine.os][machineResult.machine.type].push(machineResult);
       }
     });
-    for (var i in self._pushes) {
-      if(!self._pushes[i].results)
-        continue;
-      for (var j in self._pushes[i].results)
-        for (var k in self._pushes[i].results[j])
-          self._pushes[i].results[j][k].sort(function(a, b) {
+    $(self._pushes).each(function () {
+      if(!this.results)
+        return;
+
+      for (var j in this.results) {
+        for (var k in this.results[j]) {
+          this.results[j][k].sort(function(a, b) {
             // if the start time of two Mochitests does not differ by more than
             // 5 minutes, they probably belong together so sort them by their
             // number.
@@ -158,7 +159,9 @@ Data.prototype = {
             }
             return timeDiff;
           });
-    }
+        }
+      }
+    });
   },
 
 }
