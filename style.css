@@ -154,6 +154,30 @@ iframe {
 .machineResult.busted[active=true]     { background-color: #D00; }
 .machineResult.building[active=true]   { background-color: #CCC; }
 
+#pushes .machineResultGroup .machineResult {
+  padding: 0 2px 2px;
+}
+
+#pushes .machineResultGroup::before {
+  content: attr(machinetype) " [";
+  margin-left: 3px;
+  margin-right: -2px;
+}
+
+#pushes .machineResultGroup::after {
+  content: "]";
+  margin-left: -2px;
+  margin-right: 3px;
+}
+
+#pushes .machineResultGroup::before,
+#pushes .machineResultGroup::after {
+  float: left;
+  font-size: 1.1em;
+  padding: 0 0 2px;
+  color: #777;
+}
+
 a {
   text-decoration: none;
 }

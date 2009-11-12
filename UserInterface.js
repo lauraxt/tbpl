@@ -4,7 +4,7 @@ var UserInterface = {
   _treeName: "",
   _data: null,
   _activeResult: "",
-  _lastNumber: 6,
+  _groupedMachineTypes: ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
 
   init: function(controller) {
     var self = this;
@@ -255,9 +255,10 @@ var UserInterface = {
       + 'mins';
   },
   
-  _shortNameForMachine: function(machine) {
-    var thisNumber = this._numberForMachine(machine);
-    return (this._lastNumber >= thisNumber ? this._shortNameForMachineWithoutNumber(machine) : '') + (this._lastNumber = thisNumber);
+  _shortNameForMachine: function(machine, onlyNumber) {
+    if (onlyNumber)
+      return this._numberForMachine(machine);
+    return this._shortNameForMachineWithoutNumber(machine) + this._numberForMachine(machine);
   },
 
   _shortNameForMachineWithoutNumber: function (machine) {
@@ -280,14 +281,23 @@ var UserInterface = {
     return match ? match[1] : "";
   },
 
-  _machineResultLink: function(machineResult) {
+  _machineResultLink: function(machineResult, onlyNumber) {
     return '<a href="' + machineResult.briefLogURL +
     '" resultID="' + machineResult.runID +
     '" class="machineResult ' + machineResult.state +
     '" title="' + this._resultTitle(machineResult) +
-    '">' + this._shortNameForMachine(machineResult.machine) +
+    '">' + this._shortNameForMachine(machineResult.machine, onlyNumber) +
     (machineResult.note ? '*' : '') +
     '</a>';
+  },
+
+  _machineGroupResultLink: function(machineResults) {
+    var self = this;
+    return '<span class="machineResultGroup" machineType="' +
+    self._shortNameForMachineWithoutNumber(machineResults[0].machine) +
+    '"> ' +
+    machineResults.map(function (a) { return self._machineResultLink(a, true); }).join(" ") +
+    ' </span>';
   },
 
   _buildPushesList: function() {
@@ -317,7 +327,9 @@ var UserInterface = {
         machineTypes.map(function(machineType) {
           if (!results[machineType])
             return '';
-          self._lastNumber = 6;
+          if (self._groupedMachineTypes.indexOf(machineType) != -1) {
+            return self._machineGroupResultLink(results[machineType]);
+          }
           return results[machineType].map(function (a) { return self._machineResultLink(a); }).join(" ");
         }).join("\n") +
         '</span></li>';
