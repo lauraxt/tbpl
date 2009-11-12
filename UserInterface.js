@@ -213,11 +213,7 @@ var UserInterface = {
     if (!globalStorage[location.host].useLocalTime) {
       var hoursdiff = date.getTimezoneOffset()/60 + Config.mvtTimezone/100;
       d = new Date(date.getTime() + hoursdiff * 60 * 60 * 1000);
-      // properly display half-hour timezones with sign and leading zero
-      var absdiff = Math.abs(hoursdiff);
-      timediff = ' ' + (hoursdiff < 0 ? '-' : '') +
-        (absdiff < 10 ? '0' : '') + (Math.floor(absdiff) * 100 + 60 * (absdiff -
-        Math.floor(absdiff)));
+      timediff = ' ' + Config.mvtTimezone;
     }
     return d.toLocaleString() + timediff;
   },
