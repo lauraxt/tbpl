@@ -62,7 +62,9 @@ var AddCommentUI = {
     var div = $("#addNotePopup").fadeIn('fast');
     if (!this.addToBuilds[UserInterface._activeResult]) {
       this.addToBuilds[UserInterface._activeResult] = true;
-      ($("#logNoteEmail").get(0).value ? $("#logNoteText") : $("#logNoteEmail")).get(0).focus();
+      var focusTextfield = ($("#logNoteEmail").get(0).value ? $("#logNoteText") : $("#logNoteEmail")).get(0);
+      focusTextfield.focus();
+      focusTextfield.select();
     } else {
       delete this.addToBuilds[UserInterface._activeResult];
     }
