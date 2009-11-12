@@ -151,7 +151,7 @@ Data.prototype = {
             // 5 minutes, they probably belong together so sort them by their
             // number.
             var timeDiff = a.startTime.getTime() - b.startTime.getTime();
-            if (Math.abs(timeDiff) < 5*60*1000) {
+            if (Math.abs(timeDiff) < 30*60*1000) {
               var matchA = /([0-9]+)\/[0-9]/.exec(a.machine.name);
               var matchB = /([0-9]+)\/[0-9]/.exec(b.machine.name);
               if (matchA && matchB)
