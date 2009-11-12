@@ -208,7 +208,7 @@ var UserInterface = {
     var d = date;
     var timediff = '';
     if (!globalStorage[location.host].useLocalTime) {
-      var hoursdiff = Config.mvtTimezone / 100;
+      var hoursdiff = date.getTimezoneOffset()/60 + Config.mvtTimezone/100;
       d = new Date(date.getTime() + hoursdiff * 60 * 60 * 1000);
       // properly display half-hour timezones with sign and leading zero
       var absdiff = Math.abs(hoursdiff);
