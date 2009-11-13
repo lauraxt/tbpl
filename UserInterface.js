@@ -4,7 +4,6 @@ var UserInterface = {
   _treeName: "",
   _data: null,
   _activeResult: "",
-  _groupedMachineTypes: ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
 
   init: function(controller) {
     var self = this;
@@ -323,7 +322,7 @@ var UserInterface = {
         machineTypes.map(function(machineType) {
           if (!results[machineType])
             return '';
-          if (self._groupedMachineTypes.indexOf(machineType) != -1) {
+          if (self._data.machineTypeIsGrouped(machineType)) {
             return self._machineGroupResultLink(results[machineType]);
           }
           return results[machineType].map(function (a) { return self._machineResultLink(a); }).join(" ");

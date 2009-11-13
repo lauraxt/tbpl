@@ -48,6 +48,11 @@ Data.prototype = {
     return this._tinderboxData.machineTypes;
   },
 
+  machineTypeIsGrouped: function(machineType) {
+    return this._tinderboxData.treesWithGroups[this._treeName] &&
+      this._tinderboxData.treesWithGroups[this._treeName].indexOf(machineType) != -1;
+  },
+
   getMachines: function() {
     return this._machines;
   },
