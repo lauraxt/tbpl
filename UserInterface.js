@@ -498,10 +498,11 @@ var UserInterface = {
       result.fullLogURL + '">View Full Log</a> <a class="addNote" href="' +
       result.addNoteURL + '">Add a Comment</a> <span id="summaryLoader"></span>' +
       (function () {
-        if (!result.testResults.length)
+        var testResults = result.getTestResults();
+        if (!testResults.length)
           return '';
         return '<ul class="testResults">\n' +
-        result.testResults.map(function(r) {
+        testResults.map(function(r) {
           return '<li>' + r.name +
             (r.result ? ': ' + (r.resultURL ? '<a href="' + r.resultURL.replace(/"/g, "&quot;") +
                                               '">' + r.result + '</a>'
