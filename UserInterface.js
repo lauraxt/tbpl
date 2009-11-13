@@ -5,7 +5,7 @@ var UserInterface = {
   _data: null,
   _activeResult: "",
 
-  init: function(controller) {
+  init: function (controller) {
     var self = this;
     this._controller = controller;
     this._treeName = controller.treeName;
@@ -25,12 +25,12 @@ var UserInterface = {
       return false;
     });
 
-    document.getElementById("pushes").onmousedown = function(e) {
+    document.getElementById("pushes").onmousedown = function (e) {
       self._clickNowhere(e);
     };
 
     AddCommentUI.init("http://tinderbox.mozilla.org/addnote.cgi");
-    AddCommentUI.registerNumSendingCommentChangedCallback(function() {
+    AddCommentUI.registerNumSendingCommentChangedCallback(function () {
       self.updateStatus();
     });
 
@@ -38,13 +38,13 @@ var UserInterface = {
 
   },
 
-  loadedData: function(kind) {
+  loadedData: function (kind) {
     if (kind == "machineResults")
       this._paintBoxMatrix(this._generateBoxMatrix());
     this._buildPushesList();
   },
 
-  updateStatus: function() {
+  updateStatus: function () {
     var loading = [];
     for (i in this._controller.loadStatus) {
       if (this._controller.loadStatus[i] == "loading")
@@ -71,7 +71,7 @@ var UserInterface = {
     statusSpan.html(text);
   },
   
-  _buildTreeSwitcher: function() {
+  _buildTreeSwitcher: function () {
     var labels = [];
     var numTrees = 3, i = 0;
     for (var tree in Config.repoNames) {
@@ -83,14 +83,14 @@ var UserInterface = {
     $("#treechooser").html(labels.join(" | "));
   },
 
-  _updateTimezoneDisplay: function() {
+  _updateTimezoneDisplay: function () {
     document.getElementById('localTime').className =
       globalStorage[location.host].useLocalTime ? 'selected' : '';
     document.getElementById('mvtTime').className =
       !globalStorage[location.host].useLocalTime ? 'selected' : '';
   },
 
-  _switchTimezone: function(local) {
+  _switchTimezone: function (local) {
     if (local)
       globalStorage[location.host].useLocalTime = true;
     else
@@ -100,22 +100,22 @@ var UserInterface = {
     this._buildPushesList();
   },
 
-  _stripTags: function(text) {
+  _stripTags: function (text) {
     var div = document.createElement("div");
     div.innerHTML = text;
     return div.textContent.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   },
 
-  _linkBugs: function(text) {
+  _linkBugs: function (text) {
     return text.replace(/(bug\s*|b=)([1-9][0-9]*)\b/ig, '<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=$2">$1$2</a>')
            .replace(/(changeset\s*)?([0-9a-f]{12})\b/ig, '<a href="'+this._revURL('')+'$2">$1$2</a>');
   },
   
-  _generateBoxMatrix: function() {
+  _generateBoxMatrix: function () {
     var boxMatrix = {};
     var machines = this._data.getMachines();
     var machineResults = this._data.getMachineResults();
-    machines.forEach(function(machine) {
+    machines.forEach(function (machine) {
       if (!machine.latestFinishedRun.id) {
         // Ignore machines without run information.
         return;
@@ -129,7 +129,7 @@ var UserInterface = {
     return boxMatrix;
   },
   
-  _paintBoxMatrix: function(boxMatrix) {
+  _paintBoxMatrix: function (boxMatrix) {
     var self = this;
     var colspans = { "linux": 1, "osx": 1, "windows": 1 };
     var groupedMachineTypes = [
@@ -139,10 +139,10 @@ var UserInterface = {
       ["Nightly"],
       ["Talos"]
     ];
-    groupedMachineTypes.forEach(function(types) {
+    groupedMachineTypes.forEach(function (types) {
       for (var os in colspans) {
         var colspan = 0;
-        types.forEach(function(t) {
+        types.forEach(function (t) {
           if (!boxMatrix[t] || !boxMatrix[t][os])
             return;
           colspan += boxMatrix[t][os].length;
@@ -152,28 +152,28 @@ var UserInterface = {
     });
 
     var oss = this._data.getOss();
-    oss.forEach(function(os) {
+    oss.forEach(function (os) {
       document.getElementById(os + "th").setAttribute("colspan", colspans[os]);
     });
   
     var table = $("#matrix");
     table.find("tbody").remove();
     var tbody = $("<tbody></tbody>").appendTo(table);
-    groupedMachineTypes.forEach(function(types) {
+    groupedMachineTypes.forEach(function (types) {
       var row = $("<tr></tr>");
       var innerHTML = '<th>' + types[0] + '</th>';
       var haveAnyOfType = false;
       var typeColspan = {};
       for (var os in colspans) {
         typeColspan[os] = 0;
-        types.forEach(function(t) {
+        types.forEach(function (t) {
           if (!boxMatrix[t] || !boxMatrix[t][os])
             return;
           typeColspan[os] += boxMatrix[t][os].length;
         });
       }
-      oss.forEach(function(os) {
-        types.forEach(function(t) {
+      oss.forEach(function (os) {
+        types.forEach(function (t) {
           if (!boxMatrix[t])
             return;
           haveAnyOfType = true;
@@ -184,7 +184,7 @@ var UserInterface = {
             return;
           }
           var boxColspan = colspans[os] / typeColspan[os];
-          boxMatrix[t][os].forEach(function(machineResult) {
+          boxMatrix[t][os].forEach(function (machineResult) {
             var status = machineResult.state;
             innerHTML += '<td colspan="' + boxColspan + '"><a href="' +
                      machineResult.briefLogURL + '" class="machineResult ' + status +
@@ -198,15 +198,15 @@ var UserInterface = {
         row.html(innerHTML).appendTo(tbody);
     });
     table.css("visibility", "visible");
-    $("a", table).get().forEach(function(cell) {
-      cell.addEventListener("click", function(e) {
+    $("a", table).get().forEach(function (cell) {
+      cell.addEventListener("click", function (e) {
         self._resultLinkClick(this);
         e.preventDefault();
       }, false);
     });
   },
 
-  _getDisplayDate: function(date) {
+  _getDisplayDate: function (date) {
     var d = date;
     var timediff = '';
     if (!globalStorage[location.host].useLocalTime) {
@@ -217,7 +217,7 @@ var UserInterface = {
     return d.toLocaleString() + timediff;
   },
   
-  _getDisplayTime: function(date) {
+  _getDisplayTime: function (date) {
     if (!date.getTime)
       return '';
     var d = date;
@@ -226,11 +226,11 @@ var UserInterface = {
     return d.toLocaleFormat('%H:%M');
   },
   
-  _revURL: function(rev) {
+  _revURL: function (rev) {
     return this._data.getRevUrl(rev);
   },
 
-  _resultTitle: function(result) {
+  _resultTitle: function (result) {
     var type = result.machine.type;
     return {
       "building": type + ' is still running, ' + this._etaString(result),
@@ -240,7 +240,7 @@ var UserInterface = {
     }[result.state];
   },
   
-  _etaString: function(result) {
+  _etaString: function (result) {
     if (!result.machine.averageCycleTime)
       return 'ETA unknown';
     var elapsed = Math.ceil(((new Date()).getTime() - result.startTime.getTime()) / 1000);
@@ -250,7 +250,7 @@ var UserInterface = {
       + 'mins';
   },
   
-  _shortNameForMachine: function(machine, onlyNumber) {
+  _shortNameForMachine: function (machine, onlyNumber) {
     if (onlyNumber)
       return this._numberForMachine(machine);
     return this._shortNameForMachineWithoutNumber(machine) + this._numberForMachine(machine);
@@ -271,12 +271,12 @@ var UserInterface = {
     }
   },
 
-  _numberForMachine: function(machine) {
+  _numberForMachine: function (machine) {
     var match = /([0-9]+)\/[0-9]/.exec(machine.name);
     return match ? match[1] : "";
   },
 
-  _machineResultLink: function(machineResult, onlyNumber) {
+  _machineResultLink: function (machineResult, onlyNumber) {
     return '<a href="' + machineResult.briefLogURL +
     '" resultID="' + machineResult.runID +
     '" class="machineResult ' + machineResult.state +
@@ -286,7 +286,7 @@ var UserInterface = {
     '</a>';
   },
 
-  _machineGroupResultLink: function(machineResults) {
+  _machineGroupResultLink: function (machineResults) {
     var self = this;
     return '<span class="machineResultGroup" machineType="' +
     self._shortNameForMachineWithoutNumber(machineResults[0].machine) +
@@ -295,7 +295,7 @@ var UserInterface = {
     ' </span>';
   },
 
-  _buildPushesList: function() {
+  _buildPushesList: function () {
     $(".patches > li").unbind();
     $(".machineResult").unbind();
     $("#goForward").unbind();
@@ -307,19 +307,19 @@ var UserInterface = {
     var oss = this._data.getOss();
     var machineTypes = this._data.getMachineTypes();
     var timeOffset = this._controller.getTimeOffset();
-    ul.innerHTML+= pushes.map(function(push, pushIndex) {
+    ul.innerHTML+= pushes.map(function (push, pushIndex) {
       return '<li>\n' +
       '<h2><span class="pusher">' + push.pusher + '</span> &ndash; ' +
       '<span class="date">' + self._getDisplayDate(push.date) + '</span></h2>\n' +
       '<ul class="results">\n' +
-      oss.map(function(os) {
+      oss.map(function (os) {
         if (!push.results || !push.results[os])
           return '';
         var results = push.results[os];
         return '<li><span class="os ' + os + '">' +
         { "linux": "Linux", "osx": "Mac OS X", "windows": "Windows" }[os] +
         '</span><span class="osresults">' +
-        machineTypes.map(function(machineType) {
+        machineTypes.map(function (machineType) {
           if (!results[machineType])
             return '';
           if (self._data.machineTypeIsGrouped(machineType)) {
@@ -331,7 +331,7 @@ var UserInterface = {
       }).join("\n") +
       '</ul>' +
       '<ul class="patches">\n' +
-      push.patches.map(function(patch, patchIndex) {
+      push.patches.map(function (patch, patchIndex) {
         return '<li>\n' +
         '<a class="revlink" href="' + self._revURL(patch.rev) + '">' + patch.rev +
         '</a>\n<div class="popup"><span><span class="author">' + patch.author + '</span> &ndash; ' +
@@ -363,7 +363,7 @@ var UserInterface = {
       return false;
     });
     
-    $(".machineResult").bind("click", function(e) {
+    $(".machineResult").bind("click", function (e) {
       self._resultLinkClick(this);
       e.preventDefault();
     });
@@ -411,22 +411,22 @@ var UserInterface = {
     this._setActiveResult(this._activeResult, false);
   },
   
-  _clickNowhere: function(e) {
+  _clickNowhere: function (e) {
     if (!$(e.target).is("a, #pushes"))
       this._setActiveResult("");
   },
   
-  _resultLinkClick: function(link) {
+  _resultLinkClick: function (link) {
     var resultID = link.getAttribute("resultID");
     this._setActiveResult(resultID, true);
   },
   
-  _markActiveResultLinks: function() {
+  _markActiveResultLinks: function () {
     if (this._activeResult)
       $('.machineResult[resultID="' + this._activeResult + '"]').attr("active", "true");
   },
   
-  _setActiveResult: function(resultID, scroll) {
+  _setActiveResult: function (resultID, scroll) {
     SummaryLoader._abortOutstandingSummaryLoadings();
     SummaryLoader._abortOutstandingSummaryLoadings = function () {};
     if (this._activeResult) {
@@ -443,7 +443,7 @@ var UserInterface = {
     this._displayResult();
   },
   
-  _scrollElemIntoView: function(elem, box, margin) {
+  _scrollElemIntoView: function (elem, box, margin) {
     var boxBox = box.getBoundingClientRect();
     var elemBox = elem.getBoundingClientRect();
     if (elemBox.top < boxBox.top) {
@@ -455,7 +455,7 @@ var UserInterface = {
     }
   },
 
-  _animateScroll: function(scrollBox, end, duration) {
+  _animateScroll: function (scrollBox, end, duration) {
     var startTime = Date.now();
     var start = scrollBox.scrollTop;
     var timer = setInterval(function () {
@@ -473,7 +473,7 @@ var UserInterface = {
     }, 16);
   },
   
-  _displayResult: function() {
+  _displayResult: function () {
     var self = this;
     var result = this._data.getMachineResults()[this._activeResult];
     var box = document.getElementById("results");
@@ -502,7 +502,7 @@ var UserInterface = {
         if (!testResults.length)
           return '';
         return '<ul class="testResults">\n' +
-        testResults.map(function(r) {
+        testResults.map(function (r) {
           return '<li>' + r.name +
             (r.result ? ': ' + (r.resultURL ? '<a href="' + r.resultURL.replace(/"/g, "&quot;") +
                                               '">' + r.result + '</a>'
@@ -517,7 +517,7 @@ var UserInterface = {
       })() +
       (function () {
         return '<div class="stars">' +
-        (function() {
+        (function () {
           if (!result.note)
             return '';
           return '<div class="note">' +

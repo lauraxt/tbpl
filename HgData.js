@@ -5,15 +5,15 @@ function HgData(repoName, dataLoader) {
 
 HgData.prototype = {
 
-  load: function(timeOffset, loadCallback, failCallback) {
+  load: function (timeOffset, loadCallback, failCallback) {
     return this._dataLoader.load(this._repoName, timeOffset, loadCallback, failCallback);
   },
 
-  getRepoUrl: function() {
+  getRepoUrl: function () {
     return "http://hg.mozilla.org/" + this._repoName + "/";
   },
 
-  getRevUrl: function(rev) {
+  getRevUrl: function (rev) {
     return this.getRepoUrl() + "rev/" + rev;
   },
 

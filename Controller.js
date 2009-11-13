@@ -13,7 +13,7 @@ var Controller = {
   _loadInterval: null,
   _data: null,
 
-  init: function() {
+  init: function () {
     // Allow specifying a tree name in the URL (http://foo/?tree=Firefox3.5)
     var match = /[?&]tree=([^&]+)/.exec(document.location.search);
     if (match) {
@@ -31,20 +31,20 @@ var Controller = {
     this.forceRefresh();
   },
 
-  getData: function() {
+  getData: function () {
     return this._data;
   },
 
-  getTimeOffset: function() {
+  getTimeOffset: function () {
     return this._timeOffset;
   },
 
-  setTimeOffset: function(timeOffset) {
+  setTimeOffset: function (timeOffset) {
     this._timeOffset = timeOffset;
     this.forceRefresh();
   },
 
-  forceRefresh: function() {
+  forceRefresh: function () {
     var self = this;
     this._startStatusRequest();
     if (this._loadInterval) {
@@ -53,11 +53,11 @@ var Controller = {
     }
     if (!this._timeOffset) {
       // Don't bother refreshing the past.
-      this._loadInterval = setInterval(function() { self._startStatusRequest(); }, Config.loadInterval * 1000);
+      this._loadInterval = setInterval(function () { self._startStatusRequest(); }, Config.loadInterval * 1000);
     }
   },
 
-  _startStatusRequest: function() {
+  _startStatusRequest: function () {
     var self = this;
     this.loadStatus = { pushlog: "loading", tinderbox: "loading" };
     UserInterface.updateStatus();
@@ -88,7 +88,7 @@ var Controller = {
     );
   },
 
-  _loadedData: function(kind) {
+  _loadedData: function (kind) {
     UserInterface.updateStatus();
     UserInterface.loadedData(kind);
   },

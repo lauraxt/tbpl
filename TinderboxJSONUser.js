@@ -1,6 +1,6 @@
 var TinderboxJSONUser = {
 
-  load: function(tree, timeOffset, loadCallback, failCallback) {
+  load: function (tree, timeOffset, loadCallback, failCallback) {
     delete tinderbox_data;
     var self = this;
     /**
@@ -22,7 +22,7 @@ var TinderboxJSONUser = {
     });
   },
 
-  getMachineType: function(name) {
+  getMachineType: function (name) {
     return {
       os:
       /Linux/.test(name) ? "linux" :
@@ -48,14 +48,14 @@ var TinderboxJSONUser = {
     };
   },
   
-  getLogURL: function(tree, id, full, note) {
+  getLogURL: function (tree, id, full, note) {
     return "http://tinderbox.mozilla.org/" + (note ? "addnote" : "showlog") + ".cgi?log=" + tree + "/" + id + (full ? "&fulltext=1" : "");
   },
-  processNote: function(note) {
+  processNote: function (note) {
     return note.replace(/<\/?pre>/g, "").trim().replace(/\n/g, "<br>");
   },
   
-  findRevInScrape: function(scrape) {
+  findRevInScrape: function (scrape) {
     if (!scrape)
       return "";
     var cell = document.createElement("td");
@@ -73,14 +73,14 @@ var TinderboxJSONUser = {
     return match ? match[1] : null;
   },
   
-  getBuildScrape: function(td, machineRunID) {
+  getBuildScrape: function (td, machineRunID) {
     return td.scrape[machineRunID];
   },
   
-  parseTinderbox: function(tree, td) {
+  parseTinderbox: function (tree, td) {
     var self = this;
     var machines = [];
-    $(td.build_names).each(function(i, name) {
+    $(td.build_names).each(function (i, name) {
       var machinetype = self.getMachineType(name);
       if (!machinetype.os || !machinetype.type) {
         return;
@@ -98,7 +98,7 @@ var TinderboxJSONUser = {
     var notes = td.note_array.map(self.processNote);
   
     var machineResults = {};
-    td.build_table.forEach(function(row) { row.forEach(function(build, machineIndex) {
+    td.build_table.forEach(function (row) { row.forEach(function (build, machineIndex) {
       if (!build.buildstatus || build.buildstatus == "null" || !machines[machineIndex])
         return;
       var state = build.buildstatus; /* building, success, testfailed, busted */
@@ -149,7 +149,7 @@ var TinderboxJSONUser = {
       }
     }); });
   
-    machines.forEach(function(machine) {
+    machines.forEach(function (machine) {
       if (machine.runs) {
         machine.averageCycleTime = Math.ceil(machine.runtime/machine.runs);
       }
@@ -200,31 +200,31 @@ MachineResult.prototype = {
     });
   },
   
-  getScrapeResults: function(scrape) {
-    return $(scrape).map(function() {
+  getScrapeResults: function (scrape) {
+    return $(scrape).map(function () {
       if (this.match(/rev\:/) || this.match(/s\:/) || this.match(/try\-/))
         return null;
       var match = this.match(/(.*)\:(.*)/);
       return (match ? { name: match[1], result: match[2]} : { name: this });
-    }).filter(function() { return this; }).get();
+    }).filter(function () { return this; }).get();
   },
   
-  getUnitTestResults: function(scrape) {
-    return $(scrape).map(function() {
+  getUnitTestResults: function (scrape) {
+    return $(scrape).map(function () {
       var match = this.match(/(.*)<br\/>(.*)/);
       return match && {
         name: match[1],
         result: match[2]
       };
-    }).filter(function() { return this; }).get();
+    }).filter(function () { return this; }).get();
   },
   
-  getTalosResults: function(scrape) {
+  getTalosResults: function (scrape) {
     var seriesURLs = {};
     var foundSomething = false;
     var cell = document.createElement("td");
     cell.innerHTML = scrape.join("<br>\n");
-    $('p a', cell).each(function() {
+    $('p a', cell).each(function () {
       if (this.getAttribute("href").indexOf("http://graphs-new") != 0)
         return;
       seriesURLs[this.textContent] = this.getAttribute("href");
@@ -234,7 +234,7 @@ MachineResult.prototype = {
     if (!foundSomething)
       return this.getScrapeResults(scrape);
   
-    return $('a', cell).map(function() {
+    return $('a', cell).map(function () {
       var resultURL = $(this).attr("href");
       if (resultURL.indexOf("http://graphs-new") != 0)
         return;
@@ -248,6 +248,6 @@ MachineResult.prototype = {
         detailsURL: seriesURLs[testname],
         "resultURL": resultURL
       };
-    }).filter(function() { return this; }).get();
+    }).filter(function () { return this; }).get();
   },
 };

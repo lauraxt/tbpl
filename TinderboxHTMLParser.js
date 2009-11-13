@@ -1,8 +1,8 @@
 var TinderboxHTMLParser = {};
 
-(function(){
+(function (){
 
-TinderboxHTMLParser.load = function(tree, loadCallback, failCallback) {
+TinderboxHTMLParser.load = function (tree, loadCallback, failCallback) {
   NetUtils.loadDom("fetchraw.php?site=tinderbox&url=" + tree + "/", function (doc) {
     try {
       loadCallback(parseTinderbox(doc));
@@ -94,10 +94,10 @@ function getUnitTestResults(reva) {
 
 function getTalosResults(tt) {
   var seriesURLs = {};
-  $('p a[href^="http://graphs-new"]', tt.parentNode).each(function() {
+  $('p a[href^="http://graphs-new"]', tt.parentNode).each(function () {
     seriesURLs[this.textContent] = this.getAttribute("href");
   });
-  return $('a[href^="http://graphs-new"]', tt.parentNode).get().map(function(ra) {
+  return $('a[href^="http://graphs-new"]', tt.parentNode).get().map(function (ra) {
     var resultURL = ra.getAttribute("href");
     var match = ra.textContent.match(/(.*)\:(.*)/);
     if (!match)
@@ -109,7 +109,7 @@ function getTalosResults(tt) {
       seriesURL: seriesURLs[testname],
       "resultURL": resultURL
     };
-  }).filter(function(a) { return a; });
+  }).filter(function (a) { return a; });
 }
 
 function parseTinderbox(doc) {
@@ -117,7 +117,7 @@ function parseTinderbox(doc) {
     throw "I can't parse that";
 
   var machines = [];
-  $("#build_waterfall th ~ td > font", doc).each(function(i, cell) {
+  $("#build_waterfall th ~ td > font", doc).each(function (i, cell) {
     var name = cell.textContent.replace(/%/, "").trim();
     var machinetype = getMachineType(name);
     if (!machinetype.os || !machinetype.type) {
@@ -137,7 +137,7 @@ function parseTinderbox(doc) {
   var script = $(".script", doc).get(0).textContent;
   var match = script.match(/notes\[([0-9]+)\] = "(.*)";/g);
   if (match) {
-    match.forEach(function(m) {
+    match.forEach(function (m) {
       var match = m.match(/notes\[([0-9]+)\] = "(.*)";/);
       notes[match[1]*1] = linkBugs(saneLineBreakNote(match[2]));
     });
@@ -145,7 +145,7 @@ function parseTinderbox(doc) {
   
   var machineResults = {};
   var seenMachines = [];
-  $("#build_waterfall td > tt", doc).get().forEach(function(tt) {
+  $("#build_waterfall td > tt", doc).get().forEach(function (tt) {
     var td = tt.parentNode;
     var a = $('a[title]', td).get(0); // should be 'a[onclick^="return log"]', but jQuery doesn't like that
     if (!a) {
@@ -185,7 +185,7 @@ function parseTinderbox(doc) {
       return;
 
     var stars = [];
-    $('a', td).get().forEach(function(s) {
+    $('a', td).get().forEach(function (s) {
       var onclick = s.getAttribute("onclick");
       if (!onclick)
         return;

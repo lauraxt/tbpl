@@ -11,20 +11,20 @@ var AddCommentUI = {
       self.logLinkClick();
       return false;
     });
-    $("#closeAddNotePopup").bind("click", function() {
-      $("#addNotePopup").fadeOut('fast', function() {
+    $("#closeAddNotePopup").bind("click", function () {
+      $("#addNotePopup").fadeOut('fast', function () {
         self.reset();
       });
       return false;
     });
-    $("#logNoteEmail").bind("change", function() {
+    $("#logNoteEmail").bind("change", function () {
       globalStorage[location.host].email = this.value;
     });
     $("#logNoteEmail").get(0).value = globalStorage[location.host].email || "";
     $("#addNotePopup").draggable({ containment: 'window', handle: 'form, h2, table, tbody, tr, th, td, label, p' });
     $("#addNoteForm").bind("submit", function () {
       self.submit();
-      $("#addNotePopup").fadeOut('fast', function() {
+      $("#addNotePopup").fadeOut('fast', function () {
         self.reset();
       });
       return false;
@@ -76,7 +76,7 @@ var AddCommentUI = {
     this.numSendingCommentChangedCallback();
   },
 
-  registerNumSendingCommentChangedCallback: function(callback) {
+  registerNumSendingCommentChangedCallback: function (callback) {
     this.numSendingCommentChangedCallback = callback;
   },
 
@@ -110,7 +110,7 @@ var AddCommentUI = {
     return $("#addNotePopup").is(":visible");
   },
 
-  _postOneComment: function(email, comment, machineResult, callback) {
+  _postOneComment: function (email, comment, machineResult, callback) {
     NetUtils.crossDomainPost(this._submitURL, {
       buildname: machineResult.machine.name,
       buildtime: machineResult.startTime.getTime() / 1000,

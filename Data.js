@@ -9,11 +9,11 @@ function Data(treeName, config) {
 
 Data.prototype = {
 
-  getRevUrl: function(rev) {
+  getRevUrl: function (rev) {
     return this._hgData.getRevUrl(rev);
   },
 
-  loadPushes: function(timeOffset, loadCallback, failCallback) {
+  loadPushes: function (timeOffset, loadCallback, failCallback) {
     var self = this;
     return this._hgData.load(
       timeOffset,
@@ -26,7 +26,7 @@ Data.prototype = {
     );
   },
 
-  loadMachineResults: function(timeOffset, loadCallback, failCallback) {
+  loadMachineResults: function (timeOffset, loadCallback, failCallback) {
     var self = this;
     return this._tinderboxData.load(
       timeOffset,
@@ -40,36 +40,36 @@ Data.prototype = {
     );
   },
 
-  getOss: function() {
+  getOss: function () {
     return this._tinderboxData.oss;
   },
 
-  getMachineTypes: function() {
+  getMachineTypes: function () {
     return this._tinderboxData.machineTypes;
   },
 
-  machineTypeIsGrouped: function(machineType) {
+  machineTypeIsGrouped: function (machineType) {
     return this._tinderboxData.treesWithGroups[this._treeName] &&
       this._tinderboxData.treesWithGroups[this._treeName].indexOf(machineType) != -1;
   },
 
-  getMachines: function() {
+  getMachines: function () {
     return this._machines;
   },
 
-  getMachineResults: function() {
+  getMachineResults: function () {
     return this._machineResults;
   },
 
-  getPushes: function() {
+  getPushes: function () {
     return this._pushes;
   },
 
-  _loadedData: function() {
+  _loadedData: function () {
     this._combineResults();
   },
 
-  _getPushForRev: function(rev) {
+  _getPushForRev: function (rev) {
     for (var k = 0; k < this._pushes.length; k++) {
       if (rev == this._pushes[k].toprev)
         return this._pushes[k];
@@ -77,7 +77,7 @@ Data.prototype = {
     return null;
   },
   
-  _getRevForResult: function(machineResult) {
+  _getRevForResult: function (machineResult) {
     if (machineResult.rev)
       return machineResult.rev;
   
@@ -117,10 +117,10 @@ Data.prototype = {
     return latestPushRev;
   },
   
-  _combineResults: function() {
+  _combineResults: function () {
     var self = this;
 
-    $(this._pushes).each(function() {
+    $(this._pushes).each(function () {
       delete this.results;
     });
     this._tinderboxData.machineTypes.forEach(function (machineType) {
@@ -151,7 +151,7 @@ Data.prototype = {
 
       for (var j in this.results) {
         for (var k in this.results[j]) {
-          this.results[j][k].sort(function(a, b) {
+          this.results[j][k].sort(function (a, b) {
             // if the start time of two Mochitests does not differ by more than
             // 5 minutes, they probably belong together so sort them by their
             // number.
