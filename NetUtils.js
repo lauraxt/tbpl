@@ -1,15 +1,15 @@
 var NetUtils = {
 
-  loadDom: function (url, callback) {
+  loadDom: function NetUtils_loadDom(url, callback) {
     var iframe = $("<iframe></iframe>").hide().appendTo(document.body).get(0);
     iframe.contentWindow.location.href = url;
-    iframe.onload = function () {
+    iframe.onload = function iframeLoaded() {
       callback(this.contentDocument);
-      setTimeout(function () { $(iframe).remove(); }, 0);
+      setTimeout(function removeIframe() { $(iframe).remove(); }, 0);
     };
   },
 
-  loadText: function (url, loadCallback, failCallback, timeoutCallback, timeout) {
+  loadText: function NetUtils_loadText(url, loadCallback, failCallback, timeoutCallback, timeout) {
     if (timeout === undefined) {
       timeout = 30; // seconds
     }
@@ -17,7 +17,7 @@ var NetUtils = {
     var errorTimer;
     var req = new XMLHttpRequest();
     req.onerror = failCallback;
-    req.onload = function () {
+    req.onload = function requestLoaded() {
       clearInterval(errorTimer);
       loadCallback(req.responseText);
     };
@@ -29,7 +29,7 @@ var NetUtils = {
       failCallback(e);
       return;
     }
-    errorTimer = setTimeout(function () {
+    errorTimer = setTimeout(function requestTimedOut() {
       window.tinderboxException = "timed out";
       req.abort();
       timeoutCallback();
@@ -37,7 +37,7 @@ var NetUtils = {
     return req;
   },
 
-  crossDomainPost: function (url, values, callback) {
+  crossDomainPost: function NetUtils_crossDomainPost(url, values, callback) {
     if (!arguments.callee.c)
       arguments.callee.c = 1;
     var iframeName = "iframe" + arguments.callee.c++;
@@ -48,7 +48,7 @@ var NetUtils = {
     }
     form.get(0).submit();
     form.remove();
-    iframe.get(0).onload = function () {
+    iframe.get(0).onload = function crossDomainIframeLoaded() {
       callback();
       setTimeout(function () { iframe.remove(); }, 0);
     }

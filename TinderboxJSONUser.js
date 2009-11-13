@@ -1,6 +1,6 @@
 var TinderboxJSONUser = {
 
-  load: function (tree, timeOffset, loadCallback, failCallback) {
+  load: function TinderboxJSONUser_load(tree, timeOffset, loadCallback, failCallback) {
     delete tinderbox_data;
     var self = this;
     /**
@@ -11,7 +11,7 @@ var TinderboxJSONUser = {
       'http://tinderbox.mozilla.org/showbuilds.cgi?tree=' + tree +
       '&maxdate=' + (timeOffset + 12 * 3600) + '&hours=24&json=1' :
       "http://tinderbox.mozilla.org/" + tree + "/json.js"
-    $.getScript(scriptURL, function () {
+    $.getScript(scriptURL, function tinderboxJSONGetScriptCallback() {
       try {
         if (!tinderbox_data) throw "tinderbox_data is invalid";
         loadCallback(self.parseTinderbox(tree, tinderbox_data));
@@ -22,7 +22,7 @@ var TinderboxJSONUser = {
     });
   },
 
-  getMachineType: function (name) {
+  getMachineType: function TinderboxJSONUser_getMachineType(name) {
     return {
       os:
       /Linux/.test(name) ? "linux" :
@@ -48,14 +48,14 @@ var TinderboxJSONUser = {
     };
   },
   
-  getLogURL: function (tree, id, full, note) {
+  getLogURL: function TinderboxJSONUser_getLogURL(tree, id, full, note) {
     return "http://tinderbox.mozilla.org/" + (note ? "addnote" : "showlog") + ".cgi?log=" + tree + "/" + id + (full ? "&fulltext=1" : "");
   },
-  processNote: function (note) {
+  processNote: function TinderboxJSONUser_processNote(note) {
     return note.replace(/<\/?pre>/g, "").trim().replace(/\n/g, "<br>");
   },
   
-  findRevInScrape: function (scrape) {
+  findRevInScrape: function TinderboxJSONUser_findRevInScrape(scrape) {
     if (!scrape)
       return "";
     var cell = document.createElement("td");
@@ -73,14 +73,14 @@ var TinderboxJSONUser = {
     return match ? match[1] : null;
   },
   
-  getBuildScrape: function (td, machineRunID) {
+  getBuildScrape: function TinderboxJSONUser_getBuildScrape(td, machineRunID) {
     return td.scrape[machineRunID];
   },
   
-  parseTinderbox: function (tree, td) {
+  parseTinderbox: function TinderboxJSONUser_parseTinderbox(tree, td) {
     var self = this;
     var machines = [];
-    $(td.build_names).each(function (i, name) {
+    $(td.build_names).each(function buildMachinesArray(i, name) {
       var machinetype = self.getMachineType(name);
       if (!machinetype.os || !machinetype.type) {
         return;
@@ -98,7 +98,7 @@ var TinderboxJSONUser = {
     var notes = td.note_array.map(self.processNote);
   
     var machineResults = {};
-    td.build_table.forEach(function (row) { row.forEach(function (build, machineIndex) {
+    td.build_table.forEach(function forEachTinderboxTableColumn(row) { row.forEach(function forEachTinderboxTableRow(build, machineIndex) {
       if (!build.buildstatus || build.buildstatus == "null" || !machines[machineIndex])
         return;
       var state = build.buildstatus; /* building, success, testfailed, busted */
@@ -149,7 +149,7 @@ var TinderboxJSONUser = {
       }
     }); });
   
-    machines.forEach(function (machine) {
+    machines.forEach(function setAverageCycleTimeOnMachine(machine) {
       if (machine.runs) {
         machine.averageCycleTime = Math.ceil(machine.runtime/machine.runs);
       }
@@ -162,7 +162,7 @@ var TinderboxJSONUser = {
 };
 
 if (!String.prototype.trim) {
-  String.prototype.trim = function () {
+  String.prototype.trim = function String_trim() {
     var x=this;
     x=x.replace(/^\s*(.*?)/, "$1");
     x=x.replace(/(.*?)\s*$/, "$1");
@@ -177,13 +177,13 @@ function MachineResult(data) {
 }
 
 MachineResult.prototype = {
-  getTestResults: function () {
+  getTestResults: function MachineResult_getTestResults() {
     var self = this;
     var machine = this.machine;
     var scrape = this._scrape;
     if (!scrape)
       return [];
-    return (function (fun) {
+    return (function callRightScrapeParser(fun) {
       return (fun[machine.type] ? fun[machine.type] : fun.generic).call(self, scrape);
     })({
       "Unit Test": self.getUnitTestResults,
@@ -200,31 +200,31 @@ MachineResult.prototype = {
     });
   },
   
-  getScrapeResults: function (scrape) {
-    return $(scrape).map(function () {
+  getScrapeResults: function MachineResult_getScrapeResults(scrape) {
+    return $(scrape).map(function parseGenericTestScrapeLine() {
       if (this.match(/rev\:/) || this.match(/s\:/) || this.match(/try\-/))
         return null;
       var match = this.match(/(.*)\:(.*)/);
       return (match ? { name: match[1], result: match[2]} : { name: this });
-    }).filter(function () { return this; }).get();
+    }).filter(function filterNull() { return this; }).get();
   },
   
-  getUnitTestResults: function (scrape) {
-    return $(scrape).map(function () {
+  getUnitTestResults: function MachineResult_getUnitTestResults(scrape) {
+    return $(scrape).map(function parseUnitTestScrapeLine() {
       var match = this.match(/(.*)<br\/>(.*)/);
       return match && {
         name: match[1],
         result: match[2]
       };
-    }).filter(function () { return this; }).get();
+    }).filter(function filterNull() { return this; }).get();
   },
   
-  getTalosResults: function (scrape) {
+  getTalosResults: function MachineResult_getTalosResults(scrape) {
     var seriesURLs = {};
     var foundSomething = false;
     var cell = document.createElement("td");
     cell.innerHTML = scrape.join("<br>\n");
-    $('p a', cell).each(function () {
+    $('p a', cell).each(function lookForGraphLink() {
       if (this.getAttribute("href").indexOf("http://graphs-new") != 0)
         return;
       seriesURLs[this.textContent] = this.getAttribute("href");
@@ -234,7 +234,7 @@ MachineResult.prototype = {
     if (!foundSomething)
       return this.getScrapeResults(scrape);
   
-    return $('a', cell).map(function () {
+    return $('a', cell).map(function parseEachGraphLink() {
       var resultURL = $(this).attr("href");
       if (resultURL.indexOf("http://graphs-new") != 0)
         return;
@@ -248,6 +248,6 @@ MachineResult.prototype = {
         detailsURL: seriesURLs[testname],
         "resultURL": resultURL
       };
-    }).filter(function () { return this; }).get();
+    }).filter(function filterNull() { return this; }).get();
   },
 };

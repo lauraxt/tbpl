@@ -15,16 +15,16 @@ TinderboxData.prototype = {
   },
   _treesWithUnittest: ["Firefox", "Firefox3.5", "Firefox3.6", "TraceMonkey"],
 
-  getRepoName: function () {
+  getRepoName: function TinderboxData_getRepoName() {
     return this._repoNames[this._treeName];
   },
 
-  load: function (timeOffset, loadCallback, failCallback) {
+  load: function TinderboxData_load(timeOffset, loadCallback, failCallback) {
     var self = this;
     this._dataLoader.load(
       this._treeName,
       timeOffset,
-      function (normalData) {
+      function mainTreeLoadCallback(normalData) {
         self._normalData = normalData;
         loadCallback(self.getData());
       },
@@ -34,7 +34,7 @@ TinderboxData.prototype = {
       this._dataLoader.load(
         this._getUnittestTreeName(),
         timeOffset,
-        function (unittestData) {
+        function unittestTreeLoadCallback(unittestData) {
           self._unittestData = unittestData;
           loadCallback(self.getData());
         },
@@ -43,14 +43,14 @@ TinderboxData.prototype = {
     }
   },
 
-  getData: function () {
+  getData: function TinderboxData_getData() {
     return {
       machines: this._normalData.machines.concat(this._unittestData.machines),
       machineResults: this._combineObjects(this._normalData.machineResults, this._unittestData.machineResults),
     };
   },
 
-  _combineObjects: function (a, b) {
+  _combineObjects: function TinderboxData__combineObjects(a, b) {
     var c = {};
     for (var i in a) {
       c[i] = a[i];
@@ -61,11 +61,11 @@ TinderboxData.prototype = {
     return c;
   },
 
-  _hasUnittestTree: function () {
+  _hasUnittestTree: function TinderboxData__hasUnittestTree() {
     return this._treesWithUnittest.indexOf(this._treeName) != -1;
   },
 
-  _getUnittestTreeName: function () {
+  _getUnittestTreeName: function TinderboxData__getUnittestTreeName() {
     return this._treeName + "-Unittest";
   },
 

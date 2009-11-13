@@ -9,15 +9,15 @@ function Data(treeName, config) {
 
 Data.prototype = {
 
-  getRevUrl: function (rev) {
+  getRevUrl: function Data_getRevUrl(rev) {
     return this._hgData.getRevUrl(rev);
   },
 
-  loadPushes: function (timeOffset, loadCallback, failCallback) {
+  loadPushes: function Data_loadPushes(timeOffset, loadCallback, failCallback) {
     var self = this;
     return this._hgData.load(
       timeOffset,
-      function (data) {
+      function hgDataLoadCallback(data) {
         self._pushes = data;
         self._loadedData();
         loadCallback();
@@ -26,11 +26,11 @@ Data.prototype = {
     );
   },
 
-  loadMachineResults: function (timeOffset, loadCallback, failCallback) {
+  loadMachineResults: function Data_loadMachineResults(timeOffset, loadCallback, failCallback) {
     var self = this;
     return this._tinderboxData.load(
       timeOffset,
-      function (data) {
+      function tinderboxDataLoadCallback(data) {
         self._machines = data.machines;
         self._machineResults = data.machineResults;
         self._loadedData();
@@ -40,36 +40,36 @@ Data.prototype = {
     );
   },
 
-  getOss: function () {
+  getOss: function Data_getOss() {
     return this._tinderboxData.oss;
   },
 
-  getMachineTypes: function () {
+  getMachineTypes: function Data_getMachineTypes() {
     return this._tinderboxData.machineTypes;
   },
 
-  machineTypeIsGrouped: function (machineType) {
+  machineTypeIsGrouped: function Data_machineTypeIsGrouped(machineType) {
     return this._tinderboxData.treesWithGroups[this._treeName] &&
       this._tinderboxData.treesWithGroups[this._treeName].indexOf(machineType) != -1;
   },
 
-  getMachines: function () {
+  getMachines: function Data_getMachines() {
     return this._machines;
   },
 
-  getMachineResults: function () {
+  getMachineResults: function Data_getMachineResults() {
     return this._machineResults;
   },
 
-  getPushes: function () {
+  getPushes: function Data_getPushes() {
     return this._pushes;
   },
 
-  _loadedData: function () {
+  _loadedData: function Data__loadedData() {
     this._combineResults();
   },
 
-  _getPushForRev: function (rev) {
+  _getPushForRev: function Data__getPushForRev(rev) {
     for (var k = 0; k < this._pushes.length; k++) {
       if (rev == this._pushes[k].toprev)
         return this._pushes[k];
@@ -77,7 +77,7 @@ Data.prototype = {
     return null;
   },
   
-  _getRevForResult: function (machineResult) {
+  _getRevForResult: function Data__getRevForResult(machineResult) {
     if (machineResult.rev)
       return machineResult.rev;
   
@@ -105,7 +105,7 @@ Data.prototype = {
 
     var latestPushRev = "", latestPushTime = -1;
     var machineTime = machineResult.startTime.getTime();
-    this._pushes.forEach(function (push) {
+    this._pushes.forEach(function findLatestPush(push) {
       var pushTime = push.date.getTime();
       if (pushTime < machineTime) {
         if (latestPushTime < pushTime) {
@@ -117,13 +117,13 @@ Data.prototype = {
     return latestPushRev;
   },
   
-  _combineResults: function () {
+  _combineResults: function Data__combineResults() {
     var self = this;
 
-    $(this._pushes).each(function () {
+    $(this._pushes).each(function deletePush() {
       delete this.results;
     });
-    this._tinderboxData.machineTypes.forEach(function (machineType) {
+    this._tinderboxData.machineTypes.forEach(function addMachineTypeToPushes(machineType) {
       for (var i in self._machineResults) {
         var machineResult = self._machineResults[i];
         if (machineResult.machine.type != machineType)
@@ -145,13 +145,13 @@ Data.prototype = {
         push.results[machineResult.machine.os][machineResult.machine.type].push(machineResult);
       }
     });
-    $(self._pushes).each(function () {
+    $(self._pushes).each(function sortMachineResultsForPush() {
       if(!this.results)
         return;
 
       for (var j in this.results) {
         for (var k in this.results[j]) {
-          this.results[j][k].sort(function (a, b) {
+          this.results[j][k].sort(function machineResultSortComparison(a, b) {
             // if the start time of two Mochitests does not differ by more than
             // 5 minutes, they probably belong together so sort them by their
             // number.

@@ -2,29 +2,29 @@ var AddCommentUI = {
 
   addToBuilds: {},
   numSendingComments: 0,
-  numSendingCommentChangedCallback: function () {},
+  numSendingCommentChangedCallback: function empty() {},
   _submitURL: "",
 
-  init: function (submitURL) {
+  init: function AddCommentUI_init(submitURL) {
     var self = this;
-    $("a.addNote").live("click", function () {
+    $("a.addNote").live("click", function addNoteLinkClick() {
       self.logLinkClick();
       return false;
     });
-    $("#closeAddNotePopup").bind("click", function () {
-      $("#addNotePopup").fadeOut('fast', function () {
+    $("#closeAddNotePopup").bind("click", function closeAddNotePopupClick() {
+      $("#addNotePopup").fadeOut('fast', function afterAddNotePopupFadeOut() {
         self.reset();
       });
       return false;
     });
-    $("#logNoteEmail").bind("change", function () {
+    $("#logNoteEmail").bind("change", function logNoteEmailChange() {
       globalStorage[location.host].email = this.value;
     });
     $("#logNoteEmail").get(0).value = globalStorage[location.host].email || "";
     $("#addNotePopup").draggable({ containment: 'window', handle: 'form, h2, table, tbody, tr, th, td, label, p' });
-    $("#addNoteForm").bind("submit", function () {
+    $("#addNoteForm").bind("submit", function addNoteFormSubmit() {
       self.submit();
-      $("#addNotePopup").fadeOut('fast', function () {
+      $("#addNotePopup").fadeOut('fast', function afterAddNotePopupFadeOutAfterSubmit() {
         self.reset();
       });
       return false;
@@ -32,32 +32,32 @@ var AddCommentUI = {
     this._submitURL = submitURL;
   },
 
-  updateUI: function () {
+  updateUI: function AddCommentUI_updateUI() {
     this._updateBuildList();
     this._updateLogLinkText();
     this._updateSubmitButton();
   },
 
-  reset: function () {
+  reset: function AddCommentUI_resut() {
     $("#logNoteText").get(0).value = "";
     this.addToBuilds = {};
     this.updateUI();
   },
 
-  submit: function () {
+  submit: function AddCommentUI_submit() {
     var self = this;
     var machineResults = UserInterface._data.getMachineResults(); // XXX hack
     var email = $("#logNoteEmail").get(0).value;
     var comment = $("#logNoteText").get(0).value;
     for (var i in this.addToBuilds) {
-      this._postOneComment(email, comment, machineResults[i], function () {
+      this._postOneComment(email, comment, machineResults[i], function oneLessCommentPending() {
         self.pendingCommentsChanged(-1);
       });
       this.pendingCommentsChanged(1);
     }
   },
 
-  logLinkClick: function () {
+  logLinkClick: function AddCommentUI_logLinkClick() {
     // XXX fix activeResult
     var div = $("#addNotePopup").fadeIn('fast');
     if (!this.addToBuilds[UserInterface._activeResult]) {
@@ -71,20 +71,20 @@ var AddCommentUI = {
     this.updateUI();
   },
 
-  pendingCommentsChanged: function (changedBy) {
+  pendingCommentsChanged: function AddCommentUI_pendingCommentsChanged(changedBy) {
     this.numSendingComments += changedBy;
     this.numSendingCommentChangedCallback();
   },
 
-  registerNumSendingCommentChangedCallback: function (callback) {
+  registerNumSendingCommentChangedCallback: function AddCommentUI_registerNumSendingCommentChangedCallback(callback) {
     this.numSendingCommentChangedCallback = callback;
   },
 
-  _updateSubmitButton: function () {
+  _updateSubmitButton: function AddCommentUI__updateSubmitButton() {
     $("#addNoteForm input[type=submit]").get(0).disabled = this._buildListIsEmpty();
   },
 
-  _updateBuildList: function () {
+  _updateBuildList: function AddCommentUI__updateBuildList() {
     var html = "";
     for (var i in this.addToBuilds) {
       html += UserInterface._machineResultLink(Controller.getData().getMachineResults()[i])
@@ -93,24 +93,24 @@ var AddCommentUI = {
     UserInterface._markActiveResultLinks(); // XXX fix this
   },
 
-  _updateLogLinkText: function () {
+  _updateLogLinkText: function AddCommentUI__updateLogLinkText() {
     $("a.addNote").text(
       !this._popupIsOpen() ? "Add a comment" :
         (this.addToBuilds[UserInterface._activeResult] ? "Don't add the comment to this build" :
                                           "Add the comment to this build, too"));
   },
 
-  _buildListIsEmpty: function () {
+  _buildListIsEmpty: function AddCommentUI__buildListIsEmpty() {
     for (var i in this.addToBuilds)
       return false;
     return true;
   },
 
-  _popupIsOpen: function () {
+  _popupIsOpen: function AddCommentUI__popupIsOpen() {
     return $("#addNotePopup").is(":visible");
   },
 
-  _postOneComment: function (email, comment, machineResult, callback) {
+  _postOneComment: function AddCommentUI__postOneComment(email, comment, machineResult, callback) {
     NetUtils.crossDomainPost(this._submitURL, {
       buildname: machineResult.machine.name,
       buildtime: machineResult.startTime.getTime() / 1000,

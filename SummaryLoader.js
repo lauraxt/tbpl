@@ -1,44 +1,44 @@
 var SummaryLoader = {
 
 
-  _abortOutstandingSummaryLoadings: function () {},
+  _abortOutstandingSummaryLoadings: function empty() {},
   _cachedSummaries: {},
 
-  setupSummaryLoader: function (result, box) {
+  setupSummaryLoader: function SummaryLoader_setupSummaryLoader(result, box) {
     if (result.state == "building" || result.state == "success")
       return;
   
     var summaryLoader = $("#summaryLoader").get(0);
     summaryLoader.innerHTML = "Retrieving summary..."
     summaryLoader.className = "loading";
-    this._fetchSummary(result.runID, result.tree, function (summary) {
+    this._fetchSummary(result.runID, result.tree, function fetchSummaryLoadCallback(summary) {
       summaryLoader.innerHTML = summary ? "" : "Summary is empty.";
       summaryLoader.className = "";
       if (summary)
         box.className += " hasSummary";
       $(".stars .summary").get(0).innerHTML = summary.replace(/ALSA.*device\n/g, "").replace(/\n/g, "<br>\n");
-    }, function () {
+    }, function fetchSummaryFailCallback() {
       summaryLoader.innerHTML = "Fetching summary failed.";
       summaryLoader.className = "";
-    }, function () {
+    }, function fetchSummaryTimeoutCallback() {
       summaryLoader.innerHTML = "Fetching summary timed out.";
       summaryLoader.className = "";
     });
   },
 
-  _fetchSummary: function (runID, tree, loadCallback, failCallback, timeoutCallback) {
+  _fetchSummary: function SummaryLoader__fetchSummary(runID, tree, loadCallback, failCallback, timeoutCallback) {
     var self = this;
     if (this._cachedSummaries[runID]) {
       loadCallback(this._cachedSummaries[runID]);
       return;
     }
-    var onLoad = function (summary) {
+    var onLoad = function onSummaryLoad(summary) {
       self._cachedSummaries[runID] = summary;
       loadCallback(summary);
     };
     var req = NetUtils.loadText("summaries/get.php?tree=" + tree + "&id=" + runID, onLoad, failCallback, timeoutCallback);
     var oldAbort = this._abortOutstandingSummaryLoadings;
-    this._abortOutstandingSummaryLoadings = function () {
+    this._abortOutstandingSummaryLoadings = function abortThisLoadWhenAborting() {
       if (req)
         req.abort();
       oldAbort();
