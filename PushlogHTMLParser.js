@@ -32,7 +32,7 @@ var PushlogHTMLParser = {
       var date = new Date($(".date", this).get(0).innerHTML);
       var patches = [];
       $("tr.id"+matches[1], table).each(function forEachPatch() {
-        var rev = $("td.age a", this).get(0).textContent;
+        var rev = $("a", this).get(0).textContent;
         var strong = this.lastChild.firstChild.innerHTML;
         var dashpos = strong.indexOf(String.fromCharCode(8212));
         var author = strong.substring(0, dashpos - 1);
