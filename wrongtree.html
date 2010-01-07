@@ -24,7 +24,9 @@ window.onload = function() {
       rc += '<li><a href="./?tree=' + name + '">' + name + '<' + '/a><' + '/li>';
     }
     return rc;
-  })() + "<" + "/ul>";
+  })() + "<" + "/ul>" +
+  '<p>Maybe the tree you’re looking for is on the <a href="http://build.mozillamessaging.com/tinderboxpushlog/?tree=' +
+  match[1] + '">Mozilla Messaging version of Tinderboxpushlog<' + '/a>.';
 }
 
 // for Config.js:
