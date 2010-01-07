@@ -131,7 +131,9 @@ var UserInterface = {
   
   _paintBoxMatrix: function UserInterface__paintBoxMatrix(boxMatrix) {
     var self = this;
-    var colspans = { "linux": 1, "osx": 1, "windows": 1 };
+    var colspans = {};
+    var oss = this._data.getOss();
+    oss.forEach(function initColspanForOS(os) { colspans[os] = 1; });
     var groupedMachineTypes = [
       ["Build"],
       ["Leak Test"],
@@ -151,7 +153,6 @@ var UserInterface = {
       }
     });
 
-    var oss = this._data.getOss();
     oss.forEach(function setColspansOnColumnHeaders(os) {
       document.getElementById(os + "th").setAttribute("colspan", colspans[os]);
     });
@@ -178,7 +179,7 @@ var UserInterface = {
             return;
           haveAnyOfType = true;
           if (!boxMatrix[t][os]) {
-            if(typeColspan[os] == 0) {
+            if(typeColspan[os] == 0 && t == types[0] /* XXX hack */) {
               innerHTML += '<td class="empty" colspan=' + colspans[os] + '></td>';
             }
             return;
