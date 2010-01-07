@@ -208,24 +208,40 @@ var UserInterface = {
     });
   },
 
+  _useLocalTime: function UserInterface__useLocalTime() {
+    return globalStorage[location.host].useLocalTime;
+  },
+
+  _getTimezoneAdaptedDate: function UserInterface__getTimezoneAdaptedDate(date) {
+    if (this._useLocalTime())
+      return date;
+
+    var hoursdiff = date.getTimezoneOffset() / 60 + Config.mvtTimezoneOffset;
+    return new Date(date.getTime() + hoursdiff * 60 * 60 * 1000);
+  },
+
+  _pad: function UserInterface__pad(n) {
+    return n < 10 ? '0' + n : n;
+  },
+
   _getDisplayDate: function UserInterface__getDisplayDate(date) {
-    var d = date;
-    var timediff = '';
-    if (!globalStorage[location.host].useLocalTime) {
-      var hoursdiff = date.getTimezoneOffset()/60 + Config.mvtTimezone/100;
-      d = new Date(date.getTime() + hoursdiff * 60 * 60 * 1000);
-      timediff = ' ' + Config.mvtTimezone;
-    }
-    return d.toLocaleString() + timediff;
+    var timezoneName = this._useLocalTime() ? "" : " " + Config.mvtTimezoneName;
+    var d = this._getTimezoneAdaptedDate(date);
+    var pad = this._pad;
+    // Thu Jan 7 20:25:03 2010 (PST)
+    return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()] + " " +
+    ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][d.getMonth()] + " " +
+    d.getDate() + " " + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds()) + " " +
+    d.getFullYear() + timezoneName;
   },
   
   _getDisplayTime: function UserInterface__getDisplayTime(date) {
     if (!date.getTime)
       return '';
-    var d = date;
-    if (!globalStorage[location.host].useLocalTime)
-      d = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000 + Config.mvtTimezone/100 * 60 * 60 * 1000);
-    return d.toLocaleFormat('%H:%M');
+
+    var d = this._getTimezoneAdaptedDate(date);
+    var pad = this._pad;
+    return pad(d.getHours()) + ":" + pad(d.getMinutes());
   },
   
   _revURL: function UserInterface__revURL(rev) {
