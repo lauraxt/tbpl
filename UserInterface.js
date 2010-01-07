@@ -1,3 +1,4 @@
+
 var UserInterface = {
 
   _controller: null,
@@ -250,6 +251,13 @@ var UserInterface = {
     return 'ETA ~' + Math.ceil((result.machine.averageCycleTime - elapsed) / 60)
       + 'mins';
   },
+
+  _uninstallPushesListClickHandlers: function UserInterface__uninstallPushesListClickHandlers() {
+    $(".patches > li").unbind();
+    $(".machineResult").unbind();
+    $("#goForward").unbind();
+    $("#goBack").unbind();
+  },
   
   _shortNameForMachine: function UserInterface__shortNameForMachines(machine, onlyNumber) {
     if (onlyNumber)
@@ -296,11 +304,30 @@ var UserInterface = {
     ' </span>';
   },
 
-  _buildPushesList: function UserInterface__buildPushesList() {
-    $(".patches > li").unbind();
-    $(".machineResult").unbind();
-    $("#goForward").unbind();
-    $("#goBack").unbind();
+  _buildHTMLForPushResults: function UserInterface__buildHTMLForPushResults(oss, push, machineTypes) {
+    var self = this;
+    return '<ul class="results">\n' +
+    oss.map(function buildHTMLForPushResultsOnOS(os) {
+      if (!push.results || !push.results[os])
+        return '';
+      var results = push.results[os];
+      return '<li><span class="os ' + os + '">' +
+      { "linux": "Linux", "osx": "Mac OS X", "windows": "Windows" }[os] +
+      '</span><span class="osresults">' +
+      machineTypes.map(function buildHTMLForPushResultsOnOSForMachineType(machineType) {
+        if (!results[machineType])
+          return '';
+        if (self._data.machineTypeIsGrouped(machineType)) {
+          return self._machineGroupResultLink(results[machineType]);
+        }
+        return results[machineType].map(function linkMachineResults(a) { return self._machineResultLink(a); }).join(" ");
+      }).join("\n") +
+      '</span></li>';
+    }).join("\n") +
+    '</ul>';
+  },
+
+  _writePushesListHTML: function UserInterface__writePushesListHTML() {
     var self = this;
     var ul = document.getElementById("pushes");
     ul.innerHTML = this._controller.getTimeOffset() ? '<li><a id="goForward" href="#" title="go forward by 12 hours"></a></li>' : '';
@@ -312,25 +339,7 @@ var UserInterface = {
       return '<li>\n' +
       '<h2><span class="pusher">' + push.pusher + '</span> &ndash; ' +
       '<span class="date">' + self._getDisplayDate(push.date) + '</span></h2>\n' +
-      '<ul class="results">\n' +
-      oss.map(function buildHTMLForPushResults(os) {
-        if (!push.results || !push.results[os])
-          return '';
-        var results = push.results[os];
-        return '<li><span class="os ' + os + '">' +
-        { "linux": "Linux", "osx": "Mac OS X", "windows": "Windows" }[os] +
-        '</span><span class="osresults">' +
-        machineTypes.map(function buildHTMLForPushResultsOnOS(machineType) {
-          if (!results[machineType])
-            return '';
-          if (self._data.machineTypeIsGrouped(machineType)) {
-            return self._machineGroupResultLink(results[machineType]);
-          }
-          return results[machineType].map(function linkMachineResults(a) { return self._machineResultLink(a); }).join(" ");
-        }).join("\n") +
-        '</span></li>';
-      }).join("\n") +
-      '</ul>' +
+      self._buildHTMLForPushResults(oss, push, machineTypes) +
       '<ul class="patches">\n' +
       push.patches.map(function buildHTMLForPushPatches(patch, patchIndex) {
         return '<li>\n' +
@@ -346,7 +355,11 @@ var UserInterface = {
       new Date(((new Date()).getTime()-12*3600*1000)))+'</em> and <em>' +
       self._getDisplayDate(timeOffset ? new Date(timeOffset*1000) : new Date())+'</em></li>' : '');
     ul.innerHTML+= '<li><a id="goBack" href="#" title="go back by 12 hours"></a></li>';
-    
+  },
+
+  _installHistoryArrowClickHandlers: function UserInterface__installHistoryArrowClickHandlers() {
+    var self = this;
+    var timeOffset = this._controller.getTimeOffset();
     if (timeOffset) {
       $('#goForward').bind('click', function goForward() {
         if (!timeOffset)
@@ -363,12 +376,17 @@ var UserInterface = {
       self._controller.setTimeOffset(timeOffset ? timeOffset - 12 * 3600 : Math.round((new Date()).getTime() / 1000) - 12 * 3600);
       return false;
     });
-    
+  },
+
+  _installMachineResultClickHandler: function UserInterface__installMachineResultClickHandler() {
+    var self = this;
     $(".machineResult").bind("click", function clickMachineResult(e) {
       self._resultLinkClick(this);
       e.preventDefault();
     });
+  },
 
+  _installTooltips: function UserInterface__installTooltips() {
     $(".patches > li").bind("mouseenter", function startFadeInTimeout() {
       var div = $(".popup:not(.hovering)", this);
       if (div.width() - div.children().width() > 10)
@@ -409,9 +427,17 @@ var UserInterface = {
         popup.fadeIn(200);
       }
     });
+  },
+
+  _buildPushesList: function UserInterface__buildPushesList() {
+    this._uninstallPushesListClickHandlers();
+    this._writePushesListHTML();
+    this._installHistoryArrowClickHandlers();
+    this._installMachineResultClickHandler();
+    this._installTooltips();
     this._setActiveResult(this._activeResult, false);
   },
-  
+
   _clickNowhere: function UserInterface__clickNowhere(e) {
     if (!$(e.target).is("a, #pushes"))
       this._setActiveResult("");
