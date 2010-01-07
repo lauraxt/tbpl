@@ -1,7 +1,6 @@
 var Controller = {
 
   treeName: Config.defaultTreeName,
-  everLoadedPushes: false,
   loadStatus: { pushlog: "loading", tinderbox: "loading" },
 
   /**
@@ -68,7 +67,6 @@ var Controller = {
       this._timeOffset,
       function loaded() {
         self.loadStatus.pushlog = "complete";
-        self.everLoadedPushes = true;
         self._loadedData("pushes");
       },
       function failed() {
