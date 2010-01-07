@@ -37,10 +37,17 @@ var PushlogHTMLParser = {
         var dashpos = strong.indexOf(String.fromCharCode(8212));
         var author = strong.substring(0, dashpos - 1);
         var desc = strong.substring(dashpos + 2);
+        var logtags = this.lastChild.lastChild.childNodes;
         patches.push({
           "rev": rev,
           "author": author,
-          "desc": self._stripTags(desc)
+          "desc": self._stripTags(desc),
+          "tags": $(logtags).map(function() {
+            return this.className && {
+              "type": this.className,
+              "name": this.textContent,
+            };
+          }).get(),
         });
       });
       pushes.push({
