@@ -107,6 +107,26 @@ iframe {
   background: #FFD;
   -moz-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
 }
+span.logtags span {
+	padding: 0px 4px;
+	font-size: 10px;
+	font-weight: normal;
+	border: 1px solid;
+	background-color: #ffaaff;
+	border-color: #ffccff #ff00ee #ff00ee #ffccff;
+}
+span.logtags span.tagtag {
+	background-color: #ffffaa;
+	border-color: #ffffcc #ffee00 #ffee00 #ffffcc;
+}
+span.logtags span.branchtag {
+	background-color: #aaffaa;
+	border-color: #ccffcc #00cc33 #00cc33 #ccffcc;
+}
+span.logtags span.inbranchtag {
+	background-color: #d5dde6;
+	border-color: #e3ecf4 #9398f4 #9398f4 #e3ecf4;
+}
 .revlink {
   float: left;
   width: 8em;

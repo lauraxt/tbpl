@@ -345,7 +345,16 @@ var UserInterface = {
         return '<li>\n' +
         '<a class="revlink" href="' + self._revURL(patch.rev) + '">' + patch.rev +
         '</a>\n<div class="popup"><span><span class="author">' + patch.author + '</span> &ndash; ' +
-        '<span class="desc">' + self._linkBugs(patch.desc.split("\n")[0]) + '</span></span></div>\n' +
+        '<span class="desc">' + self._linkBugs(patch.desc.split("\n")[0]) + '</span>' +
+        (function buildHTMLForPatchTags() {
+          if (!patch.tags.length)
+            return '';
+
+          return ' <span class="logtags">' + $(patch.tags).map(function () {
+            return ' <span class="' + this.type + '">' + this.name + '</span>';
+          }).get().join('') + '</span>';
+        })() +
+        '</span></div>\n' +
         '</li>';
       }).join("\n") +
       '</ul>\n' +
