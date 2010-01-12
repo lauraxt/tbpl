@@ -225,7 +225,7 @@ MachineResult.prototype = {
     var cell = document.createElement("td");
     cell.innerHTML = scrape.join("<br>\n");
     $('p a', cell).each(function lookForGraphLink() {
-      if (this.getAttribute("href").indexOf("http://graphs-new") != 0)
+      if (this.getAttribute("href").indexOf("http://graphs") != 0)
         return;
       seriesURLs[this.textContent] = this.getAttribute("href");
       foundSomething = true;
@@ -236,7 +236,7 @@ MachineResult.prototype = {
   
     return $('a', cell).map(function parseEachGraphLink() {
       var resultURL = $(this).attr("href");
-      if (resultURL.indexOf("http://graphs-new") != 0)
+      if (resultURL.indexOf("http://graphs") != 0)
         return;
       var match = this.textContent.match(/(.*)\:(.*)/);
       if (!match)
