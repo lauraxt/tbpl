@@ -40,9 +40,9 @@ var TinderboxJSONUser = {
       /debug.*everythingelse/i.test(name) ? "Debug Everythingelse Test" :
       /everythingelse/i.test(name) ? "Everythingelse Test" :
       /unit test/i.test(name) ? "Unit Test" :
-      /depend/i.test(name) ? "Build" :
-      /(leak|bloat)/i.test(name) ? "Leak Test" :
-      /build/i.test(name) ? "Build" :
+      /depend/i.test(name) ? "Opt Build" :
+      /(leak|bloat)/i.test(name) ? "Debug Build" :
+      /build/i.test(name) ? "Opt Build" :
       /static-analysis/.test(name) ? "Static Analysis" :
       /(check|test)/.test(name) ? "Unit Test" : ""
     };
@@ -194,8 +194,8 @@ MachineResult.prototype = {
       "Debug Everythingelse Test": self.getUnitTestResults,
       "Everythingelse Test": self.getUnitTestResults,
       "Talos": self.getTalosResults,
-      "Leak Test": self.getScrapeResults,
-      "Build": self.getScrapeResults,
+      "Debug Build": self.getScrapeResults,
+      "Opt Build": self.getScrapeResults,
       "generic": self.getScrapeResults
     });
   },

@@ -135,14 +135,14 @@ var UserInterface = {
     var colspans = {};
     var oss = this._data.getOss();
     oss.forEach(function initColspanForOS(os) { colspans[os] = 1; });
-    var groupedMachineTypes = [
-      ["Build"],
-      ["Leak Test"],
-      ["Unit Test", "Mochitest", "Opt Mochitest", "Debug Mochitest", "Everythingelse Test", "Opt Everythingelse Test", "Debug Everythingelse Test"],
-      ["Nightly"],
-      ["Talos"]
-    ];
-    groupedMachineTypes.forEach(function calculateColspans(types) {
+    var groupedMachineTypes = {
+      "Build": ["Opt Build", "Debug Build"],
+      "Test": ["Unit Test", "Mochitest", "Opt Mochitest", "Debug Mochitest", "Everythingelse Test", "Opt Everythingelse Test", "Debug Everythingelse Test"],
+      "Nightly": ["Nightly"],
+      "Talos": ["Talos"],
+    };
+    for (var machineTypeGroup in groupedMachineTypes) {
+      var types = groupedMachineTypes[machineTypeGroup];
       for (var os in colspans) {
         var colspan = 0;
         types.forEach(function addColspanForMachineType(t) {
@@ -152,7 +152,7 @@ var UserInterface = {
         });
         colspans[os] *= colspan ? colspan : 1;
       }
-    });
+    }
 
     oss.forEach(function setColspansOnColumnHeaders(os) {
       document.getElementById(os + "th").setAttribute("colspan", colspans[os]);
@@ -161,9 +161,10 @@ var UserInterface = {
     var table = $("#matrix");
     table.find("tbody").remove();
     var tbody = $("<tbody></tbody>").appendTo(table);
-    groupedMachineTypes.forEach(function buildBoxMatrixTableForMachineTypeGroup(types) {
+    for (var machineTypeGroup in groupedMachineTypes) {
+      var types = groupedMachineTypes[machineTypeGroup];
       var row = $("<tr></tr>");
-      var innerHTML = '<th>' + types[0] + '</th>';
+      var innerHTML = '<th>' + machineTypeGroup + '</th>';
       var haveAnyOfType = false;
       var typeColspan = {};
       for (var os in colspans) {
@@ -198,7 +199,7 @@ var UserInterface = {
       });
       if (haveAnyOfType)
         row.html(innerHTML).appendTo(tbody);
-    });
+    }
     table.css("visibility", "visible");
     $("a", table).get().forEach(function setupClickListenerForBoxMatrixCell(cell) {
       cell.addEventListener("click", function clickBoxMatrixCell(e) {
@@ -283,6 +284,10 @@ var UserInterface = {
 
   _shortNameForMachineWithoutNumber: function UserInterface__shortNameForMachineWithoutNumber(machine) {
     switch (machine.type) {
+      case "Opt Build":
+        return "Bo";
+      case "Debug Build":
+        return "Bd";
       case "Opt Mochitest":
         return "Mo";
       case "Debug Mochitest":
