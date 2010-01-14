@@ -14,9 +14,19 @@ var PushlogHTMLParser = {
   },
 
   _getLogUrl: function PushlogHTMLParser__getLogUrl(repoName, timeOffset) {
-    var startDate = timeOffset ? (new Date((timeOffset - 12 * 3600) * 1000)).toLocaleFormat('%Y-%m-%d+%H:%M:%S') : '12+hours+ago';
-    var endDate = timeOffset ? (new Date(timeOffset * 1000)).toLocaleFormat('%Y-%m-%d+%H:%M:%S') : 'now';
+    var startDate = timeOffset ? this._formattedDate(new Date((timeOffset - 12 * 3600) * 1000)) : '12+hours+ago';
+    var endDate = timeOffset ? this._formattedDate(new Date(timeOffset * 1000)) : 'now';
     return "fetchraw.php?site=pushlog&url=" + repoName + "/pushloghtml%3Fstartdate=" + startDate + "%26enddate=" + endDate;
+  },
+
+  _pad: function UserInterface__pad(n) {
+    return n < 10 ? '0' + n : n;
+  },
+
+  _formattedDate: function PushlogHTMLParser__formattedDate(d) {
+    var pad = this._pad;
+    return pad(d.getFullYear()) + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + "+" +
+           pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
   },
 
   _parsePushlog: function PushlogHTMLParser__parsePushlog(doc) {
