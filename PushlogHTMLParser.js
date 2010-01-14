@@ -29,7 +29,7 @@ var PushlogHTMLParser = {
     $("td:first-child cite", table).each(function forEachPush() {
       var matches = /.*id([0-9]*)/.exec(this.parentNode.parentNode.className);
       var pusher = this.firstChild.data;
-      var date = new Date($(".date", this).get(0).innerHTML);
+      var date = self._parseDate($(".date", this).html());
       var patches = [];
       $("tr.id"+matches[1], table).each(function forEachPatch() {
         var rev = $("a", this).get(0).textContent;
@@ -58,6 +58,22 @@ var PushlogHTMLParser = {
       });
     });
     return pushes;
+  },
+
+  _parseDate: function PushlogHTMLParser__parseDate(dateString) {
+    var date = Date.parse(dateString);
+    if (date)
+      return new Date(date);
+
+    // Webkit can't deal with the timezone offset.
+    var splitString = dateString.match(/^(.*..:..:.. ....) (.*)$/);
+    if (!splitString)
+      return new Date();
+
+    var dateInCurrentTimezone = Date.parse(splitString[1]);
+    var offsetOfRealTimezoneFromGMT = splitString[2] / 100 * 60;
+    var offsetOfCurrentTimezoneFromGMT = new Date(dateInCurrentTimezone).getTimezoneOffset();
+    return new Date(dateInCurrentTimezone - (offsetOfCurrentTimezoneFromGMT + offsetOfRealTimezoneFromGMT) * 60 * 1000);
   },
 
   _stripTags: function PushlogHTMLParser__stripTags(text) {
