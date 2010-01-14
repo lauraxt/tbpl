@@ -85,18 +85,12 @@ var UserInterface = {
   },
 
   _updateTimezoneDisplay: function UserInterface__updateTimezoneDisplay() {
-    document.getElementById('localTime').className =
-      globalStorage[location.host].useLocalTime ? 'selected' : '';
-    document.getElementById('mvtTime').className =
-      !globalStorage[location.host].useLocalTime ? 'selected' : '';
+    document.getElementById('localTime').className = this._useLocalTime() ? 'selected' : '';
+    document.getElementById('mvtTime').className = !this._useLocalTime() ? 'selected' : '';
   },
 
   _switchTimezone: function UserInterface__switchTimezone(local) {
-    if (local)
-      globalStorage[location.host].useLocalTime = true;
-    else
-      delete globalStorage[location.host].useLocalTime;
-
+    this._setUseLocalTime(local);
     this._updateTimezoneDisplay();
     this._buildPushesList();
   },
@@ -210,7 +204,22 @@ var UserInterface = {
   },
 
   _useLocalTime: function UserInterface__useLocalTime() {
-    return globalStorage[location.host].useLocalTime;
+    return ("localStorage" in window && localStorage.useLocalTime) ||
+           ("globalStorage" in window && globalStorage[location.host].useLocalTime);
+  },
+
+  _setUseLocalTime: function UserInterface__useLocalTime(value) {
+    if ("localStorage" in window) {
+      if (value)
+        localStorage.useLocalTime = true;
+      else
+        delete localStorage.useLocalTime;
+    } else if ("globalStorage" in window) {
+      if (value)
+        globalStorage[location.host].useLocalTime = true;
+      else
+        delete globalStorage[location.host].useLocalTime;
+    }
   },
 
   _getTimezoneAdaptedDate: function UserInterface__getTimezoneAdaptedDate(date) {

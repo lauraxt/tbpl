@@ -18,9 +18,9 @@ var AddCommentUI = {
       return false;
     });
     $("#logNoteEmail").bind("change", function logNoteEmailChange() {
-      globalStorage[location.host].email = this.value;
+      self._setEmail(this.value);
     });
-    $("#logNoteEmail").get(0).value = globalStorage[location.host].email || "";
+    $("#logNoteEmail").get(0).value = self._getEmail();
     $("#addNotePopup").draggable({ containment: 'window', handle: 'form, h2, table, tbody, tr, th, td, label, p' });
     $("#addNoteForm").bind("submit", function addNoteFormSubmit() {
       self.submit();
@@ -78,6 +78,19 @@ var AddCommentUI = {
 
   registerNumSendingCommentChangedCallback: function AddCommentUI_registerNumSendingCommentChangedCallback(callback) {
     this.numSendingCommentChangedCallback = callback;
+  },
+
+  _getEmail: function AddCommentUI__getEmail() {
+    return ("localStorage" in window && localStorage.email) ||
+           ("globalStorage" in window && globalStorage[location.host].email) ||
+           "";
+  },
+
+  _setEmail: function AddCommentUI__setEmail(email) {
+    if ("localStorage" in window)
+      localStorage.email = email;
+    else if ("globalStorage" in window)
+      globalStorage[location.host].email = email;
   },
 
   _updateSubmitButton: function AddCommentUI__updateSubmitButton() {
