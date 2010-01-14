@@ -104,8 +104,12 @@ iframe {
   padding: 2px 5px;
   margin: -2px -5px;
   -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
   background: #FFD;
   -moz-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
 }
 span.logtags span {
 	padding: 0px 4px;
@@ -247,6 +251,8 @@ a:active {
   font-size: 0.8em;
   margin: 10px 20px 0 0;
   float: right;
+  table-layout: fixed;
+  width: 30em;
   border-collapse: collapse;
 }
 th {
@@ -257,7 +263,7 @@ td, th {
   padding: 0;
 }
 #matrix th:not(:first-child) {
-  width: 7em;
+  width: 8.5em;
 }
 #matrix th:first-child {
   text-align: right;
@@ -288,9 +294,13 @@ td, th {
 }
 #matrix a:hover {
   -moz-box-shadow: inset 0 4px 15px rgba(255, 255, 255, 0.25);
+  -webkit-box-shadow: inset 0 4px 15px rgba(255, 255, 255, 0.25);
+  box-shadow: inset 0 4px 15px rgba(255, 255, 255, 0.25);
 }
 #matrix a:active {
   -moz-box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
 #matrix  a.hasNote {
@@ -302,13 +312,19 @@ td, th {
   padding: 2px;
   margin: -1px;
   -moz-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
   background-position: 1px 1px;
 }
 #matrix a[active=true]:hover {
   -moz-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2), inset 0 4px 15px rgba(255, 255, 255, 0.25);
+  -webkit-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2), inset 0 4px 15px rgba(255, 255, 255, 0.25);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2), inset 0 4px 15px rgba(255, 255, 255, 0.25);
 }
 #matrix a[active=true]:active {
   -moz-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2), inset 0 3px 10px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2), inset 0 3px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2), inset 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
 #results {
@@ -361,6 +377,8 @@ a.addNote {
   overflow: hidden;
   overflow-x: auto;
   -moz-column-width: 18em;
+  -webkit-column-width: 18em;
+  column-width: 18em;
 }
 
 em.testfail {
@@ -415,11 +433,15 @@ em.testfail {
   cursor: default;
   background: rgba(0, 0, 0, 0.75);
   -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
   border: solid transparent;
   border-width: 10px 18px 25px;
 }
 #addNotePopup:nth-child(1n) {
   -moz-border-image: url(hudborderimage.png) 10 18 25 repeat;
+  -webkit-border-image: url(hudborderimage.png) 10 18 25 repeat;
+  border-image: url(hudborderimage.png) 10 18 25 repeat;
   background: transparent;
 }
 #bar:nth-child(1n) { /* Preload the border image (XXX hack) */
@@ -474,15 +496,21 @@ em.testfail {
 #addNotePopup .machineResult {
   padding: 0 5px;
   -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
 }
 #addNotePopup .machineResult[active=true] {
   -moz-box-shadow: 0 1px rgba(0, 0, 0, 0.6);
+  -webkit-box-shadow: 0 1px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 1px rgba(0, 0, 0, 0.6);
 }
 #addNotePopup input[type=text],
 #addNotePopup textarea {
   background: rgba(0, 0, 0, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.2);
   -moz-box-shadow: 0pt 1px 1px rgba(0, 0, 0, 0.4) inset;
+  -webkit-box-shadow: 0pt 1px 1px rgba(0, 0, 0, 0.4) inset;
+  box-shadow: 0pt 1px 1px rgba(0, 0, 0, 0.4) inset;
   padding: 2px;
   color: white;
   -moz-user-select: text;
@@ -491,13 +519,19 @@ em.testfail {
 #addNotePopup textarea:focus {
   outline: 2px solid rgba(255, 255, 255, 0.7);
   -moz-outline-radius: 2px;
+  -webkit-outline-radius: 2px;
+  outline-radius: 2px;
 }
 #addNotePopup input[type=submit] {
-  -moz-border-radius: 100%;
+  -moz-border-radius: 1000px;
+  -webkit-border-radius: 1000px;
+  border-radius: 1000px;
   border: 1px solid rgba(255, 255, 255, 0.7);
   background: rgba(0, 0, 0, 0.2);
   color: white;
   -moz-box-shadow: inset 0 12px 16px -4px rgba(255, 255, 255, 0.25), 0 1px #000;
+  -webkit-box-shadow: inset 0 12px 16px -4px rgba(255, 255, 255, 0.25), 0 1px #000;
+  box-shadow: inset 0 12px 16px -4px rgba(255, 255, 255, 0.25), 0 1px #000;
   padding: 1px 10px;
   margin: 0 5px 5px 0;
 }
@@ -506,9 +540,14 @@ em.testfail {
 }
 #addNotePopup input[type=submit]:focus {
   -moz-box-shadow: inset 0 0 2px 1px rgba(255, 255, 255, 0.4), inset 0 12px 16px -4px rgba(255, 255, 255, 0.25), 0 1px #000;
+  -webkit-box-shadow: inset 0 0 2px 1px rgba(255, 255, 255, 0.4), inset 0 12px 16px -4px rgba(255, 255, 255, 0.25), 0 1px #000;
+  box-shadow: inset 0 0 2px 1px rgba(255, 255, 255, 0.4), inset 0 12px 16px -4px rgba(255, 255, 255, 0.25), 0 1px #000;
+  outline: 0;
 }
 #addNotePopup input[type=submit]:not([disabled]):active:hover {
   -moz-box-shadow: inset 0 12px 16px -4px rgba(255, 255, 255, 0.25), 0 1px #000;
+  -webkit-box-shadow: inset 0 12px 16px -4px rgba(255, 255, 255, 0.25), 0 1px #000;
+  box-shadow: inset 0 12px 16px -4px rgba(255, 255, 255, 0.25), 0 1px #000;
   background: rgba(255, 255, 255, 0.4);
 }
 #addNotePopup input[type=submit]::-moz-focus-inner {
