@@ -106,20 +106,38 @@ var UserInterface = {
            .replace(/(changeset\s*)?([0-9a-f]{12})\b/ig, '<a href="'+this._revURL('')+'$2">$1$2</a>');
   },
   
+  _groupedMachineTypes: {
+    "Build": ["Opt Build", "Debug Build", "Nightly"],
+    "Test": ["Unit Test", "Mochitest", "Opt Mochitest", "Debug Mochitest", "Everythingelse Test", "Opt Everythingelse Test", "Debug Everythingelse Test"],
+    "Talos": ["Talos"],
+  },
+  
+  _getMachineTypeGroupForMachineType: function UserInterface__getMachineTypeGroupForMachineType(machineType) {
+    for (var group in this._groupedMachineTypes) {
+      if (this._groupedMachineTypes[group].indexOf(machineType) != -1)
+        return group;
+    }
+    return null;
+  },
+  
   _generateBoxMatrix: function UserInterface__generateBoxMatrix() {
     var boxMatrix = {};
     var machines = this._data.getMachines();
     var machineResults = this._data.getMachineResults();
+    var self = this;
     machines.forEach(function addMachineToBoxMatrix(machine) {
       if (!machine.latestFinishedRun.id) {
         // Ignore machines without run information.
         return;
       }
-      if (!boxMatrix[machine.type])
-        boxMatrix[machine.type] = {};
-      if (!boxMatrix[machine.type][machine.os])
-        boxMatrix[machine.type][machine.os] = [];
-      boxMatrix[machine.type][machine.os].push(machineResults[machine.latestFinishedRun.id]);
+      var machineTypeGroup = self._getMachineTypeGroupForMachineType(machine.type);
+      if (!machineTypeGroup)
+        return;
+      if (!boxMatrix[machineTypeGroup])
+        boxMatrix[machineTypeGroup] = {};
+      if (!boxMatrix[machineTypeGroup][machine.os])
+        boxMatrix[machineTypeGroup][machine.os] = [];
+      boxMatrix[machineTypeGroup][machine.os].push(machineResults[machine.latestFinishedRun.id]);
     });
     return boxMatrix;
   },
@@ -129,21 +147,9 @@ var UserInterface = {
     var colspans = {};
     var oss = this._data.getOss();
     oss.forEach(function initColspanForOS(os) { colspans[os] = 1; });
-    var groupedMachineTypes = {
-      "Build": ["Opt Build", "Debug Build", "Nightly"],
-      "Test": ["Unit Test", "Mochitest", "Opt Mochitest", "Debug Mochitest", "Everythingelse Test", "Opt Everythingelse Test", "Debug Everythingelse Test"],
-      "Talos": ["Talos"],
-    };
-    for (var machineTypeGroup in groupedMachineTypes) {
-      var types = groupedMachineTypes[machineTypeGroup];
-      for (var os in colspans) {
-        var colspan = 0;
-        types.forEach(function addColspanForMachineType(t) {
-          if (!boxMatrix[t] || !boxMatrix[t][os])
-            return;
-          colspan += boxMatrix[t][os].length;
-        });
-        colspans[os] *= colspan ? colspan : 1;
+    for (var machineTypeGroup in boxMatrix) {
+      for (var os in boxMatrix[machineTypeGroup]) {
+        colspans[os] *= boxMatrix[machineTypeGroup][os].length;
       }
     }
 
@@ -154,44 +160,32 @@ var UserInterface = {
     var table = $("#matrix");
     table.find("tbody").remove();
     var tbody = $("<tbody></tbody>").appendTo(table);
-    for (var machineTypeGroup in groupedMachineTypes) {
-      var types = groupedMachineTypes[machineTypeGroup];
+    for (var machineTypeGroup in this._groupedMachineTypes) {
+      if (!boxMatrix[machineTypeGroup])
+        continue;
+
       var row = $("<tr></tr>");
       var innerHTML = '<th>' + machineTypeGroup + '</th>';
-      var haveAnyOfType = false;
-      var typeColspan = {};
+      var numMachines = {};
       for (var os in colspans) {
-        typeColspan[os] = 0;
-        types.forEach(function calculateColspanForSubtype(t) {
-          if (!boxMatrix[t] || !boxMatrix[t][os])
-            return;
-          typeColspan[os] += boxMatrix[t][os].length;
-        });
+        numMachines[os] = boxMatrix[machineTypeGroup][os].length || 0;
       }
       oss.forEach(function buildBoxMatrixTableCellsForOS(os) {
-        types.forEach(function buildBoxMatrixTableCellsForMachineType(t) {
-          if (!boxMatrix[t])
-            return;
-          haveAnyOfType = true;
-          if (!boxMatrix[t][os]) {
-            if(typeColspan[os] == 0 && t == types[0] /* XXX hack */) {
-              innerHTML += '<td class="empty" colspan=' + colspans[os] + '></td>';
-            }
-            return;
-          }
-          var boxColspan = colspans[os] / typeColspan[os];
-          boxMatrix[t][os].forEach(function writeHTMLForMachineTypeCell(machineResult) {
-            var status = machineResult.state;
-            innerHTML += '<td colspan="' + boxColspan + '"><a href="' +
-                     machineResult.briefLogURL + '" class="machineResult ' + status +
-                     (machineResult.note ? ' hasNote" title="(starred)' : '') +
-                     '" resultID="' + machineResult.runID + '">' +
-                     self._resultTitle(machineResult) + '</a></td>';
-          });
+        if (numMachines[os] == 0) {
+          innerHTML += '<td class="empty" colspan=' + colspans[os] + '></td>';
+          return;
+        }
+        var boxColspan = colspans[os] / numMachines[os];
+        boxMatrix[machineTypeGroup][os].forEach(function writeHTMLForMachineTypeCell(machineResult) {
+          var status = machineResult.state;
+          innerHTML += '<td colspan="' + boxColspan + '"><a href="' +
+                   machineResult.briefLogURL + '" class="machineResult ' + status +
+                   (machineResult.note ? ' hasNote" title="(starred)' : '') +
+                   '" resultID="' + machineResult.runID + '">' +
+                   self._resultTitle(machineResult) + '</a></td>';
         });
       });
-      if (haveAnyOfType)
-        row.html(innerHTML).appendTo(tbody);
+      row.html(innerHTML).appendTo(tbody);
     }
     table.css("visibility", "visible");
     $("a", table).get().forEach(function setupClickListenerForBoxMatrixCell(cell) {
