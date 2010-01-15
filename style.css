@@ -261,9 +261,10 @@ th {
 td, th {
   border: 0;
   padding: 0;
+  vertical-align: top;
 }
 #matrix th:not(:first-child) {
-  width: 8.5em;
+  width: 81px;
 }
 #matrix th:first-child {
   text-align: right;
@@ -284,13 +285,19 @@ td, th {
   background-color: #D00 !important;
 }
 #matrix a {
-  display: block;
+  float: left;
+  width: 8px;
+  height: 8px;
   opacity: 0.8;
-  padding: 1px;
   text-indent: -1000px;
   overflow: hidden;
   border-right: 1px solid white;
   border-bottom: 1px solid white;
+}
+#matrix a.testfailed,
+#matrix a.busted {
+  width: 17px;
+  height: 17px;
 }
 #matrix a:hover {
   -moz-box-shadow: inset 0 4px 15px rgba(255, 255, 255, 0.25);
@@ -303,28 +310,25 @@ td, th {
   box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
-#matrix  a.hasNote {
+#matrix a.hasNote {
   background-image: url(starredbox.png);
   background-position: 0 0;
   background-repeat: no-repeat;
 }
 #matrix .machineResult[active=true] {
-  padding: 2px;
-  margin: -1px;
-  -moz-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
-  -webkit-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
-  background-position: 1px 1px;
+  -moz-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
 }
 #matrix a[active=true]:hover {
-  -moz-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2), inset 0 4px 15px rgba(255, 255, 255, 0.25);
-  -webkit-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2), inset 0 4px 15px rgba(255, 255, 255, 0.25);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2), inset 0 4px 15px rgba(255, 255, 255, 0.25);
+  -moz-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3), inset 0 4px 15px rgba(255, 255, 255, 0.25);
+  -webkit-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3), inset 0 4px 15px rgba(255, 255, 255, 0.25);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3), inset 0 4px 15px rgba(255, 255, 255, 0.25);
 }
 #matrix a[active=true]:active {
-  -moz-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2), inset 0 3px 10px rgba(0, 0, 0, 0.1);
-  -webkit-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2), inset 0 3px 10px rgba(0, 0, 0, 0.1);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2), inset 0 3px 10px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3), inset 0 3px 10px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3), inset 0 3px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3), inset 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
 #results {

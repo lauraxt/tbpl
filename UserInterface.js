@@ -144,19 +144,7 @@ var UserInterface = {
   
   _paintBoxMatrix: function UserInterface__paintBoxMatrix(boxMatrix) {
     var self = this;
-    var colspans = {};
-    var oss = this._data.getOss();
-    oss.forEach(function initColspanForOS(os) { colspans[os] = 1; });
-    for (var machineTypeGroup in boxMatrix) {
-      for (var os in boxMatrix[machineTypeGroup]) {
-        colspans[os] *= boxMatrix[machineTypeGroup][os].length;
-      }
-    }
-
-    oss.forEach(function setColspansOnColumnHeaders(os) {
-      document.getElementById(os + "th").setAttribute("colspan", colspans[os]);
-    });
-  
+    var oss = this._data.getOss()
     var table = $("#matrix");
     table.find("tbody").remove();
     var tbody = $("<tbody></tbody>").appendTo(table);
@@ -166,24 +154,17 @@ var UserInterface = {
 
       var row = $("<tr></tr>");
       var innerHTML = '<th>' + machineTypeGroup + '</th>';
-      var numMachines = {};
-      for (var os in colspans) {
-        numMachines[os] = boxMatrix[machineTypeGroup][os].length || 0;
-      }
       oss.forEach(function buildBoxMatrixTableCellsForOS(os) {
-        if (numMachines[os] == 0) {
-          innerHTML += '<td class="empty" colspan=' + colspans[os] + '></td>';
-          return;
-        }
-        var boxColspan = colspans[os] / numMachines[os];
+        innerHTML += '<td>';
         boxMatrix[machineTypeGroup][os].forEach(function writeHTMLForMachineTypeCell(machineResult) {
           var status = machineResult.state;
-          innerHTML += '<td colspan="' + boxColspan + '"><a href="' +
+          innerHTML += '<a href="' +
                    machineResult.briefLogURL + '" class="machineResult ' + status +
                    (machineResult.note ? ' hasNote" title="(starred)' : '') +
                    '" resultID="' + machineResult.runID + '">' +
-                   self._resultTitle(machineResult) + '</a></td>';
+                   self._resultTitle(machineResult) + '</a>';
         });
+        innerHTML += '</td>';
       });
       row.html(innerHTML).appendTo(tbody);
     }
