@@ -145,28 +145,6 @@ Data.prototype = {
         push.results[machineResult.machine.os][machineResult.machine.type].push(machineResult);
       }
     });
-    $(self._pushes).each(function sortMachineResultsForPush() {
-      if(!this.results)
-        return;
-
-      for (var j in this.results) {
-        for (var k in this.results[j]) {
-          this.results[j][k].sort(function machineResultSortComparison(a, b) {
-            // if the start time of two Mochitests does not differ by more than
-            // 5 minutes, they probably belong together so sort them by their
-            // number.
-            var timeDiff = a.startTime.getTime() - b.startTime.getTime();
-            if (Math.abs(timeDiff) < 30*60*1000) {
-              var matchA = /([0-9]+)\/[0-9]/.exec(a.machine.name);
-              var matchB = /([0-9]+)\/[0-9]/.exec(b.machine.name);
-              if (matchA && matchB)
-                return matchA[1] - matchB[1];
-            }
-            return timeDiff;
-          });
-        }
-      }
-    });
   },
 
 }

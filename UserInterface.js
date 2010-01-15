@@ -328,9 +328,17 @@ var UserInterface = {
       machineTypes.map(function buildHTMLForPushResultsOnOSForMachineType(machineType) {
         if (!results[machineType])
           return '';
+
+        // Sort results.
         if (self._data.machineTypeIsGrouped(machineType)) {
+          results[machineType].sort(function machineResultSortOrderComparison(a, b) {
+            return self._numberForMachine(a.machine) - self._numberForMachine(b.machine);
+          });
           return self._machineGroupResultLink(results[machineType]);
         }
+        results[machineType].sort(function machineResultSortTimeComparison(a, b) {
+          return a.startTime.getTime() - b.startTime.getTime();
+        });
         return results[machineType].map(function linkMachineResults(a) { return self._machineResultLink(a); }).join(" ");
       }).join("\n") +
       '</span></li>';
