@@ -36,10 +36,18 @@ var TinderboxJSONUser = {
       /opt.*mochitest/i.test(name) ? "Opt Mochitest" :
       /debug.*mochitest/i.test(name) ? "Debug Mochitest" :
       /mochitest/i.test(name) ? "Mochitest" :
-      /opt.*everythingelse/i.test(name) ? "Opt Everythingelse Test" :
-      /debug.*everythingelse/i.test(name) ? "Debug Everythingelse Test" :
-      /everythingelse/i.test(name) ? "Everythingelse Test" :
-      /unit test/i.test(name) ? "Unit Test" :
+      /opt.*crashtest/i.test(name) ? "Opt Crashtest" :
+      /debug.*crashtest/i.test(name) ? "Debug Crashtest" :
+      /crashtest/i.test(name) ? "Crashtest" :
+      /opt.*jsreftest/i.test(name) ? "Opt JSReftest" :
+      /debug.*jsreftest/i.test(name) ? "Debug JSReftest" :
+      /jsreftest/i.test(name) ? "JSReftest" :
+      /opt.*reftest/i.test(name) ? "Opt Reftest" :
+      /debug.*reftest/i.test(name) ? "Debug Reftest" :
+      /reftest/i.test(name) ? "Reftest" :
+      /opt.*xpcshell/i.test(name) ? "Opt XPCShellTest" :
+      /debug.*xpcshell/i.test(name) ? "Debug XPCShellTest" :
+      /xpcshell/i.test(name) ? "XPCShellTest" :
       /depend/i.test(name) ? "Opt Build" :
       /(leak|bloat)/i.test(name) ? "Debug Build" :
       /build/i.test(name) ? "Opt Build" :

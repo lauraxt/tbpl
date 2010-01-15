@@ -8,7 +8,17 @@ function TinderboxData(treeName, dataLoader, repoNames) {
 TinderboxData.prototype = {
 
   oss: ["linux", "osx", "windows"],
-  machineTypes: ["Opt Build", "Debug Build", "Unit Test", "Mochitest", "Opt Mochitest", "Debug Mochitest", "Everythingelse Test", "Opt Everythingelse Test", "Debug Everythingelse Test", "Nightly", "Talos", "Static Analysis"],
+  machineTypes: [
+    "Opt Build", "Debug Build", "Nightly",
+    "Mochitest", "Opt Mochitest", "Debug Mochitest",
+    "Crashtest", "Opt Crashtest", "Debug Crashtest",
+    "Reftest", "Opt Reftest", "Debug Reftest",
+    "JSReftest", "Opt JSReftest", "Debug JSReftest",
+    "XPCShellTest", "Opt XPCShellTest", "Debug XPCShellTest",
+    "Unit Test",
+    "Talos",
+    "Static Analysis"
+  ],
 
   // These "groups" are machine types that are grouped like M(12345).
   treesWithGroups: {

@@ -108,7 +108,14 @@ var UserInterface = {
   
   _groupedMachineTypes: {
     "Build": ["Opt Build", "Debug Build", "Nightly"],
-    "Test": ["Unit Test", "Mochitest", "Opt Mochitest", "Debug Mochitest", "Everythingelse Test", "Opt Everythingelse Test", "Debug Everythingelse Test"],
+    "Test": [
+      "Mochitest", "Opt Mochitest", "Debug Mochitest",
+      "Crashtest", "Opt Crashtest", "Debug Crashtest",
+      "Reftest", "Opt Reftest", "Debug Reftest",
+      "JSReftest", "Opt JSReftest", "Debug JSReftest",
+      "XPCShellTest", "Opt XPCShellTest", "Debug XPCShellTest",
+      "Unit Test",
+    ],
     "Talos": ["Talos"],
   },
   
@@ -266,27 +273,27 @@ var UserInterface = {
   },
 
   _shortNameForMachineWithoutNumber: function UserInterface__shortNameForMachineWithoutNumber(machine) {
-    switch (machine.type) {
-      case "Opt Build":
-        return "Bo";
-      case "Debug Build":
-        return "Bd";
-      case "Opt Mochitest":
-        return "Mo";
-      case "Debug Mochitest":
-        return "Md";
-      case "Opt Everythingelse Test":
-        return "Eo";
-      case "Debug Everythingelse Test":
-        return "Ed";
-      default:
-        return machine.type.charAt(0);
-    }
+    var type = machine.type;
+    var prefix = "";
+    ["Opt ", "Debug "].some(function (p) {
+      if (type.indexOf(p) == 0) {
+        prefix = p;
+        return true;
+      }
+      return false;
+    });
+    return type.charAt(prefix.length) + prefix.charAt(0).toLowerCase();
   },
 
   _numberForMachine: function UserInterface__numberForMachine(machine) {
     var match = /([0-9]+)\/[0-9]/.exec(machine.name);
-    return match ? match[1] : "";
+    if (match)
+      return match[1];
+    
+    if (machine.name.match(/mochitest\-other/))
+      return "6";
+
+    return "";
   },
 
   _machineResultLink: function UserInterface__machineResultLink(machineResult, onlyNumber) {
