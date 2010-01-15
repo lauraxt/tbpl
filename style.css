@@ -269,6 +269,7 @@ td, th {
 #matrix th:first-child {
   text-align: right;
   font-size: 0.9em;
+  line-height: 8px;
   padding-right: 2px;
 }
 #matrix th img {
