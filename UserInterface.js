@@ -130,9 +130,8 @@ var UserInterface = {
     var oss = this._data.getOss();
     oss.forEach(function initColspanForOS(os) { colspans[os] = 1; });
     var groupedMachineTypes = {
-      "Build": ["Opt Build", "Debug Build"],
+      "Build": ["Opt Build", "Debug Build", "Nightly"],
       "Test": ["Unit Test", "Mochitest", "Opt Mochitest", "Debug Mochitest", "Everythingelse Test", "Opt Everythingelse Test", "Debug Everythingelse Test"],
-      "Nightly": ["Nightly"],
       "Talos": ["Talos"],
     };
     for (var machineTypeGroup in groupedMachineTypes) {
