@@ -12,7 +12,7 @@ var Config = {
     "TraceMonkey": "tracemonkey",
     "Electrolysis": "projects/electrolysis",
     "Places": "projects/places/",
-    "Mobile": "mozilla-cental",
+    "Mobile": "mozilla-central",
     "MozillaTry": "try",
   },
 };
