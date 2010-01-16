@@ -163,7 +163,8 @@ var UserInterface = {
       var innerHTML = '<th>' + machineTypeGroup + '</th>';
       oss.forEach(function buildBoxMatrixTableCellsForOS(os) {
         innerHTML += '<td>';
-        boxMatrix[machineTypeGroup][os].forEach(function writeHTMLForMachineTypeCell(machineResult) {
+        var machineResults = (os in boxMatrix[machineTypeGroup]) ? boxMatrix[machineTypeGroup][os] : [];
+        machineResults.forEach(function writeHTMLForMachineTypeCell(machineResult) {
           var status = machineResult.state;
           innerHTML += '<a href="' +
                    machineResult.briefLogURL + '" class="machineResult ' + status +
