@@ -70,7 +70,7 @@ var Controller = {
         self._loadedData("pushes");
       },
       function failed() {
-        self.loadStatus.tinderbox = "fail";
+        self.loadStatus.pushlog = "fail";
         UserInterface.updateStatus();
       }
     );

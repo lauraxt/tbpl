@@ -62,6 +62,9 @@ var UserInterface = {
     if (this._controller.loadStatus.tinderbox == "fail") {
       text += " Parsing Tinderbox failed. :-(";
       statusSpan.addClass("fail");
+    } else if (this._controller.loadStatus.pushlog == "fail") {
+      text += " Parsing Pushlog failed. :-(";
+      statusSpan.addClass("fail");
     }
     var numComments = AddCommentUI.numSendingComments;
     if (numComments) {
