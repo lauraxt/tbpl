@@ -295,7 +295,7 @@ var UserInterface = {
       return match[1];
     
     if (machine.name.match(/mochitest\-other/))
-      return "6";
+      return "oth";
 
     return "";
   },
@@ -336,7 +336,12 @@ var UserInterface = {
         // Sort results.
         if (self._data.machineTypeIsGrouped(machineType)) {
           results[machineType].sort(function machineResultSortOrderComparison(a, b) {
-            return self._numberForMachine(a.machine) - self._numberForMachine(b.machine);
+            var numA = self._numberForMachine(a.machine);
+            var numB = self._numberForMachine(b.machine);
+            if (numA == numB)
+              return a.startTime.getTime() - b.startTime.getTime();
+
+            return numA > numB ? 1 : -1;
           });
           return self._machineGroupResultLink(results[machineType]);
         }
