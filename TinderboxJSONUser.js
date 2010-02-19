@@ -24,12 +24,12 @@ var TinderboxJSONUser = {
 
   getMachineType: function TinderboxJSONUser_getMachineType(name) {
     return {
-      os:
+      os: (
       /Linux/.test(name) ? "linux" :
       /Fedora/.test(name) ? "linux" :
       /OS\s?X/.test(name) ? "osx" :
       /WINNT/i.test(name) ? "windows" :
-      /static-analysis/.test(name) ? "linux" : "",
+      /static-analysis/.test(name) ? "linux" : "") + (/64/.test(name) ? "64" : ""),
   
       type:
       /talos/i.test(name) ? "Talos" :
