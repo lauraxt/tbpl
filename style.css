@@ -243,6 +243,7 @@ a:active {
   height: 10em;
   background: white;
   font-size: 0.76em;
+  overflow: hidden;
 }
 
 
