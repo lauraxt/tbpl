@@ -247,10 +247,16 @@ a:active {
 
 
 /* Current tree state table */
-#matrix {
+#matrixWrapper {
   font-size: 0.8em;
-  margin: 10px 20px 0 0;
-  float: right;
+  top: 10px;
+  bottom: 0;
+  right: 20px;
+  width: 30em;
+  position: absolute;
+  overflow: hidden;
+}
+#matrix {
   table-layout: fixed;
   width: 30em;
   border-collapse: collapse;
