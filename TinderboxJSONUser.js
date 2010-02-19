@@ -26,8 +26,9 @@ var TinderboxJSONUser = {
     return {
       os:
       /Linux/.test(name) ? "linux" :
+      /Fedora/.test(name) ? "linux" :
       /OS\s?X/.test(name) ? "osx" :
-      /^WIN/i.test(name) ? "windows" :
+      /WINNT/i.test(name) ? "windows" :
       /static-analysis/.test(name) ? "linux" : "",
   
       type:
