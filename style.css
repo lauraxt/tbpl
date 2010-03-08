@@ -100,7 +100,7 @@ iframe {
 }
 .patches > li > div {
   white-space: nowrap;
-  margin-left: 80px;
+  margin-left: 95px;
 }
 .patches > li > .popup.hovering {
   white-space: normal;
@@ -142,7 +142,7 @@ span.logtags span.inbranchtag {
 }
 .revlink {
   float: left;
-  width: 80px;
+  width: 95px;
 }
 .results {
   float: right;
