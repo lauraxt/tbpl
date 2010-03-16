@@ -12,6 +12,9 @@ var UserInterface = {
     this._treeName = controller.treeName;
     this._data = controller.getData();
 
+    if(!window.localStorage)
+      window.localStorage = window.globalStorage ? globalStorage[location.host] : {};
+
     document.title = controller.treeName + " - Tinderboxpushlog";
 
     this._buildTreeSwitcher();
@@ -189,22 +192,14 @@ var UserInterface = {
   },
 
   _useLocalTime: function UserInterface__useLocalTime() {
-    return ("localStorage" in window && localStorage.useLocalTime) ||
-           ("globalStorage" in window && globalStorage[location.host].useLocalTime);
+    return localStorage.useLocalTime == "true"; // Storage stores Strings, not Objects :-(
   },
 
-  _setUseLocalTime: function UserInterface__useLocalTime(value) {
-    if ("localStorage" in window) {
-      if (value)
-        localStorage.useLocalTime = true;
-      else
-        delete localStorage.useLocalTime;
-    } else if ("globalStorage" in window) {
-      if (value)
-        globalStorage[location.host].useLocalTime = true;
-      else
-        delete globalStorage[location.host].useLocalTime;
-    }
+  _setUseLocalTime: function UserInterface__setUseLocalTime(value) {
+    if(value)
+      localStorage.useLocalTime = "true";
+    else
+      delete localStorage.useLocalTime;
   },
 
   _getTimezoneAdaptedDate: function UserInterface__getTimezoneAdaptedDate(date) {

@@ -81,16 +81,11 @@ var AddCommentUI = {
   },
 
   _getEmail: function AddCommentUI__getEmail() {
-    return ("localStorage" in window && localStorage.email) ||
-           ("globalStorage" in window && globalStorage[location.host].email) ||
-           "";
+    return localStorage.email || "";
   },
 
   _setEmail: function AddCommentUI__setEmail(email) {
-    if ("localStorage" in window)
-      localStorage.email = email;
-    else if ("globalStorage" in window)
-      globalStorage[location.host].email = email;
+    localStorage.email = email;
   },
 
   _updateSubmitButton: function AddCommentUI__updateSubmitButton() {
