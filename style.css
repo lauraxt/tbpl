@@ -1,7 +1,6 @@
 html {
   font-family: "Lucida Grande", Verdana, sans-serif;
   line-height: 1.5;
-  font-size: 14px;
 }
 p {
   font-size: 0.8em;
@@ -93,20 +92,20 @@ iframe {
 }
 .patches {
   margin-right: 50%;
-  padding-right: 2em;
-  min-height: 5em;
+  padding-right: 20px;
+  min-height: 50px;
 }
 .patches > li {
   overflow: hidden;
 }
 .patches > li > div {
   white-space: nowrap;
-  margin-left: 8em;
+  margin-left: 95px;
 }
 .patches > li > .popup.hovering {
   white-space: normal;
   position: absolute;
-  margin-right: 6em;
+  margin-right: 60px;
   display: none;
 }
 .patches > li > .popup.hovering > span {
@@ -143,7 +142,7 @@ span.logtags span.inbranchtag {
 }
 .revlink {
   float: left;
-  width: 8em;
+  width: 95px;
 }
 .results {
   float: right;
@@ -152,12 +151,12 @@ span.logtags span.inbranchtag {
 }
 .results .os {
   float: left;
-  width: 6em;
+  width: 60px;
   word-spacing: 0;
 }
 .osresults {
   display: block;
-  margin-left: 6em;
+  margin-left: 60px;
   overflow: hidden;
 }
 #pushes .machineResult,
@@ -338,7 +337,7 @@ td, th {
 }
 
 #results {
-  margin: 0 390px 0 0;
+  margin: 0 380px 0 0;
   border-right: 1px solid #DDD;
   height: 100px;
   position: relative;
