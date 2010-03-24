@@ -5,15 +5,14 @@ var UserInterface = {
   _treeName: "",
   _data: null,
   _activeResult: "",
+  _storage: null,
 
   init: function UserInterface_init(controller) {
     var self = this;
     this._controller = controller;
     this._treeName = controller.treeName;
     this._data = controller.getData();
-
-    if(!window.localStorage)
-      window.localStorage = window.globalStorage ? globalStorage[location.host] : {};
+    this._setupStorage();
 
     document.title = controller.treeName + " - Tinderboxpushlog";
 
@@ -33,7 +32,7 @@ var UserInterface = {
       self._clickNowhere(e);
     };
 
-    AddCommentUI.init("http://tinderbox.mozilla.org/addnote.cgi");
+    AddCommentUI.init("http://tinderbox.mozilla.org/addnote.cgi", this._storage);
     AddCommentUI.registerNumSendingCommentChangedCallback(function commentSendUpdater() {
       self.updateStatus();
     });
@@ -78,6 +77,19 @@ var UserInterface = {
     statusSpan.html(text);
   },
   
+  _setupStorage: function UserInterface__setupStorage() {
+    try {
+      this._storage = window.localStorage;
+    } catch (e) {}
+    if (!this._storage) {
+      try {
+        if (window.globalStorage)
+          this._storage = globalStorage[location.host];
+      } catch (e) {}
+    }
+    this._storage = this._storage || {};
+  },
+
   _buildTreeSwitcher: function UserInterface__buildTreeSwitcher() {
     var labels = [];
     var numTrees = 3, i = 0;
@@ -192,14 +204,14 @@ var UserInterface = {
   },
 
   _useLocalTime: function UserInterface__useLocalTime() {
-    return localStorage.useLocalTime == "true"; // Storage stores Strings, not Objects :-(
+    return this._storage.useLocalTime == "true"; // Storage stores Strings, not Objects :-(
   },
 
   _setUseLocalTime: function UserInterface__setUseLocalTime(value) {
-    if(value)
-      localStorage.useLocalTime = "true";
+    if (value)
+      this._storage.useLocalTime = "true";
     else
-      delete localStorage.useLocalTime;
+      delete this._storage.useLocalTime;
   },
 
   _getTimezoneAdaptedDate: function UserInterface__getTimezoneAdaptedDate(date) {

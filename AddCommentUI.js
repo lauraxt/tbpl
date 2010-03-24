@@ -4,8 +4,9 @@ var AddCommentUI = {
   numSendingComments: 0,
   numSendingCommentChangedCallback: function empty() {},
   _submitURL: "",
+  _storage: {},
 
-  init: function AddCommentUI_init(submitURL) {
+  init: function AddCommentUI_init(submitURL, storage) {
     var self = this;
     $("a.addNote").live("click", function addNoteLinkClick() {
       self.logLinkClick();
@@ -30,6 +31,7 @@ var AddCommentUI = {
       return false;
     });
     this._submitURL = submitURL;
+    this._storage = storage;
   },
 
   updateUI: function AddCommentUI_updateUI() {
@@ -81,11 +83,11 @@ var AddCommentUI = {
   },
 
   _getEmail: function AddCommentUI__getEmail() {
-    return localStorage.email || "";
+    return this._storage.email || "";
   },
 
   _setEmail: function AddCommentUI__setEmail(email) {
-    localStorage.email = email;
+    this._storage.email = email;
   },
 
   _updateSubmitButton: function AddCommentUI__updateSubmitButton() {
