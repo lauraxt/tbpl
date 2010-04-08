@@ -15,5 +15,6 @@ var Config = {
     "Places": "projects/places/",
     "Mobile": "mozilla-central",
     "MozillaTry": "try",
+    "AddonsMgr": "projects/addonsmgr",
   },
 };
