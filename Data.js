@@ -5,6 +5,7 @@ function Data(treeName, config) {
   this._pushes = [];
   this._machines = [];
   this._machineResults = {};
+  this._config = config;
 };
 
 Data.prototype = {
@@ -49,8 +50,8 @@ Data.prototype = {
   },
 
   machineTypeIsGrouped: function Data_machineTypeIsGrouped(machineType) {
-    return this._tinderboxData.treesWithGroups[this._treeName] &&
-      this._tinderboxData.treesWithGroups[this._treeName].indexOf(machineType) != -1;
+    return this._config.treesWithGroups[this._treeName] &&
+      this._config.treesWithGroups[this._treeName].indexOf(machineType) != -1;
   },
 
   getMachines: function Data_getMachines() {

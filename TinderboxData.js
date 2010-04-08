@@ -20,12 +20,6 @@ TinderboxData.prototype = {
     "Static Analysis"
   ],
 
-  // These "groups" are machine types that are grouped like M(12345).
-  treesWithGroups: {
-    "Firefox": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
-    "AddonsMgr": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
-  },
-
   getRepoName: function TinderboxData_getRepoName() {
     return this._repoNames[this._treeName];
   },

@@ -17,4 +17,9 @@ var Config = {
     "MozillaTry": "try",
     "AddonsMgr": "projects/addonsmgr",
   },
+  // These "groups" are machine types that are grouped like M(12345).
+  treesWithGroups: {
+    "Firefox": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
+    "AddonsMgr": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
+  },
 };
