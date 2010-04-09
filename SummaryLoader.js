@@ -17,6 +17,18 @@ var SummaryLoader = {
       if (summary)
         box.className += " hasSummary";
       $(".stars .summary").get(0).innerHTML = summary.replace(/ALSA.*device\n/g, "").replace(/\n/g, "<br>\n");
+      result.suggestions = [];
+      var suggestions = $(".stars .summary [data-bugid]");
+      for (var i = 0; i < suggestions.length; ++i) {
+        var item = $(suggestions[i]);
+        var suggestion = {
+          id: item.attr("data-bugid"),
+          summary: item.attr("data-summary"),
+          status: item.attr("data-status")
+        };
+        result.suggestions.push(suggestion);
+      }
+      AddCommentUI.updateUI();
     }, function fetchSummaryFailCallback() {
       summaryLoader.innerHTML = "Fetching summary failed.";
       summaryLoader.className = "";

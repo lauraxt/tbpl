@@ -317,6 +317,18 @@ var UserInterface = {
     '</a>';
   },
 
+  _addSuggestionLink: function UserInterface__addSuggestionLink(machineResults, target) {
+    if (machineResults.suggestions) {
+      for (var i = 0; i < machineResults.suggestions.length; ++i) {
+        var item = machineResults.suggestions[i];
+        $("<a href=\"#\">Bug " + item.id + "</a>").click(function() {
+          AddCommentUI.toggleSuggestion(item.id, item.summary, item.status, this);
+        }).attr("title", "[" + item.status.trim() + "] " + item.summary)
+        .appendTo(target);
+      }
+    }
+  },
+
   _machineGroupResultLink: function UserInterface__machineGroupResultLink(machineResults) {
     var self = this;
     return '<span class="machineResultGroup" machineType="' +

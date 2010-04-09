@@ -160,14 +160,16 @@ span.logtags span.inbranchtag {
   overflow: hidden;
 }
 #pushes .machineResult,
-#addNotePopup .machineResult {
+#addNotePopup .machineResult,
+#addNotePopup #logNoteSuggestions a {
   font-size: 1.1em;
   font-weight: bold;
   padding: 0 5px 2px;
   float: left;
   outline: none !important;
 }
-.machineResult:hover, .machineResult[active=true] {
+.machineResult:hover, .machineResult[active=true],
+#logNoteSuggestions a:hover {
   color: white !important;
   text-decoration: none;
 }
@@ -521,11 +523,20 @@ em.testfail {
   padding-bottom: 4px;
   text-shadow: 0 1px #000;
 }
-#addNotePopup .machineResult {
+#addNotePopup .machineResult,
+#addNotePopup #logNoteSuggestions a {
   padding: 0 5px;
   -moz-border-radius: 4px;
   -webkit-border-radius: 4px;
   border-radius: 4px;
+}
+#addNotePopup #logNoteSuggestions a {
+  color: #aaf;
+  white-space: nowrap;
+}
+#addNotePopup #logNoteSuggestions a.added {
+  color: white;
+  background: #aaf;
 }
 #addNotePopup .machineResult[active=true] {
   -moz-box-shadow: 0 1px rgba(0, 0, 0, 0.6);

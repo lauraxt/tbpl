@@ -38,6 +38,7 @@ var AddCommentUI = {
     this._updateBuildList();
     this._updateLogLinkText();
     this._updateSubmitButton();
+    this._updateSuggestions();
   },
 
   reset: function AddCommentUI_resut() {
@@ -82,6 +83,22 @@ var AddCommentUI = {
     this.numSendingCommentChangedCallback = callback;
   },
 
+  toggleSuggestion: function AddCommentUI_toggleSuggestion(id, status, summary, link) {
+    var box = $("#logNoteText").get(0);
+    if (box.value == "") {
+      box.value = link.textContent;
+      $(link).addClass("added");
+    } else {
+      if (box.value.indexOf(link.textContent) >= 0) {
+        box.value = box.value.replace(new RegExp("(, )?" + link.textContent), "");
+        $(link).removeClass("added");
+      } else {
+        box.value += ", " + link.textContent;
+        $(link).addClass("added");
+      }
+    }
+  },
+
   _getEmail: function AddCommentUI__getEmail() {
     return this._storage.email || "";
   },
@@ -101,6 +118,20 @@ var AddCommentUI = {
     }
     $("#logNoteRuns").html(html ? html : "(none selected)");
     UserInterface._markActiveResultLinks(); // XXX fix this
+  },
+
+  _updateSuggestions: function AddCommentUI__updateSuggestions() {
+    $("#logNoteSuggestions").empty();
+    var added = false;
+    for (var i in this.addToBuilds) {
+      added = true;
+      UserInterface._addSuggestionLink(Controller.getData().getMachineResults()[i],
+                                       $("#logNoteSuggestions"));
+    }
+    if (added)
+      $("#suggestions").show();
+    else
+      $("#suggestions").hide();
   },
 
   _updateLogLinkText: function AddCommentUI__updateLogLinkText() {
