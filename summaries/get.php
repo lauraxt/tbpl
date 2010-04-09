@@ -43,7 +43,7 @@ function getSummary($tree, $id) {
         }
         if (preg_match_all("/Build Error Summary.*<PRE>(.*)$/i", $line, $m)) {
           $foundSummaryStart = true;
-          $line = $m[1][0];
+          $line = $m[1][0] . "\n";
           $lines[] = $line;
         }
       } else {
