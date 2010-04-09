@@ -29,6 +29,7 @@ var SummaryLoader = {
         result.suggestions.push(suggestion);
         item.html('<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=' +
           item.attr("data-bugid") + '" target="_blank">' + item.html() + '</a>');
+        item.attr("title", item.attr("data-status"));
       }
       AddCommentUI.updateUI();
     }, function fetchSummaryFailCallback() {
