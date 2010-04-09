@@ -424,7 +424,6 @@ em.testfail {
   border-top: 1px solid #DDD;
 }
 .stars .summary [data-bugid] {
-  background: #FF8800;
   padding-left: 5em;
   display: block;
 }
