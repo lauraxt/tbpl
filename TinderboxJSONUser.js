@@ -26,6 +26,7 @@ var TinderboxJSONUser = {
     return {
       os:
       /Linux x86-64/.test(name) ? "linux64" :
+      /Fedora.*x64/.test(name) ? "linux64" :
       /Linux/.test(name) ? "linux" :
       /Fedora/.test(name) ? "linux" :
       /OS\s?X.*10\.6/.test(name) ? "osx64" :
