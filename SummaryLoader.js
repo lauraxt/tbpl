@@ -11,7 +11,7 @@ var SummaryLoader = {
     var summaryLoader = $("#summaryLoader").get(0);
     summaryLoader.innerHTML = "Retrieving summary..."
     summaryLoader.className = "loading";
-    this._fetchSummary(result.runID, result.tree, function fetchSummaryLoadCallback(summary) {
+    this._fetchSummary(result.runID, result.tree, !!result.note, function fetchSummaryLoadCallback(summary) {
       summaryLoader.innerHTML = summary ? "" : "Summary is empty.";
       summaryLoader.className = "";
       if (summary)
@@ -26,7 +26,7 @@ var SummaryLoader = {
     });
   },
 
-  _fetchSummary: function SummaryLoader__fetchSummary(runID, tree, loadCallback, failCallback, timeoutCallback) {
+  _fetchSummary: function SummaryLoader__fetchSummary(runID, tree, isStarred, loadCallback, failCallback, timeoutCallback) {
     var self = this;
     if (this._cachedSummaries[runID]) {
       loadCallback(this._cachedSummaries[runID]);
@@ -36,7 +36,8 @@ var SummaryLoader = {
       self._cachedSummaries[runID] = summary;
       loadCallback(summary);
     };
-    var req = NetUtils.loadText("summaries/get.php?tree=" + tree + "&id=" + runID, onLoad, failCallback, timeoutCallback);
+    var req = NetUtils.loadText("summaries/get.php?tree=" + tree + "&id=" + runID + "&starred=" + (isStarred ? "true" : "false"),
+                                onLoad, failCallback, timeoutCallback);
     var oldAbort = this._abortOutstandingSummaryLoadings;
     this._abortOutstandingSummaryLoadings = function abortThisLoadWhenAborting() {
       if (req)

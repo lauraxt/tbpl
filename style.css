@@ -421,6 +421,20 @@ em.testfail {
   font-size: 10px;
   border-top: 1px solid #DDD;
 }
+.stars .summary [data-bugid] {
+  background: #FF8800;
+  padding-left: 5em;
+  display: block;
+}
+.stars .summary [data-bugid] + br {
+  display: none;
+}
+.stars .summary [data-status~=RESOLVED] span {
+  text-decoration: line-through;
+}
+.stars .summary [data-status~=UNCONFIRMED] {
+  font-style: italic;
+}
 #results:not(.hasSummary) .stars .summary {
   display: none;
 }
