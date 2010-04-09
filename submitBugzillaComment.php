@@ -25,6 +25,7 @@ if ($bug_comments !== false) {
     $id = $matches[1];
     if (strpos($bug_comments, $id) !== false)
       exit;
+  }
 }
 
 $ch = curl_init();
