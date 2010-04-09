@@ -3,10 +3,15 @@
 if (!isset($_GET["tree"]) || !isset($_GET["id"]))
   die("tree or id not set");
 
-echo getSummary($_GET["tree"], $_GET["id"]);
+if (!isset($_GET["starred"]) || $_GET["starred"] != "true")
+  $_GET["starred"] = false;
+else
+  $_GET["starred"] = true;
 
-function getSummary($tree, $id) {
-  $file = $tree . "_" . $id;
+echo getSummary($_GET["tree"], $_GET["id"], $_GET["starred"]);
+
+function getSummary($tree, $id, $starred) {
+  $file = $tree . "_" . $id . "_" . ($starred ? "" : "not") . "starred";
   if (file_exists($file))
     return file_get_contents($file);
 
@@ -44,20 +49,70 @@ function getSummary($tree, $id) {
         if (preg_match_all("/Build Error Summary.*<PRE>(.*)$/i", $line, $m)) {
           $foundSummaryStart = true;
           $line = $m[1][0] . "\n";
+	   $line = strip_tags($line);
           $lines[] = $line;
+          if (!$starred)
+            processLine($lines, $line);
         }
       } else {
         if (preg_match("/Build Error Log/i", $line))
           break;
+        $line = strip_tags($line);
         $lines[] = $line;
+        if (!$starred)
+          processLine($lines, $line);
       }
     } else {
       usleep(80 * 1000);
     }
   }
   fclose($fp);
-  $summary = $fileExistedAfterAll ? file_get_contents($file) : strip_tags(implode($lines));
+  $summary = $fileExistedAfterAll ? file_get_contents($file) : implode($lines);
   if (!file_exists($file) && !$isStillRunning)
     file_put_contents($file, $summary);
   return $summary;
+}
+
+function processLine(&$lines, $line) {
+  $tokens = explode(" ", $line);
+  if (count($tokens) > 1) {
+    foreach ($tokens as $token) {
+      $parts = preg_split("/[\\/\\\\]/", $token);
+      if (count($parts) > 1) {
+        // get the file name
+        $fileName = end($parts);
+        $bugs = getBugsForTestFailure($fileName);
+        foreach ($bugs as $bug) {
+          $bug->summary = htmlspecialchars($bug->summary);
+          $lines[] =
+            "<span data-bugid=\"$bug->id\" " .
+                  "data-summary=\"$bug->summary\" " .
+                  "data-status=\"$bug->status $bug->resolution\"" .
+            ">Bug <span>$bug->id</span> - $bug->summary</span>\n";
+        }
+      }
+    }
+  }
+}
+
+function parseJSON($json) {
+  require_once "./JSON.php";
+  $engine = new Services_JSON();
+  return $engine->decode($json);
+}
+
+$bugsCache = array();
+function getBugsForTestFailure($fileName) {
+  global $bugsCache;
+  if (isset($bugsCache[$fileName]))
+    return array();
+  $bugs_json = file_get_contents("https://api-dev.bugzilla.mozilla.org/latest/bug?whiteboard=orange&summary=" . urlencode($fileName));
+  if ($bugs_json !== false) {
+    $bugs = parseJSON($bugs_json);
+    if (isset($bugs->bugs)) {
+      $bugsCache[$fileName] = $bugs->bugs;
+      return $bugs->bugs;
+    }
+  }
+  return array();
 }
