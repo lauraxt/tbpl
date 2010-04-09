@@ -10,6 +10,8 @@ var AddCommentUI = {
   _storage: {},
 
   init: function AddCommentUI_init(submitURL, storage) {
+    this._submitURL = submitURL;
+    this._storage = storage;
     var self = this;
     $("a.addNote").live("click", function addNoteLinkClick() {
       self.logLinkClick();
@@ -33,8 +35,6 @@ var AddCommentUI = {
       });
       return false;
     });
-    this._submitURL = submitURL;
-    this._storage = storage;
   },
 
   updateUI: function AddCommentUI_updateUI() {
