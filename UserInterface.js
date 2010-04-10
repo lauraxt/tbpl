@@ -36,9 +36,6 @@ var UserInterface = {
     AddCommentUI.registerNumSendingCommentChangedCallback(function commentSendUpdater() {
       self.updateStatus();
     });
-    AddCommentUI.registerNumSendingBugChangedCallback(function bugSendUpdater() {
-      self.updateStatus();
-    });
 
     this._updateTimezoneDisplay();
 
@@ -74,11 +71,6 @@ var UserInterface = {
     var numComments = AddCommentUI.numSendingComments;
     if (numComments) {
       text += " Sending " + numComments + " " + (numComments == 1 ? "comment" : "comments") + "...";
-      statusSpan.addClass("loading");
-    }
-    var numBugs = AddCommentUI.numSendingBugs;
-    if (numBugs) {
-      text += " Marking " + numBugs + " " + (numBugs == 1 ? "bug" : "bugs") + "...";
       statusSpan.addClass("loading");
     }
     statusSpan.css("visibility", text ? "visible" : "hidden");
@@ -563,12 +555,6 @@ var UserInterface = {
       scrollBox.scrollTop = newpos;
     }, 16);
   },
-
-  _durationDisplay: function UserInterface__durationDisplay(result) {
-    return 'Started ' + this._getDisplayTime(result.startTime) +
-      ', ' + (result.state == "building" ? 'still running... ' + this._etaString(result)
-      : 'finished ') + this._getDisplayTime(result.endTime);
-  },
   
   _displayResult: function UserInterface__displayResult() {
     var self = this;
@@ -587,7 +573,9 @@ var UserInterface = {
     box.innerHTML = (function htmlForResultInBottomBar() {
       return '<h3><span class="machineName">' + result.machine.name +
       '</span> [<span class="state">' + result.state + '</span>] ' +
-      '<span class="duration">' + self._durationDisplay(result) + '</span></h3>\n' +
+      '<span class="duration">Started ' + self._getDisplayTime(result.startTime) +
+      ', ' + (result.state == "building" ? 'still running... ' + self._etaString(result)
+      : 'finished ') + self._getDisplayTime(result.endTime) + '</span></h3>\n' +
       '<a class="briefLog" href="' + result.briefLogURL +
       '">View Brief Log</a> <a class="fullLog" href="' +
       result.fullLogURL + '">View Full Log</a> <a class="addNote" href="' +
