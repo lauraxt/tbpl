@@ -90,6 +90,8 @@ function processLine(&$lines, $line) {
                   "data-status=\"$bug->status $bug->resolution\"" .
             ">Bug <span>$bug->id</span> - $bug->summary</span>\n";
         }
+        if (count($bugs) > 0)
+          break;
       }
     }
   }
