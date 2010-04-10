@@ -116,7 +116,7 @@ var AddCommentUI = {
     this.numSendingBugChangedCallback = callback;
   },
 
-  toggleSuggestion: function AddCommentUI_toggleSuggestion(id, status, summary, link) {
+  toggleSuggestion: function AddCommentUI_toggleSuggestion(id, link) {
     var box = $("#logNoteText").get(0);
     if (box.value == "") {
       this.addToBugs[id] = true;

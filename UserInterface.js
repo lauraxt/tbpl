@@ -330,8 +330,9 @@ var UserInterface = {
       for (var i = 0; i < machineResults.suggestions.length; ++i) {
         var item = machineResults.suggestions[i];
         $("<a href=\"#\">Bug " + item.id + "</a>").click(function() {
-          AddCommentUI.toggleSuggestion(item.id, item.summary, item.status, this);
+          AddCommentUI.toggleSuggestion(this.getAttribute("data-id"), this);
         }).attr("title", "[" + item.status.trim() + "] " + item.summary)
+        .attr("data-id", item.id)
         .appendTo(target);
       }
     }
