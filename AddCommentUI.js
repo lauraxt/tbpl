@@ -1,11 +1,8 @@
 var AddCommentUI = {
 
   addToBuilds: {},
-  addToBugs: {},
   numSendingComments: 0,
   numSendingCommentChangedCallback: function empty() {},
-  numSendingBugs: 0,
-  numSendingBugChangedCallback: function empty() {},
   _submitURL: "",
   _storage: {},
 
@@ -47,7 +44,6 @@ var AddCommentUI = {
   reset: function AddCommentUI_resut() {
     $("#logNoteText").get(0).value = "";
     this.addToBuilds = {};
-    this.addToBugs = {};
     this.updateUI();
   },
 
@@ -61,26 +57,6 @@ var AddCommentUI = {
         self.pendingCommentsChanged(-1);
       });
       this.pendingCommentsChanged(1);
-    }
-    var bugsSubmitData = {};
-    for (var i in this.addToBuilds) {
-      if (!machineResults[i].suggestions)
-        continue;
-      for (var j = 0; j < machineResults[i].suggestions.length; ++j) {
-        var suggestion = machineResults[i].suggestions[j];
-        if (!(suggestion.id in this.addToBugs))
-          continue;
-        bugsSubmitData[suggestion.id] = {
-          header: machineResults[i].machine.name + ", " + UserInterface._durationDisplay(machineResults[i]),
-          logLink: machineResults[i].briefLogURL
-        };
-      }
-    }
-    for (var id in bugsSubmitData) {
-      this._postOneBug(id, bugsSubmitData[id].header, bugsSubmitData[id].logLink, function oneLessBugPending() {
-        self.pendingBugsChanged(-1);
-      });
-      this.pendingBugsChanged(1);
     }
   },
 
@@ -107,28 +83,16 @@ var AddCommentUI = {
     this.numSendingCommentChangedCallback = callback;
   },
 
-  pendingBugsChanged: function AddCommentUI_pendingBugsChanged(changedBy) {
-    this.numSendingBugs += changedBy;
-    this.numSendingBugChangedCallback();
-  },
-
-  registerNumSendingBugChangedCallback: function AddCommentUI_registerNumSendingBugChangedCallback(callback) {
-    this.numSendingBugChangedCallback = callback;
-  },
-
   toggleSuggestion: function AddCommentUI_toggleSuggestion(id, status, summary, link) {
     var box = $("#logNoteText").get(0);
     if (box.value == "") {
-      this.addToBugs[id] = true;
       box.value = link.textContent;
       $(link).addClass("added");
     } else {
       if (box.value.indexOf(link.textContent) >= 0) {
-        delete this.addToBugs[id];
         box.value = box.value.replace(new RegExp("(, )?" + link.textContent), "");
         $(link).removeClass("added");
       } else {
-        this.addToBugs[id] = true;
         box.value += ", " + link.textContent;
         $(link).addClass("added");
       }
@@ -197,11 +161,6 @@ var AddCommentUI = {
       who: email,
       note: comment,
     }, callback);
-  },
-
-  _postOneBug: function AddCommentUI__postOneBug(id, header, logLink, callback) {
-    NetUtils.loadText("submitBugzillaComment.php?id=" + id + "&comment=" + escape(logLink + "\n" + header),
-                      callback, callback, callback);
   },
 
 };
