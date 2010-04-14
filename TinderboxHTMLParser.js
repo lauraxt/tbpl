@@ -3,7 +3,7 @@ var TinderboxHTMLParser = {};
 (function (){
 
 TinderboxHTMLParser.load = function (tree, loadCallback, failCallback) {
-  NetUtils.loadDom("fetchraw.php?site=tinderbox&url=" + tree + "/", function (doc) {
+  NetUtils.loadDom(Config.baseURL + "fetchraw.php?site=tinderbox&url=" + tree + "/", function (doc) {
     try {
       loadCallback(parseTinderbox(doc));
     } catch (e) {

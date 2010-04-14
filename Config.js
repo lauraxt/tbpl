@@ -5,6 +5,7 @@ var Config = {
   mvtTimezoneOffset: -7,
   mvtTimezoneName: "PDT",
   loadInterval: 120, // seconds
+  baseURL: "http://tests.themasta.com/tinderboxpushlog/",
   repoNames: {
     "Firefox": "mozilla-central",
     "Firefox3.6": "releases/mozilla-1.9.2",
