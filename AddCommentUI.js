@@ -72,12 +72,16 @@ var AddCommentUI = {
           continue;
         bugsSubmitData[suggestion.id] = {
           header: machineResults[i].machine.name + ", " + UserInterface._durationDisplay(machineResults[i]),
+          log: suggestion.log,
+          email: email,
           logLink: machineResults[i].briefLogURL
         };
       }
     }
     for (var id in bugsSubmitData) {
-      this._postOneBug(id, bugsSubmitData[id].header, bugsSubmitData[id].logLink, function oneLessBugPending() {
+      this._postOneBug(id, bugsSubmitData[id].header, bugsSubmitData[id].logLink,
+                       bugsSubmitData[id].email, bugsSubmitData[id].log,
+                       function oneLessBugPending() {
         self.pendingBugsChanged(-1);
       });
       this.pendingBugsChanged(1);
@@ -199,8 +203,8 @@ var AddCommentUI = {
     }, callback);
   },
 
-  _postOneBug: function AddCommentUI__postOneBug(id, header, logLink, callback) {
-    NetUtils.loadText("submitBugzillaComment.php?id=" + id + "&comment=" + escape(logLink + "\n" + header),
+  _postOneBug: function AddCommentUI__postOneBug(id, header, logLink, email, summary, callback) {
+    NetUtils.loadText("submitBugzillaComment.php?id=" + id + "&comment=" + escape(email + "\n" + logLink + "\n" + header + "\n\n" + summary),
                       callback, callback, callback);
   },
 

@@ -16,14 +16,20 @@ var SummaryLoader = {
       summaryLoader.className = "";
       if (summary)
         box.className += " hasSummary";
-      $(".stars .summary").get(0).innerHTML = summary.replace(/ALSA.*device\n/g, "").replace(/\n/g, "<br>\n");
+      var summaryPlaceholder = $(".stars .summary").get(0);
+      summaryPlaceholder.innerHTML = summary.replace(/ALSA.*device\n/g, "").replace(/\n/g, "<br>\n");
       result.suggestions = [];
+      var log = $(summaryPlaceholder)
+                .contents().filter(function () { return this.nodeType == this.TEXT_NODE; })
+                .map(function() { return this.textContent.trim() || null; })
+                .get().join("\n");
       var suggestions = $(".stars .summary [data-bugid]");
       for (var i = 0; i < suggestions.length; ++i) {
         var item = $(suggestions[i]);
         var suggestion = {
           id: item.attr("data-bugid"),
           summary: item.attr("data-summary"),
+          log: log,
           status: item.attr("data-status")
         };
         result.suggestions.push(suggestion);
