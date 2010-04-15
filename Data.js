@@ -146,6 +146,45 @@ Data.prototype = {
         push.results[machineResult.machine.os][machineResult.machine.type].push(machineResult);
       }
     });
+
+    // generate performance results for each push
+    this._pushes.forEach(function(push) {
+      push.perfResults = this._getPerfResultsForPush(push);
+    }, this);
   },
 
+  /**
+   * Aggregate test results for a push into an easy-to-use result set:
+   *
+   * [
+   *  {
+   *   os1: {
+   *         ts: 200.3,
+   *         tp4: 3002.21
+   *        }
+   *   }
+   * ]
+   */
+  _getPerfResultsForPush: function Data__getPerfResultsForPush(push) {
+    var perfResults = {};
+    this.getOss().forEach(function(os) {
+      perfResults[os] = {};
+      if (push.results && push.results[os]) {
+        for (var buildType in push.results[os]) {
+          if (buildType != "Talos")
+            continue;
+          var buildResults = push.results[os][buildType];
+          buildResults.forEach(function(buildResult) {
+            var testResults = this.getMachineResults()[buildResult.runID].getTestResults();
+            if (testResults) {
+              testResults.forEach(function(testResult) {
+                perfResults[os][testResult.name] = testResult.result;
+              });
+            }
+          }, this);
+        }
+      }
+    }, this);
+    return perfResults;
+  }
 }

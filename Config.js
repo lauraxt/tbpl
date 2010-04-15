@@ -23,4 +23,11 @@ var Config = {
     "Firefox": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
     "AddonsMgr": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
   },
+  OSNames: {
+    "linux": "Linux",
+    "linux64": "Linux64",
+    "osx":"Mac OS X",
+    "osx64": "Mac OS X64",
+    "windows": "Windows"
+  },
 };

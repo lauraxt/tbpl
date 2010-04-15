@@ -391,10 +391,12 @@ var UserInterface = {
     var oss = this._data.getOss();
     var machineTypes = this._data.getMachineTypes();
     var timeOffset = this._controller.getTimeOffset();
-    ul.innerHTML+= pushes.map(function buildHTMLForPush(push, pushIndex) {
+    ul.innerHTML += pushes.map(function buildHTMLForPush(push, pushIndex) {
       return '<li>\n' +
       '<h2><span class="pusher">' + push.pusher + '</span> &ndash; ' +
-      '<span class="date">' + self._getDisplayDate(push.date) + '</span></h2>\n' +
+      '<span class="date">' + self._getDisplayDate(push.date) + '</span>' +
+      ' (compare: <input class="revsToCompare" id="compareRevs" type="checkbox" value="' + push.patches[0].rev + '">)' +
+      '</h2>\n' +
       self._buildHTMLForPushResults(oss, push, machineTypes) +
       '<ul class="patches">\n' +
       push.patches.map(function buildHTMLForPushPatches(patch, patchIndex) {
@@ -451,6 +453,56 @@ var UserInterface = {
     });
   },
 
+  /**
+   * Finds pushes with checked boxes in the UI, gets the first revision number
+   * from each, aggregates the performance test results for them, and displays
+   * the results in a table overlaying TBPL.
+   *
+   * Usage:
+   * - Selecting two pushes will trigger the comparison.
+   * - Clicking on the overlay makes it go away.
+   *
+   * TODO:
+   * - show revision comment somewhere
+   * - red/green colors for changes greater than n%
+   * - add a "close" button
+   * - support multiple runs per test
+   * - support copy/paste of the table
+   */
+  _installComparisonClickHandler: function UserInterface__installComparisonClickHandler() {
+    $(".revsToCompare").bind("click", function clickRevsToCompare(e) {
+      // get selected revisions
+      var revs = [];
+      var revsEls = document.getElementsByClassName("revsToCompare");
+      Array.forEach(revsEls, function(el) {
+        if (el.checked)
+          revs.push(el.value);
+      });
+
+      if (revs.length < 2)
+        return;
+
+      PerformanceComparator.compareRevisions(revs, function(resultTable) {
+        function arrayToHTMLTable(a) {
+          return "<table style='border: 1px solid black;'>" +
+            a.map(function(row) "<tr><td>" + row.join("</td><td>") + "</td></tr>").join("\n") +
+            "</table>";
+        }
+
+        var resultHTML = arrayToHTMLTable(resultTable);
+
+        var div = document.createElement("div");
+        div.setAttribute("class", "performanceComparatorResult");
+        div.innerHTML = resultHTML;
+        div.onclick = function() {
+          div.parentNode.removeChild(div);
+          $(".revsToCompare").each(function(){ this.checked = false; })
+        };
+        document.body.appendChild(div);
+      });
+    });
+  },
+
   _installTooltips: function UserInterface__installTooltips() {
     $(".patches > li").bind("mouseenter", function startFadeInTimeout() {
       var div = $(".popup:not(.hovering)", this);
@@ -499,6 +551,7 @@ var UserInterface = {
     this._writePushesListHTML();
     this._installHistoryArrowClickHandlers();
     this._installMachineResultClickHandler();
+    this._installComparisonClickHandler();
     this._installTooltips();
     this._setActiveResult(this._activeResult, false);
   },
