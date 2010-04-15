@@ -591,12 +591,3 @@ em.testfail {
 #addNotePopup input[type=submit]::-moz-focus-inner {
   border: 0;
 }
-
-.performanceComparatorResult {
-  position: absolute;
-  z-index: 1000; left: 0px;
-  top: 0px;
-  background-color: #ffffff;
-  border: 1px solid black;
-  font-size: 0.6em;
-}
