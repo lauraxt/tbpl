@@ -4,10 +4,15 @@ var PerformanceComparator = {
   compareRevisions:
   function PerformanceComparator_compareRevisions(revs, callback) {
     var revResults = [];
+    var sortData = {};
     revs.forEach(function(rev) {
       var push = Controller._data._getPushForRev(rev);
       push.perfResults.rev = rev;
       revResults.push(push.perfResults);
+      sortData[rev] = push.date.getTime();
+    });
+    revResults.sort(function(a, b) {
+      return sortData[a.rev] - sortData[b.rev];
     });
 
     var osNames = Config.OSNames;
