@@ -261,14 +261,18 @@ var UserInterface = {
   _resultTitle: function UserInterface__resultTitle(result) {
     var type = result.machine.type;
     return {
-      "building": type + ' is still running, ' + this._etaString(result),
+      "building": type + ' is still running',
       "success": type + ' was successful',
       "testfailed": 'Tests failed on ' + type,
       "busted": type + ' is burning'
-    }[result.state];
+    }[result.state] + ', ' + this._timeString(result);
   },
   
-  _etaString: function UserInterface__etaString(result) {
+  _timeString: function UserInterface__timeString(result) {
+    if (result.state != 'building') {
+      return 'took ' + Math.ceil((result.endTime.getTime() - result.startTime.getTime()) / 1000 / 60)
+        + 'mins';
+    }
     if (!result.machine.averageCycleTime)
       return 'ETA unknown';
     var elapsed = Math.ceil(((new Date()).getTime() - result.startTime.getTime()) / 1000);
@@ -620,8 +624,8 @@ var UserInterface = {
 
   _durationDisplay: function UserInterface__durationDisplay(result) {
     return 'Started ' + this._getDisplayTime(result.startTime) +
-      ', ' + (result.state == "building" ? 'still running... ' + this._etaString(result)
-      : 'finished ') + this._getDisplayTime(result.endTime);
+      ', ' + (result.state == "building" ? 'still running... ' : 'finished ' +
+      this._getDisplayTime(result.endTime) + ', ') + this._timeString(result);
   },
   
   _displayResult: function UserInterface__displayResult() {
