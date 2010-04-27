@@ -73,7 +73,7 @@ var AddCommentUI = {
         bugsSubmitData[suggestion.id] = {
           header: machineResults[i].machine.name + ", " + UserInterface._durationDisplay(machineResults[i]),
           log: suggestion.log,
-          email: email,
+          email: email.replace("@", "%"),
           logLink: machineResults[i].briefLogURL
         };
       }
