@@ -97,12 +97,6 @@ function processLine(&$lines, $line) {
   }
 }
 
-function parseJSON($json) {
-  require_once "./JSON.php";
-  $engine = new Services_JSON();
-  return $engine->decode($json);
-}
-
 $bugsCache = array();
 function getBugsForTestFailure($fileName) {
   global $bugsCache;
@@ -110,7 +104,7 @@ function getBugsForTestFailure($fileName) {
     return array();
   $bugs_json = file_get_contents("https://api-dev.bugzilla.mozilla.org/latest/bug?whiteboard=orange&summary=" . urlencode($fileName));
   if ($bugs_json !== false) {
-    $bugs = parseJSON($bugs_json);
+    $bugs = json_decode($bugs_json);
     if (isset($bugs->bugs)) {
       $bugsCache[$fileName] = $bugs->bugs;
       return $bugs->bugs;

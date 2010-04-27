@@ -1,7 +1,6 @@
 <?php
 
 require_once './tbplbot.password';
-require_once 'summaries/JSON.php';
 
 if (!defined('TBPLBOT_PASSWORD'))
   die('Invalid configuration!');
@@ -19,11 +18,10 @@ if ($id <=0)
 header("Content-Type: application/json");
 
 $url = "https://api-dev.bugzilla.mozilla.org/latest/bug/$id/comment?username=tbplbot@gmail.com&password=" . urlencode(TBPLBOT_PASSWORD);
-$json = new Services_JSON();
 $data = array(
   "text" => $_GET["comment"]
 );
-$data = $json->encode($data);
+$data = json_encode($data);
 
 // check to make sure that the bug has not already been commented on
 $bug_comments = file_get_contents("https://api-dev.bugzilla.mozilla.org/latest/bug/$id/comment");
@@ -47,7 +45,7 @@ if ($result === false) {
   $error = array(
     "error" => curl_errno($ch)
   );
-  echo $json->encode($error);
+  echo json_encode($error);
 } else {
   echo $result;
 }
