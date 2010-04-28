@@ -49,7 +49,7 @@ function getSummary($tree, $id, $starred) {
         if (preg_match_all("/Build Error Summary.*<PRE>(.*)$/i", $line, $m)) {
           $foundSummaryStart = true;
           $line = $m[1][0] . "\n";
-	   $line = strip_tags($line);
+          $line = strip_tags($line);
           $lines[] = $line;
           if (!$starred)
             processLine($lines, $line);
