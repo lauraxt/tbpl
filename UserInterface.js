@@ -476,12 +476,9 @@ var UserInterface = {
   _installComparisonClickHandler: function UserInterface__installComparisonClickHandler() {
     $(".revsToCompare").bind("click", function clickRevsToCompare(e) {
       // get selected revisions
-      var revs = [];
-      var revsEls = document.getElementsByClassName("revsToCompare");
-      Array.forEach(revsEls, function(el) {
-        if (el.checked)
-          revs.push(el.value);
-      });
+      var revs = $(".revsToCompare").map(function() {
+        return this.checked ? this.value : null;
+      }).get();
 
       if (revs.length < 2)
         return;
@@ -489,20 +486,22 @@ var UserInterface = {
       PerformanceComparator.compareRevisions(revs, function(resultTable) {
         function arrayToHTMLTable(a) {
           return "<table style='border: 1px solid black;'>" +
-            a.map(function(row) "<tr><td>" + row.join("</td><td>") + "</td></tr>").join("\n") +
+            a.map(function(row) {
+              return "<tr><td>" + row.join("</td><td>") + "</td></tr>";
+            }).join("\n") +
             "</table>";
         }
 
         var resultHTML = arrayToHTMLTable(resultTable);
 
-        var div = document.createElement("div");
-        div.setAttribute("class", "performanceComparatorResult");
-        div.innerHTML = resultHTML;
-        div.onclick = function() {
-          div.parentNode.removeChild(div);
-          $(".revsToCompare").each(function(){ this.checked = false; })
-        };
-        document.body.appendChild(div);
+        $("<div></div>")
+          .addClass("performanceComparatorResult")
+          .html(resultHTML)
+          .bind("click", function () {
+            $(this).remove();
+            $(".revsToCompare").each(function(){ this.checked = false; })
+          })
+          .appendTo(document.body);
       });
     });
   },
