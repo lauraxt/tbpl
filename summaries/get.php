@@ -74,26 +74,26 @@ function getSummary($tree, $id, $starred) {
 }
 
 function processLine(&$lines, $line) {
-  $tokens = explode(" ", $line);
-  if (count($tokens) > 1) {
-    foreach ($tokens as $token) {
-      $parts = preg_split("/[\\/\\\\]/", $token);
-      if (count($parts) > 1) {
-        // get the file name
-        $fileName = end($parts);
-        $bugs = getBugsForTestFailure($fileName);
-        foreach ($bugs as $bug) {
-          $bug->summary = htmlspecialchars($bug->summary);
-          $lines[] =
-            "<span data-bugid=\"$bug->id\" " .
-                  "data-summary=\"$bug->summary\" " .
-                  "data-status=\"$bug->status $bug->resolution\"" .
-            ">Bug <span>$bug->id</span> - $bug->summary</span>\n";
-        }
-        if (count($bugs) > 0)
-          break;
-      }
-    }
+  $tokens = explode(" | ", $line);
+  if (count($tokens) < 3)
+    return;
+
+  // The middle path has the test file path.
+  $testPath = $tokens[1];
+  $parts = preg_split("/[\\/\\\\]/", $testPath);
+  if (count($parts) < 2)
+    return;
+
+  // Get the file name.
+  $fileName = end($parts);
+  $bugs = getBugsForTestFailure($fileName);
+  foreach ($bugs as $bug) {
+    $bug->summary = htmlspecialchars($bug->summary);
+    $lines[] =
+      "<span data-bugid=\"$bug->id\" " .
+            "data-summary=\"$bug->summary\" " .
+            "data-status=\"$bug->status $bug->resolution\"" .
+      ">Bug <span>$bug->id</span> - $bug->summary</span>\n";
   }
 }
 
