@@ -73,7 +73,16 @@ function getSummary($tree, $id, $starred) {
   return $summary;
 }
 
+function generateSuggestion($bug) {
+  $bug->summary = htmlspecialchars($bug->summary);
+  return "<span data-bugid=\"$bug->id\" " .
+               "data-summary=\"$bug->summary\" " .
+               "data-status=\"$bug->status $bug->resolution\"" .
+         ">Bug <span>$bug->id</span> - $bug->summary</span>\n";
+}
+
 function processLine(&$lines, $line) {
+  $foundBugSuggestion = false;
   $tokens = explode(" | ", $line);
   if (count($tokens) < 3)
     return;
@@ -88,12 +97,16 @@ function processLine(&$lines, $line) {
   $fileName = end($parts);
   $bugs = getBugsForTestFailure($fileName);
   foreach ($bugs as $bug) {
-    $bug->summary = htmlspecialchars($bug->summary);
-    $lines[] =
-      "<span data-bugid=\"$bug->id\" " .
-            "data-summary=\"$bug->summary\" " .
-            "data-status=\"$bug->status $bug->resolution\"" .
-      ">Bug <span>$bug->id</span> - $bug->summary</span>\n";
+    $foundBugSuggestion = true;
+    $lines[] = generateSuggestion($bug);
+  }
+  if (!$foundBugSuggestion) {
+    $bugs = getLeaksForTestFailure($line);
+    foreach ($bugs as $bug) {
+      $lines[] = "This could be bug $bug->id. <a href=\"leak-analysis/$bug->id/?id=" . $_GET["id"] .
+        "&tree=" . $_GET["tree"] . "\" target=\"_blank\">Analyze the leak to make sure.</a>";
+      $lines[] = generateSuggestion($bug);
+    }
   }
 }
 
@@ -108,6 +121,24 @@ function getBugsForTestFailure($fileName) {
     if (isset($bugs->bugs)) {
       $bugsCache[$fileName] = $bugs->bugs;
       return $bugs->bugs;
+    }
+  }
+  return array();
+}
+
+$leaksCache = array();
+function getLeaksForTestFailure($line) {
+  global $leaksCache;
+  if (isset($leaksCache["automationutils.processLeakLog"]))
+    return array();
+  if (strpos($line, "automationutils.processLeakLog")) {
+    $bugs_json = file_get_contents("https://api-dev.bugzilla.mozilla.org/latest/bug?id=538462");
+    if ($bugs_json !== false) {
+      $bugs = parseJSON($bugs_json);
+      if (isset($bugs->bugs)) {
+        $leaksCache["automationutils.processLeakLog"] = true;
+        return $bugs->bugs;
+      }
     }
   }
   return array();
