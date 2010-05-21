@@ -21,7 +21,9 @@ var Config = {
   // These "groups" are machine types that are grouped like M(12345).
   treesWithGroups: {
     "Firefox": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
+    "TraceMonkey": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
     "AddonsMgr": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
+    "MozillaTry": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
   },
   OSNames: {
     "linux": "Linux",
