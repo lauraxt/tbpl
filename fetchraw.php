@@ -5,6 +5,7 @@ $url = isset($_GET["url"]) ? preg_replace("/ /", "+", $_GET["url"]) : "";
 
 $url = ($site == "tinderbox" ? "http://tinderbox.mozilla.org/" : "http://hg.mozilla.org/") . $url;
 header("Content-Type: text/html,charset=utf-8");
+header("Access-Control-Allow-Origin: *");
 
 // Disable caching in the way suggested by php.net/header
 header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1

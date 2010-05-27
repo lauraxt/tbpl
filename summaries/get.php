@@ -8,6 +8,8 @@ if (!isset($_GET["starred"]) || $_GET["starred"] != "true")
 else
   $_GET["starred"] = true;
 
+header("Content-Type: text/plain,charset=utf-8");
+header("Access-Control-Allow-Origin: *");
 echo getSummary($_GET["tree"], $_GET["id"], $_GET["starred"]);
 
 function getSummary($tree, $id, $starred) {
