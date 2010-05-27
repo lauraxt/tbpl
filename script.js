@@ -4,5 +4,5 @@ try {
 } catch(e) {
   if (e == "wrongtree") {
     location.href = "wrongtree.html" + location.search;
-  }
+  } else throw e;
 }
