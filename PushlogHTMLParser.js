@@ -10,7 +10,7 @@ var PushlogHTMLParser = {
         window.pushlogException = e;
         failCallback(e);
       }
-    });
+    }, failCallback, failCallback, 120);
   },
 
   _getLogUrl: function PushlogHTMLParser__getLogUrl(repoName, timeOffset) {

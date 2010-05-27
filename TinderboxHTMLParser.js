@@ -10,7 +10,7 @@ TinderboxHTMLParser.load = function (tree, loadCallback, failCallback) {
       console.log(e);
       failCallback();
     }
-  });
+  }, failCallback, failCallback, 120);
 }
 
 function getMachineType(name) {
