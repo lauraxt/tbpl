@@ -58,7 +58,7 @@ var SummaryLoader = {
       self._cachedSummaries[runID] = summary;
       loadCallback(summary);
     };
-    var req = NetUtils.loadText(Config.baseURL + "summaries/get.php?tree=" + tree + "&id=" + runID + "&starred=" + (isStarred ? "true" : "false"),
+    var req = NetUtils.loadText(Config.baseURL + "php/getSummary.php?tree=" + tree + "&id=" + runID + "&starred=" + (isStarred ? "true" : "false"),
                                 onLoad, failCallback, timeoutCallback);
     var oldAbort = this._abortOutstandingSummaryLoadings;
     this._abortOutstandingSummaryLoadings = function abortThisLoadWhenAborting() {

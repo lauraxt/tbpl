@@ -28,7 +28,7 @@ p {
   padding: 1px 0 1px 20px;
 }
 .loading {
-  background: url(loading_16.png) center left no-repeat transparent;
+  background: url(../images/loading_16.png) center left no-repeat transparent;
 }
 #tzchooser {
   position: absolute;
@@ -45,7 +45,7 @@ p {
   width: 16px;
   height: 16px;
   margin: auto;
-  background: url(tango-updown.png) no-repeat;
+  background: url(../images/tango-updown.png) no-repeat;
 }
 #goForward {
   background-position: top left;
@@ -318,7 +318,7 @@ td, th {
 }
 
 #matrix a.hasNote {
-  background-image: url(starredbox.png);
+  background-image: url(../images/starredbox.png);
   background-position: 0 0;
   background-repeat: no-repeat;
 }
@@ -445,7 +445,7 @@ em.testfail {
   border-top: none;
 }
 #results.hasStar {
-  background: url(bigstar.png) 80% 50% no-repeat white;
+  background: url(../images/bigstar.png) 80% 50% no-repeat white;
 }
 
 #addNotePopup {
@@ -468,13 +468,13 @@ em.testfail {
   border-width: 10px 18px 25px;
 }
 #addNotePopup:nth-child(1n) {
-  -moz-border-image: url(hudborderimage.png) 10 18 25 repeat;
-  -webkit-border-image: url(hudborderimage.png) 10 18 25 repeat;
-  border-image: url(hudborderimage.png) 10 18 25 repeat;
+  -moz-border-image: url(../images/hudborderimage.png) 10 18 25 repeat;
+  -webkit-border-image: url(../images/hudborderimage.png) 10 18 25 repeat;
+  border-image: url(../images/hudborderimage.png) 10 18 25 repeat;
   background: transparent;
 }
 #bar:nth-child(1n) { /* Preload the border image (XXX hack) */
-  background: url(hudborderimage.png) -1000px -1000px no-repeat white;
+  background: url(../images/hudborderimage.png) -1000px -1000px no-repeat white;
 }
 #closeAddNotePopup {
   position: absolute;
@@ -482,7 +482,7 @@ em.testfail {
   left: -7px;
   width: 13px;
   height: 13px;
-  background: url(closebutton.png) top left no-repeat;
+  background: url(../images/closebutton.png) top left no-repeat;
   opacity: 0.5;
   text-indent: -1000px;
   overflow: hidden;

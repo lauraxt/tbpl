@@ -13,7 +13,7 @@ header("Access-Control-Allow-Origin: *");
 echo getSummary($_GET["tree"], $_GET["id"], $_GET["starred"]);
 
 function getSummary($tree, $id, $starred) {
-  $file = $tree . "_" . $id . "_" . ($starred ? "" : "not") . "starred";
+  $file = "../summaries/" . $tree . "_" . $id . "_" . ($starred ? "" : "not") . "starred";
   if (file_exists($file))
     return file_get_contents($file);
 
