@@ -36,6 +36,7 @@ var UserInterface = {
     AddCommentUI.init("http://tinderbox.mozilla.org/addnote.cgi", this._storage);
     AddCommentUI.registerNumSendingCommentChangedCallback(function commentSendUpdater() {
       self.updateStatus();
+      self.loadedData("machineResults");
     });
     AddCommentUI.registerNumSendingBugChangedCallback(function bugSendUpdater() {
       self.updateStatus();
