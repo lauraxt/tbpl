@@ -16,7 +16,7 @@ var PushlogHTMLParser = {
   _getLogUrl: function PushlogHTMLParser__getLogUrl(repoName, timeOffset) {
     var startDate = timeOffset ? this._formattedDate(new Date((timeOffset - 12 * 3600) * 1000)) : '12+hours+ago';
     var endDate = timeOffset ? this._formattedDate(new Date(timeOffset * 1000)) : 'now';
-    return Config.baseURL + "php/fetchraw.php?site=pushlog&url=" + repoName + "/pushloghtml%3Fstartdate=" + startDate + "%26enddate=" + endDate;
+    return Config.baseURL + "php/pipePushlog.php?url=" + repoName + "/pushloghtml%3Fstartdate=" + startDate + "%26enddate=" + endDate;
   },
 
   _pad: function UserInterface__pad(n) {

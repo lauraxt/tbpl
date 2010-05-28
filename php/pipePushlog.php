@@ -1,9 +1,10 @@
 <?php
 
-$site = isset($_GET["site"]) ? $_GET["site"] : "tinderbox";
-$url = isset($_GET["url"]) ? preg_replace("/ /", "+", $_GET["url"]) : "";
+if (!isset($_GET["url"]))
+  die("no URL set");
 
-$url = ($site == "tinderbox" ? "http://tinderbox.mozilla.org/" : "http://hg.mozilla.org/") . $url;
+$url = "http://hg.mozilla.org/" . preg_replace("/ /", "+", $_GET["url"]);
+
 header("Content-Type: text/html,charset=utf-8");
 header("Access-Control-Allow-Origin: *");
 
