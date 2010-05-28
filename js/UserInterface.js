@@ -16,6 +16,7 @@ var UserInterface = {
 
     document.title = controller.treeName + " - Tinderboxpushlog";
 
+    this._refreshMostRecentlyUsedTrees();
     this._buildTreeSwitcher();
 
     $("#localTime").bind("click", function localTimeClick() {
@@ -98,16 +99,46 @@ var UserInterface = {
     this._storage = this._storage || {};
   },
 
-  _buildTreeSwitcher: function UserInterface__buildTreeSwitcher() {
-    var labels = [];
-    var numTrees = 3, i = 0;
-    for (var tree in Config.repoNames) {
-      if (i >= numTrees)
-        break;
-      labels.push(this._treeName == tree ? tree : "<a href='" + (i == 0 ? "./" : "?tree=" + tree) + "'>" + tree + "<" + "/a>");
-      i++;
+  _keysFromObject: function UserInterface__keysFromObject(obj) {
+    var keys = [];
+    for (var key in obj) {
+      keys.push(key);
     }
-    $("#treechooser").html(labels.join(" | "));
+    return keys;
+  },
+
+  _mostRecentlyUsedTrees: function() {
+    if (!("mostRecentlyUsedTrees" in this._storage))
+      this._setMostRecentlyUsedTrees([]);
+    if (JSON.parse(this._storage.mostRecentlyUsedTrees).length != 3)
+      this._setMostRecentlyUsedTrees(this._keysFromObject(Config.repoNames).slice(0, 3));
+    return JSON.parse(this._storage.mostRecentlyUsedTrees);
+  },
+
+  _setMostRecentlyUsedTrees: function(trees) {
+    this._storage.mostRecentlyUsedTrees = JSON.stringify(trees);
+  },
+
+  _refreshMostRecentlyUsedTrees: function UserInterface__refreshMostRecentlyUsedTrees() {
+    if (this._mostRecentlyUsedTrees().indexOf(this._treeName) == -1) {
+      // Remove the least recently used tree and add this tree as the most recently used one.
+      // The array is ordered from recent to not recent.
+      this._setMostRecentlyUsedTrees([this._treeName].concat(this._mostRecentlyUsedTrees().slice(0, 2)));
+    }
+  },
+
+  _buildTreeSwitcher: function UserInterface__buildTreeSwitcher() {
+    var mruList = $('<ul id="mruList"></ul>').appendTo("#treechooser");
+    var moreListContainer = $('<div id="moreListContainer"><h2>more...</h2></div></li>').appendTo("#treechooser");
+    var moreList = $('<ul id="moreList"></ul>').appendTo(moreListContainer);
+    var self = this;
+    this._keysFromObject(Config.repoNames).forEach(function (tree, i) {
+      var isMostRecentlyUsedTree = (self._storage.mostRecentlyUsedTrees.indexOf(tree) != -1);
+      var treeLink = self._treeName == tree ?
+        "<strong>" + tree + "</strong>" :
+        "<a href='" + (i == 0 ? "./" : "?tree=" + tree) + "'>" + tree + "</a>";
+      $("<li>" + treeLink + "</li>").appendTo(isMostRecentlyUsedTree ? mruList : moreList);
+    });
   },
 
   _updateTimezoneDisplay: function UserInterface__updateTimezoneDisplay() {
