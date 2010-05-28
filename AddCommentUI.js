@@ -71,7 +71,7 @@ var AddCommentUI = {
         if (!(suggestion.id in this.addToBugs))
           continue;
         bugsSubmitData[suggestion.id] = {
-          header: machineResults[i].machine.name + ", " + UserInterface._durationDisplay(machineResults[i]),
+          header: suggestion.signature,
           log: suggestion.log,
           email: email.replace("@", "%"),
           logLink: machineResults[i].briefLogURL

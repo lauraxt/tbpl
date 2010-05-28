@@ -30,6 +30,7 @@ var SummaryLoader = {
           id: item.attr("data-bugid"),
           summary: item.attr("data-summary"),
           log: log,
+          signature: item.attr("data-signature"),
           status: item.attr("data-status")
         };
         result.suggestions.push(suggestion);

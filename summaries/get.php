@@ -32,6 +32,8 @@ function getSummary($tree, $id, $starred) {
   $foundSummaryStart = false;
   $fileExistedAfterAll = false;
   $isStillRunning = false;
+  global $signature;
+  $signature = "";
   while (!feof($fp)) {
     if (file_exists($file)) {
       $fileExistedAfterAll = true;
@@ -56,6 +58,10 @@ function getSummary($tree, $id, $starred) {
           if (!$starred)
             processLine($lines, $line);
         }
+        if (strlen($signature) == 0 &&
+            preg_match("#<b>(.*\d{4}/\d{2}/\d{2}&nbsp;\d{2}:\d{2}:\d{2})</b>#i", $line, $matches)) {
+          $signature = $matches[1];
+        }
       } else {
         if (preg_match("/Build Error Log/i", $line))
           break;
@@ -76,9 +82,11 @@ function getSummary($tree, $id, $starred) {
 }
 
 function generateSuggestion($bug) {
+  global $signature;
   $bug->summary = htmlspecialchars($bug->summary);
   return "<span data-bugid=\"$bug->id\" " .
                "data-summary=\"$bug->summary\" " .
+               "data-signature=\"$signature\" " .
                "data-status=\"$bug->status $bug->resolution\"" .
          ">Bug <span>$bug->id</span> - $bug->summary</span>\n";
 }
