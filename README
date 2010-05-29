@@ -12,7 +12,7 @@ Hacking:
 If you only want to hack the user interface, i.e. client-side stuff, open js/Config.js and change the baseURL to "http://tests.themasta.com/tinderboxpushlog/". Then running index.html from the local file system should just work.
 
 If you want a self-contained working instance of Tinderboxpushlog, you need a web server that runs some recent version of php. Additionally, you need to create a folder named "summaries" in tbpl's root directory and chmod it to 0777. That's where build log summaries will be stored.
-If you also want Tinderboxpushlog Robot to be able to comment in Bugzilla, you'll need to ask Ehsan for the tbplbot.password file and store it in the php folder. Alternatively you could create your own Bugzilla user, replace tbplbot@gmail.com in submitBugzillaComment.php with you user's email and add a tbplbot.password file that looks like this:
+If you also want Tinderboxpushlog Robot to be able to comment in Bugzilla, you'll need to ask Ehsan for the tbplbot.password file and store it in the php folder. Alternatively you could create your own Bugzilla user, replace tbplbot@gmail.com in submitBugzillaComment.php with you user's email and add a tbplbot-password.php file that looks like this:
 <?php define('TBPLBOT_PASSWORD', 'yourpassword'); ?>
 
 If you have a question, just send me an email at mstange@themasta.com.
