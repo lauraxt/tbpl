@@ -1,6 +1,6 @@
 <?php
 
-require_once './tbplbot.password';
+require_once './tbplbot-password.php';
 require_once './JSON.php';
 
 if (!defined('TBPLBOT_PASSWORD'))
