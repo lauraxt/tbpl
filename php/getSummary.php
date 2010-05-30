@@ -92,7 +92,7 @@ function generateSuggestion($bug) {
 }
 
 function processLine(&$lines, $line) {
-  $tokens = explode(" | ", $line);
+  $tokens = preg_split("/\s\\|\s/", $line);
   if (count($tokens) < 3)
     return;
 
