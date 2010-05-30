@@ -92,7 +92,6 @@ function generateSuggestion($bug) {
 }
 
 function processLine(&$lines, $line) {
-  $foundBugSuggestion = false;
   $tokens = explode(" | ", $line);
   if (count($tokens) < 3)
     return;
@@ -100,23 +99,21 @@ function processLine(&$lines, $line) {
   // The middle path has the test file path.
   $testPath = $tokens[1];
   $parts = preg_split("/[\\/\\\\]/", $testPath);
-  if (count($parts) < 2)
+  if (count($parts) < 2) {
+    $bugs = getLeaksForTestFailure($line);
+    foreach ($bugs as $bug) {
+      $lines[] = "This could be bug $bug->id. <a href=\"leak-analysis/?id=" . $_GET["id"] .
+        "&tree=" . $_GET["tree"] . "\" target=\"_blank\">Analyze the leak to make sure.</a>";
+      $lines[] = generateSuggestion($bug);
+    }
     return;
+  }
 
   // Get the file name.
   $fileName = end($parts);
   $bugs = getBugsForTestFailure($fileName);
   foreach ($bugs as $bug) {
-    $foundBugSuggestion = true;
     $lines[] = generateSuggestion($bug);
-  }
-  if (!$foundBugSuggestion) {
-    $bugs = getLeaksForTestFailure($line);
-    foreach ($bugs as $bug) {
-      $lines[] = "This could be bug $bug->id. <a href=\"leak-analysis/$bug->id/?id=" . $_GET["id"] .
-        "&tree=" . $_GET["tree"] . "\" target=\"_blank\">Analyze the leak to make sure.</a>";
-      $lines[] = generateSuggestion($bug);
-    }
   }
 }
 
