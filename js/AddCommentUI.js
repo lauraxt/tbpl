@@ -224,7 +224,7 @@ var AddCommentUI = {
       }
       callback();
     }
-    NetUtils.loadText(Config.baseURL + "php/submitBugzillaComment.php?id=" + id + "&comment=" + encodeURIComponent(email + "\n" + logLink + "\n" + header + "\n\n" + summary),
+    NetUtils.loadText(Config.baseURL + "php/submitBugzillaComment.php?id=" + id + "&comment=" + escape(email + "\n" + logLink + "\n" + header + "\n\n" + summary),
                       errorHandler, errorHandler, errorHandler);
   },
 
