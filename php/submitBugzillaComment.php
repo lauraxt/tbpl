@@ -6,13 +6,13 @@ require_once './JSON.php';
 if (!defined('TBPLBOT_PASSWORD'))
   die('Invalid configuration!');
 
-if (!isset($_GET['id']) || !isset($_GET['comment']))
+if (!isset($_REQUEST['id']) || !isset($_REQUEST['comment']))
   die('Invalid params!');
 
 if (!function_exists('curl_init'))
   die('Needs CURL!');
 
-$id = (int) $_GET['id'];
+$id = (int) $_REQUEST['id'];
 if ($id <=0)
   die('Invalid Bug ID specified');
 
@@ -22,14 +22,14 @@ header("Access-Control-Allow-Origin: *");
 $url = "https://api-dev.bugzilla.mozilla.org/latest/bug/$id/comment?username=tbplbot@gmail.com&password=" . urlencode(TBPLBOT_PASSWORD);
 $json = new Services_JSON();
 $data = array(
-  "text" => $_GET["comment"]
+  "text" => $_REQUEST["comment"]
 );
 $data = $json->encode($data);
 
 // check to make sure that the bug has not already been commented on
 $bug_comments = file_get_contents("https://api-dev.bugzilla.mozilla.org/latest/bug/$id/comment");
 if ($bug_comments !== false) {
-  if (preg_match("/([\d]+\.[\d]+\.[\d]+)\.gz$/", $_GET['comment'], $matches)) {
+  if (preg_match("/([\d]+\.[\d]+\.[\d]+)\.gz$/", $_REQUEST['comment'], $matches)) {
     $id = $matches[1];
     if (strpos($bug_comments, $id) !== false)
       exit;

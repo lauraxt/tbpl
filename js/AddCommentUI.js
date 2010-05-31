@@ -205,27 +205,10 @@ var AddCommentUI = {
   },
 
   _postOneBug: function AddCommentUI__postOneBug(id, header, logLink, email, summary, callback) {
-    function errorHandler(something) {
-      if (typeof(something) == "undefined") {
-        // timeout
-        alert("Submitting the comment to bug " + id + " timed out");
-      } else {
-        if (typeof(something) == "string") {
-          // XHR submitted successfully
-          var result = JSON.parse(something);
-          if ("error" in result) {
-            // server returned an error
-            alert("Submitting the comment to bug " + id + " failed (" + result.error + ")");
-          }
-        } else {
-          // XHR submission failed
-          alert("Submitting the comment to bug " + id + " failed");
-        }
-      }
-      callback();
-    }
-    NetUtils.loadText(Config.baseURL + "php/submitBugzillaComment.php?id=" + id + "&comment=" + escape(email + "\n" + logLink + "\n" + header + "\n\n" + summary),
-                      errorHandler, errorHandler, errorHandler);
+    NetUtils.crossDomainPost(Config.baseURL + "php/submitBugzillaComment.php", {
+      id: id,
+      comment: escape(email + "\n" + logLink + "\n" + header + "\n\n" + summary),
+    }, callback);
   },
 
 };
