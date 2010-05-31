@@ -99,7 +99,8 @@ function processLine(&$lines, $line) {
   // The middle path has the test file path.
   $testPath = $tokens[1];
   $parts = preg_split("/[\\/\\\\]/", $testPath);
-  if (count($parts) < 2) {
+  if (count($parts) < 2 &&
+      preg_match('/^leaked/i', $tokens[2])) {
     $bugs = getLeaksForTestFailure($line);
     foreach ($bugs as $bug) {
       $lines[] = "This could be bug $bug->id. <a href=\"leak-analysis/?id=" . $_GET["id"] .
