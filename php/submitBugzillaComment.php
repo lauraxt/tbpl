@@ -16,7 +16,7 @@ $id = (int) $_REQUEST['id'];
 if ($id <=0)
   die('Invalid Bug ID specified');
 
-header("Content-Type: application/json");
+header("Content-Type: text/plain");
 header("Access-Control-Allow-Origin: *");
 
 $url = "https://api-dev.bugzilla.mozilla.org/latest/bug/$id/comment?username=tbplbot@gmail.com&password=" . urlencode(TBPLBOT_PASSWORD);
