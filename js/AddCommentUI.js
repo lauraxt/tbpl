@@ -207,7 +207,7 @@ var AddCommentUI = {
   _postOneBug: function AddCommentUI__postOneBug(id, header, logLink, email, summary, callback) {
     NetUtils.crossDomainPost(Config.baseURL + "php/submitBugzillaComment.php", {
       id: id,
-      comment: escape(email + "\n" + logLink + "\n" + header + "\n\n" + summary),
+      comment: email + "\n" + logLink + "\n" + header + "\n\n" + summary,
     }, callback);
   },
 
