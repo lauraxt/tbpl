@@ -22,7 +22,7 @@ header("Access-Control-Allow-Origin: *");
 $url = "https://api-dev.bugzilla.mozilla.org/latest/bug/$id/comment?username=tbplbot@gmail.com&password=" . urlencode(TBPLBOT_PASSWORD);
 $json = new Services_JSON();
 $data = array(
-  "text" => $_REQUEST["comment"]
+  "text" => sanitize($_REQUEST["comment"])
 );
 $data = $json->encode($data);
 
@@ -54,5 +54,11 @@ if ($result === false) {
 }
 
 curl_close($ch);
+
+function sanitize($str) {
+  // Remove UTF-8 non-breaking space character sequences (0xc2a0), and
+  // replace them with normal spaces.
+  return str_replace(chr(0xc2) . chr(0xa0), ' ', $str);
+}
 
 ?>
