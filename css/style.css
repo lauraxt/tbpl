@@ -466,7 +466,8 @@ em.testfail {
 .stars .summary [data-bugid] + br {
   display: none;
 }
-.stars .summary [data-status~=RESOLVED] span {
+.stars .summary [data-status~=RESOLVED] span,
+.stars .summary [data-status~=VERIFIED] span {
   text-decoration: line-through;
 }
 .stars .summary [data-status~=UNCONFIRMED] {
