@@ -129,6 +129,10 @@ function getBugsForTestFailure($fileName) {
   global $bugsCache;
   if (isset($bugsCache[$fileName]))
     return array();
+  if ($fileName == 'automation.py') {
+    // This won't generate any useful suggestions, see bug 570174
+    return array();
+  }
   $bugs_json = file_get_contents("https://api-dev.bugzilla.mozilla.org/latest/bug?whiteboard=orange&summary=" . urlencode($fileName));
   if ($bugs_json !== false) {
     $bugs = parseJSON($bugs_json);
