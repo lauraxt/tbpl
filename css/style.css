@@ -100,7 +100,7 @@ iframe {
   position: absolute;
   margin: 0;
   top: 25px;
-  bottom: 100px;
+  bottom: 120px;
   overflow: auto;
   left: 0;
   right: 0;
@@ -273,7 +273,7 @@ a:active {
   left: 0;
   bottom: 0;
   right: 0;
-  height: 100px;
+  height: 120px;
   background: white;
   font-size: 0.76em;
 }
@@ -282,16 +282,16 @@ a:active {
 /* Current tree state table */
 #matrixWrapper {
   font-size: 0.8em;
-  top: 10px;
+  top: 5px;
   bottom: 0;
-  right: 15px;
-  width: 440px;
+  right: 5px;
+  width: 510px;
   position: absolute;
   overflow: hidden;
 }
 #matrix {
   table-layout: fixed;
-  width: 440px;
+  width: 510px;
   border-collapse: collapse;
 }
 th {
@@ -302,15 +302,15 @@ td, th {
   padding: 0;
   vertical-align: top;
 }
-#matrix th:not(:first-child) {
+#matrix tr> :not(:first-child) {
   width: 81px;
 }
-#matrix th:first-child {
+#matrix tr> :first-child {
   text-align: right;
   font-size: 0.9em;
   line-height: 8px;
   padding-right: 5px;
-  width: 30px;
+  width: 20px;
 }
 #matrix th img {
   width: 8px;
@@ -374,9 +374,9 @@ td, th {
 }
 
 #results {
-  margin: 0 470px 0 0;
+  margin: 0 520px 0 0;
   border-right: 1px solid #DDD;
-  height: 100px;
+  height: 120px;
   position: relative;
 }
 

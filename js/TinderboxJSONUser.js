@@ -31,6 +31,7 @@ var TinderboxJSONUser = {
       /Fedora/.test(name) ? "linux" :
       /OS\s?X.*10\.6/.test(name) ? "osx64" :
       /OS\s?X/.test(name) ? "osx" :
+      /WINNT.*x86-64/i.test(name) ? "windows64" :
       /WINNT/i.test(name) ? "windows" :
       /static-analysis/.test(name) ? "linux" : "",
   

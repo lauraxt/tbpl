@@ -30,6 +30,7 @@ var Config = {
     "linux64": "Linux64",
     "osx":"Mac OS X",
     "osx64": "Mac OS X64",
-    "windows": "Windows"
+    "windows": "Windows",
+    "windows": "Windows64"
   },
 };

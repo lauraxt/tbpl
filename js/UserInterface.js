@@ -391,7 +391,7 @@ var UserInterface = {
         return '';
       var results = push.results[os];
       return '<li><span class="os ' + os + '">' +
-      { "linux": "Linux", "linux64": "Linux64", "osx": "OS X", "osx64": "OS X 64", "windows": "Windows" }[os] +
+      { "linux": "Linux", "linux64": "Linux64", "osx": "OS X", "osx64": "OS X 64", "windows": "Windows", "windows64": "Windows64" }[os] +
       '</span><span class="osresults">' +
       machineTypes.map(function buildHTMLForPushResultsOnOSForMachineType(machineType) {
         if (!results[machineType])
