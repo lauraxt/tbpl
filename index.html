@@ -13,37 +13,21 @@
 <p class="noJavaScript">Please enable JavaScript.</p>
 <p class="noFirefox3 withJavaScript">Please use Firefox 3.0 or later to view Tinderboxpushlog.</p>
 
-
-<div id="chooser" class="withFirefox3">
-  <span id="treechooser"></span>
-  <span class="loading" id="loading">Loading Tinderbox and pushlog...</span>
-  <span id="tzchooser">Timezone: <a id="localTime" href="#">local</a> | <a id="mvtTime" href="#" title="Mountain View Time">MVT</a></span>
+<div id="topbar" class="withFirefox3">
+  <div id="config">
+    Timezone: <a id="localTime">local</a> | <a id="mvtTime" title="Mountain View Time">MVT</a><br />
+    Tree: <span id="treechooser"></span><br />
+    <!-- Placeholder for multi-branch support: Showing Branch: <span id="branchchooser"></span>-->
+  </div>
+  <div id="loading" class="loading">Loading Tinderbox and pushlog...</div>
+  <div id="status"></div>
 </div>
 
 <ul id="pushes" class="withFirefox3"></ul>
 
-<div id="bar" class="withFirefox3">
-  <div id="matrixWrapper">
-    <table style="visibility: hidden;" id="matrix">
-      <thead>
-        <tr>
-          <td></td>
-          <th id="linuxth"><img src="images/linux.gif" alt=""> Linux</th>
-          <th id="linuxth"><img src="images/linux.gif" alt=""> Linux64</th>
-          <th id="osxth"><img src="images/osx.png" alt=""> Mac OS X</th>
-          <th id="osxth"><img src="images/osx.png" alt=""> Mac OS X64</th>
-          <th id="windowsth"><img src="images/windows.png" alt=""> Windows</th>
-          <th id="windowsth"><img src="images/windows.png" alt=""> Win64</th>
-        </tr>
-      </thead>
-      <tbody>
-      </tbody>
-    </table>
-  </div>
-  <div id="results">
-    
-  </div>
+<div id="details">
 </div>
+
 
 <div id="addNotePopup">
   <a id="closeAddNotePopup" href="">close</a>

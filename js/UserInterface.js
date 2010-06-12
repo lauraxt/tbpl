@@ -48,7 +48,7 @@ var UserInterface = {
 
   loadedData: function UserInterface_loadedData(kind) {
     if (kind == "machineResults")
-      this._paintBoxMatrix(this._generateBoxMatrix());
+      this._updateTreeStatus();
     this._buildPushesList();
   },
 
@@ -185,62 +185,38 @@ var UserInterface = {
     return null;
   },
   
-  _generateBoxMatrix: function UserInterface__generateBoxMatrix() {
-    var boxMatrix = {};
+  _updateTreeStatus: function UserInterface__updateTreeStatus() {
     var machines = this._data.getMachines();
     var machineResults = this._data.getMachineResults();
     var self = this;
-    machines.forEach(function addMachineToBoxMatrix(machine) {
+    var failing = [];
+    machines.forEach(function addMachineToTreeStatus1(machine) {
       if (!machine.latestFinishedRun.id) {
         // Ignore machines without run information.
         return;
       }
-      var machineTypeGroup = self._getMachineTypeGroupForMachineType(machine.type);
-      if (!machineTypeGroup)
-        return;
-      if (!boxMatrix[machineTypeGroup])
-        boxMatrix[machineTypeGroup] = {};
-      if (!boxMatrix[machineTypeGroup][machine.os])
-        boxMatrix[machineTypeGroup][machine.os] = [];
-      boxMatrix[machineTypeGroup][machine.os].push(machineResults[machine.latestFinishedRun.id]);
+      var result = machineResults[machine.latestFinishedRun.id];
+      // errors in front, failures in back
+      switch(result.state)
+      {
+        case 'busted':
+          failing.unshift(result);
+        break;
+        case 'testfailed':
+          failing.push(result);
+        break;
+      }
     });
-    return boxMatrix;
-  },
-  
-  _paintBoxMatrix: function UserInterface__paintBoxMatrix(boxMatrix) {
-    var self = this;
-    var oss = this._data.getOss()
-    var table = $("#matrix");
-    table.find("tbody").remove();
-    var tbody = $("<tbody></tbody>").appendTo(table);
-    for (var machineTypeGroup in this._groupedMachineTypes) {
-      if (!boxMatrix[machineTypeGroup])
-        continue;
-
-      var row = $("<tr></tr>");
-      var innerHTML = '<th>' + machineTypeGroup + '</th>';
-      oss.forEach(function buildBoxMatrixTableCellsForOS(os) {
-        innerHTML += '<td>';
-        var machineResults = (os in boxMatrix[machineTypeGroup]) ? boxMatrix[machineTypeGroup][os] : [];
-        machineResults.forEach(function writeHTMLForMachineTypeCell(machineResult) {
-          var status = machineResult.state;
-          innerHTML += '<a href="' +
-                   machineResult.briefLogURL + '" class="machineResult ' + status +
-                   (machineResult.note ? ' hasNote" title="(starred)' : '') +
-                   '" resultID="' + machineResult.runID + '">' +
-                   self._resultTitle(machineResult) + '</a>';
-        });
-        innerHTML += '</td>';
-      });
-      row.html(innerHTML).appendTo(tbody);
-    }
-    table.css("visibility", "visible");
-    $("a", table).get().forEach(function setupClickListenerForBoxMatrixCell(cell) {
-      cell.addEventListener("click", function clickBoxMatrixCell(e) {
-        self._resultLinkClick(this);
-        e.preventDefault();
-      }, false);
-    });
+    $('#status').html(
+      '<strong>' + failing.length + '</strong> Jobs are failing:<br />' +
+      failing.map(function(machineResult) {
+        return '<a href="' +
+               machineResult.briefLogURL + '" class="machineResult ' + machineResult.state +
+               (machineResult.note ? ' hasNote" title="(starred) ' : '" title="') +
+               self._resultTitle(machineResult) + '" resultID="' + machineResult.runID + '">' +
+               self._resultTitle(machineResult) + '</a>';
+      }).join('\n')
+    );
   },
 
   _useLocalTime: function UserInterface__useLocalTime() {
@@ -295,8 +271,8 @@ var UserInterface = {
     return {
       "building": type + ' is still running',
       "success": type + ' was successful',
-      "testfailed": 'Tests failed on ' + type,
-      "busted": type + ' is burning'
+      "testfailed": 'Tests failed on ' + type + ' on ' + Config.OSNames[result.machine.os],
+      "busted": type + ' on ' + Config.OSNames[result.machine.os] + ' is burning'
     }[result.state] + ', ' + this._timeString(result);
   },
   
@@ -654,7 +630,7 @@ var UserInterface = {
   },
 
   _durationDisplay: function UserInterface__durationDisplay(result) {
-    return 'Started ' + this._getDisplayTime(result.startTime) +
+    return 'started ' + this._getDisplayTime(result.startTime) +
       ', ' + (result.state == "building" ? 'still running... ' : 'finished ' +
       this._getDisplayTime(result.endTime) + ', ') + this._timeString(result);
   },
@@ -662,30 +638,34 @@ var UserInterface = {
   _displayResult: function UserInterface__displayResult() {
     var self = this;
     var result = this._data.getMachineResults()[this._activeResult];
-    var box = document.getElementById("results");
-    if (!box)
-      return;
+    var box = $("#details");
+    var body = $("body");
     if (!result) {
-      box.removeAttribute("state");
-      box.className = "";
-      box.innerHTML = "";
+      body.removeClass("details");
+      box.removeAttr("state");
+      box.empty();
       return;
     }
-    box.setAttribute("state", result.state);
-    box.className = result.note ? "hasStar" : "";
-    box.innerHTML = (function htmlForResultInBottomBar() {
-      return '<h3><span class="machineName">' + result.machine.name +
-      '</span> [<span class="state">' + result.state + '</span>] ' +
-      '<span class="duration">' + self._durationDisplay(result) + '</span></h3>\n' +
-      '<a class="briefLog" href="' + result.briefLogURL +
-      '">View Brief Log</a> <a class="fullLog" href="' +
-      result.fullLogURL + '">View Full Log</a> <a class="addNote" href="' +
-      result.addNoteURL + '">Add a Comment</a> <span id="summaryLoader"></span>' +
+
+    body.addClass("details");
+    box.attr("state", result.state);
+    box.removeClass("hasStar");
+    if(result.note)
+      box.addClass("hasStar");
+    box.html((function htmlForResultInBottomBar() {
+      var rev = result.rev || result.guessedRev;
+      return '<div><h3>' + result.machine.name +
+      ' [<span class="state ' + result.state + '">' + result.state + '</span>]</h3>\n' +
+      '<span>using revision: <a href="' + self._revURL(rev) + '">' + rev + '</a></span>' +
+      '<a href="' + result.briefLogURL + '">view brief log</a>' +
+      '<a href="' + result.fullLogURL + '">view full Log</a>' +
+      '<a class="addNote" href="' + result.addNoteURL + '">add a comment</a>' +
+      '<span class="duration">' + self._durationDisplay(result) + '</span></div>' +
       (function htmlForTestResults() {
         var testResults = result.getTestResults();
         if (!testResults.length)
           return '';
-        return '<ul class="testResults">\n' +
+        return '<ul id="results">\n' +
         testResults.map(function htmlForTestResultEntry(r) {
           return '<li>' + r.name +
             (r.result ? ': ' + (r.resultURL ? '<a href="' + r.resultURL.replace(/"/g, "&quot;") +
@@ -706,11 +686,11 @@ var UserInterface = {
             return '';
           return '<div class="note">' +
           self._linkBugs(result.note) + '</div>';
-        })() + '<div class="summary"></div></div>';
+        })() + '<div class="summary"><span id="summaryLoader"></span></div></div>';
       })();
-    })();
+    })());
     AddCommentUI.updateUI();
-    SummaryLoader.setupSummaryLoader(result, box);
+    SummaryLoader.setupSummaryLoader(result, box.get(0));
   },
 
 };

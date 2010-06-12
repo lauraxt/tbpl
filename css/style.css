@@ -6,8 +6,8 @@ p {
   font-size: 0.8em;
 }
 
-/* Chooser */
-#chooser {
+/* Info bar on top */
+#topbar {
   position: absolute;
   z-index: 3;
   top: 0;
@@ -17,7 +17,25 @@ p {
   padding: 4px;
   font-size: 0.8em;
   background-color: rgba(255, 255, 255, 0.8);
-  height: 17px;
+  height: 70px;
+}
+#config {
+  padding: 4px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+#loading {
+  width: 300px;
+  margin: auto;
+  text-align: center;
+}
+#status {
+  padding: 4px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  text-align: right;
 }
 #mruList, #mruList li, #moreListContainer, #moreListContainer h2 {
   margin: 0;
@@ -45,6 +63,8 @@ p {
   padding: 5px !important;
   white-space: nowrap;
   background-color: white;
+  -moz-box-shadow: 1px 1px 5px #ccc;
+  box-shadow: 1px 1px 5px #ccc;
 }
 #moreListContainer:not(:hover) #moreList {
   display: none;
@@ -57,19 +77,14 @@ p {
 #moreList a {
   padding: 5px 0;
 }
-#loading {
-  margin-left: 100px;
-  font-weight: normal;
-  padding: 1px 0 1px 20px;
-}
 .loading {
   background: url(../images/loading_16.png) center left no-repeat transparent;
+  padding-left: 20px;
 }
-#tzchooser {
-  position: absolute;
-  right: 4px;
+#config a {
+  cursor: pointer;
 }
-#tzchooser a.selected {
+#config a.selected {
   font-weight: bold;
   color: black !important;
   text-decoration: none !important;
@@ -99,12 +114,14 @@ iframe {
   padding: 10px 20px;
   position: absolute;
   margin: 0;
-  top: 25px;
-  bottom: 120px;
+  top: 78px;
+  bottom: 0px;
   overflow: auto;
   left: 0;
   right: 0;
-  border-bottom: 1px solid #DDD;
+}
+body.details > #pushes {
+	bottom: 101px;
 }
 #pushes, .patches, .results {
   list-style: none;
@@ -264,163 +281,119 @@ a:active {
   color: #800;
 }
 
-/* Bar */
 
-#bar {
+/* Selected results */
+#details {
+  display: none;
+  border-top: 1px solid #DDD;
   position: absolute;
   padding: 0;
   z-index: 4;
   left: 0;
   bottom: 0;
   right: 0;
-  height: 120px;
+  height: 100px;
   background: white;
   font-size: 0.76em;
 }
-
-
-/* Current tree state table */
-#matrixWrapper {
-  font-size: 0.8em;
-  top: 5px;
-  bottom: 0;
-  right: 5px;
-  width: 510px;
-  position: absolute;
-  overflow: hidden;
-}
-#matrix {
-  table-layout: fixed;
-  width: 510px;
-  border-collapse: collapse;
-}
-th {
-  font-weight: normal;
-}
-td, th {
-  border: 0;
-  padding: 0;
-  vertical-align: top;
-}
-#matrix tr> :not(:first-child) {
-  width: 81px;
-}
-#matrix tr> :first-child {
-  text-align: right;
-  font-size: 0.9em;
-  line-height: 8px;
-  padding-right: 5px;
-  width: 20px;
-}
-#matrix th img {
-  width: 8px;
-  height: 8px;
-  vertical-align: -10%;
-}
-#matrix a.success {
-  background-color: #0C0 !important;
-}
-#matrix a.testfailed {
-  background-color: #F90 !important;
-}
-#matrix a.busted {
-  background-color: #D00 !important;
-}
-#matrix a {
-  float: left;
-  width: 8px;
-  height: 8px;
-  opacity: 0.8;
-  text-indent: -1000px;
-  overflow: hidden;
-  margin-right: 1px;
-  margin-bottom: 1px;
-}
-#matrix a.testfailed,
-#matrix a.busted {
-  width: 17px;
-  height: 17px;
-}
-#matrix a:hover {
-  -moz-box-shadow: inset 0 4px 15px rgba(255, 255, 255, 0.25);
-  -webkit-box-shadow: inset 0 4px 15px rgba(255, 255, 255, 0.25);
-  box-shadow: inset 0 4px 15px rgba(255, 255, 255, 0.25);
-}
-#matrix a:active {
-  -moz-box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.1);
-  -webkit-box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.1);
-  box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.1);
+body.details > #details
+{
+	display: block;
 }
 
-#matrix a.hasNote {
-  background-image: url(../images/starredbox.png);
-  background-position: 0 0;
-  background-repeat: no-repeat;
-}
-#matrix .machineResult[active=true] {
-  -moz-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
-  -webkit-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
-}
-#matrix a[active=true]:hover {
-  -moz-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3), inset 0 4px 15px rgba(255, 255, 255, 0.25);
-  -webkit-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3), inset 0 4px 15px rgba(255, 255, 255, 0.25);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3), inset 0 4px 15px rgba(255, 255, 255, 0.25);
-}
-#matrix a[active=true]:active {
-  -moz-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3), inset 0 3px 10px rgba(0, 0, 0, 0.1);
-  -webkit-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3), inset 0 3px 10px rgba(0, 0, 0, 0.1);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3), inset 0 3px 10px rgba(0, 0, 0, 0.1);
-}
-
-#results {
-  margin: 0 520px 0 0;
+#details > div:first-child {
   border-right: 1px solid #DDD;
-  height: 120px;
-  position: relative;
+  position: absolute;
+  top: 0px;
+  height: 100px;
+  width: 450px;
 }
 
-#results > h3 {
+#details > div > h3 {
   margin: 0;
   font-size: 1em;
   text-align: left;
   padding: 2px 5px;
   position: relative;
 }
-#results[state=building]   .state { color: #AAA; }
-#results[state=success]    .state { color: #0B0; }
-#results[state=testfailed] .state { color: #D70; }
-#results[state=busted]     .state { color: #B00; }
+
+#details > div > h3 > .time {
+  float: right;
+  font-weight: normal;
+}
+
+#details > div > span, #details > div > a {
+  padding-left: 5px;
+  display: block;
+}
+
+#status a.testfailed {
+  background-color: #F90 !important;
+}
+#status a.busted {
+  background-color: #D00 !important;
+}
+#status a {
+  float: left;
+  width: 17px;
+  height: 17px;
+  opacity: 0.8;
+  text-indent: 1000px;
+  overflow: hidden;
+  margin-right: 1px;
+  margin-bottom: 1px;
+}
+#status a:hover {
+  -moz-box-shadow: inset 0 4px 15px rgba(255, 255, 255, 0.25);
+  -webkit-box-shadow: inset 0 4px 15px rgba(255, 255, 255, 0.25);
+  box-shadow: inset 0 4px 15px rgba(255, 255, 255, 0.25);
+}
+#status a:active {
+  -moz-box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+#status a.hasNote {
+  background-image: url(../images/starredbox.png);
+  background-position: 0 0;
+  background-repeat: no-repeat;
+}
+#status .machineResult[active=true] {
+  -moz-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
+}
+#status a[active=true]:hover {
+  -moz-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3), inset 0 4px 15px rgba(255, 255, 255, 0.25);
+  -webkit-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3), inset 0 4px 15px rgba(255, 255, 255, 0.25);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3), inset 0 4px 15px rgba(255, 255, 255, 0.25);
+}
+#status a[active=true]:active {
+  -moz-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3), inset 0 3px 10px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3), inset 0 3px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3), inset 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.state.building   { color: #AAA; }
+.state.success    { color: #0B0; }
+.state.testfailed { color: #D70; }
+.state.busted     { color: #B00; }
 .duration {
   font-weight: normal;
   position: absolute;
   right: 5px;
-}
-a.briefLog, a.fullLog, a.addNote, #summaryLoader {
-  position: absolute;
-  right: 5px;
-  bottom: 36px;
-  margin-bottom: 2px;
-}
-a.fullLog {
-  bottom: 18px;
-}
-a.addNote {
-  bottom: 0;
-}
-#summaryLoader {
-  bottom: 58px;
-  padding: 1px 0 1px 20px;
+  bottom: 5px;
 }
 
-.testResults {
+#results {
   margin: 0;
-  padding-left: 20px;
+  padding: 5px 0 0 30px;
   position: absolute;
-  top: 20px;
+  top: 0;
   bottom: 0;
-  left: 0;
-  right: 100px;
+  left: 450px;
+  right: 0;
   overflow: hidden;
   overflow-x: auto;
   /* I really don't know whats going on here,
@@ -440,7 +413,7 @@ em.testfail {
 .stars {
   position: absolute;
   bottom: 100px;
-  right: 0;
+  right: 25px;
   max-width: 100%;
   margin-right: -1px;
   border: 1px solid #DDD;
@@ -452,10 +425,10 @@ em.testfail {
   padding: 10px;
 }
 .stars .note {
-  background: #FFFACC;
+  background:  rgba(255, 250, 204, 0.8);
 }
 .stars .summary {
-  background: #CCFAFF;
+  background:  rgba(204, 250, 255, 0.8);
   font-size: 10px;
   border-top: 1px solid #DDD;
 }
@@ -473,16 +446,16 @@ em.testfail {
 .stars .summary [data-status~=UNCONFIRMED] {
   font-style: italic;
 }
-#results:not(.hasSummary) .stars .summary {
+#details:not(.hasSummary) .stars .summary {
   display: none;
 }
-#results:not(.hasSummary) .stars .note,
-#results:not(.hasStar) .stars .summary {
+#details:not(.hasSummary) .stars .note,
+#details:not(.hasStar) .stars .summary {
   max-height: 300px;
   border-top: none;
 }
-#results.hasStar {
-  background: url(../images/bigstar.png) 80% 50% no-repeat white;
+#details.hasStar > div:first-child {
+  background: url(../images/bigstar.png) right 50% no-repeat white;
 }
 
 #addNotePopup {
