@@ -176,9 +176,9 @@ var AddCommentUI = {
 
   _updateLogLinkText: function AddCommentUI__updateLogLinkText() {
     $("a.addNote").text(
-      !this._popupIsOpen() ? "Add a comment" :
-        (this.addToBuilds[UserInterface._activeResult] ? "Don't add the comment to this build" :
-                                          "Add the comment to this build, too"));
+      !this._popupIsOpen() ? "add a comment" :
+        (this.addToBuilds[UserInterface._activeResult] ? "don't add the comment to this build" :
+                                          "add the comment to this build, too"));
   },
 
   _buildListIsEmpty: function AddCommentUI__buildListIsEmpty() {

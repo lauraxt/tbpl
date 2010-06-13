@@ -658,7 +658,7 @@ var UserInterface = {
       ' [<span class="state ' + result.state + '">' + result.state + '</span>]</h3>\n' +
       '<span>using revision: <a href="' + self._revURL(rev) + '">' + rev + '</a></span>' +
       '<a href="' + result.briefLogURL + '">view brief log</a>' +
-      '<a href="' + result.fullLogURL + '">view full Log</a>' +
+      '<a href="' + result.fullLogURL + '">view full log</a>' +
       '<a class="addNote" href="' + result.addNoteURL + '">add a comment</a>' +
       '<span class="duration">' + self._durationDisplay(result) + '</span></div>' +
       (function htmlForTestResults() {

@@ -121,7 +121,7 @@ iframe {
   right: 0;
 }
 body.details > #pushes {
-	bottom: 101px;
+	bottom: 121px;
 }
 #pushes, .patches, .results {
   list-style: none;
@@ -292,7 +292,7 @@ a:active {
   left: 0;
   bottom: 0;
   right: 0;
-  height: 100px;
+  height: 120px;
   background: white;
   font-size: 0.76em;
 }
@@ -305,7 +305,7 @@ body.details > #details
   border-right: 1px solid #DDD;
   position: absolute;
   top: 0px;
-  height: 100px;
+  height: 120px;
   width: 450px;
 }
 
@@ -412,7 +412,7 @@ em.testfail {
 }
 .stars {
   position: absolute;
-  bottom: 100px;
+  bottom: 120px;
   right: 25px;
   max-width: 100%;
   margin-right: -1px;
@@ -453,9 +453,6 @@ em.testfail {
 #details:not(.hasStar) .stars .summary {
   max-height: 300px;
   border-top: none;
-}
-#details.hasStar > div:first-child {
-  background: url(../images/bigstar.png) right 50% no-repeat white;
 }
 
 #addNotePopup {
