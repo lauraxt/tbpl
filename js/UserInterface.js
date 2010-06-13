@@ -100,19 +100,11 @@ var UserInterface = {
     this._storage = this._storage || {};
   },
 
-  _keysFromObject: function UserInterface__keysFromObject(obj) {
-    var keys = [];
-    for (var key in obj) {
-      keys.push(key);
-    }
-    return keys;
-  },
-
   _mostRecentlyUsedTrees: function() {
     if (!("mostRecentlyUsedTrees" in this._storage))
       this._setMostRecentlyUsedTrees([]);
     if (JSON.parse(this._storage.mostRecentlyUsedTrees).length != 3)
-      this._setMostRecentlyUsedTrees(this._keysFromObject(Config.repoNames).slice(0, 3));
+      this._setMostRecentlyUsedTrees(Controller.keysFromObject(Config.repoNames).slice(0, 3));
     return JSON.parse(this._storage.mostRecentlyUsedTrees);
   },
 
@@ -133,7 +125,7 @@ var UserInterface = {
     var moreListContainer = $('<div id="moreListContainer"><h2>more...</h2></div></li>').appendTo("#treechooser");
     var moreList = $('<ul id="moreList"></ul>').appendTo(moreListContainer);
     var self = this;
-    this._keysFromObject(Config.repoNames).forEach(function (tree, i) {
+    Controller.keysFromObject(Config.repoNames).forEach(function (tree, i) {
       var isMostRecentlyUsedTree = (self._storage.mostRecentlyUsedTrees.indexOf(tree) != -1);
       var treeLink = self._treeName == tree ?
         "<strong>" + tree + "</strong>" :
@@ -359,15 +351,14 @@ var UserInterface = {
     ' </span>';
   },
 
-  _buildHTMLForPushResults: function UserInterface__buildHTMLForPushResults(oss, push, machineTypes) {
+  _buildHTMLForPushResults: function UserInterface__buildHTMLForPushResults(push, machineTypes) {
     var self = this;
     return '<ul class="results">\n' +
-    oss.map(function buildHTMLForPushResultsOnOS(os) {
+    Controller.keysFromObject(Config.OSNames).map(function buildHTMLForPushResultsOnOS(os) {
       if (!push.results || !push.results[os])
         return '';
       var results = push.results[os];
-      return '<li><span class="os ' + os + '">' +
-      { "linux": "Linux", "linux64": "Linux64", "osx": "OS X", "osx64": "OS X 64", "windows": "Windows", "windows64": "Win64" }[os] +
+      return '<li><span class="os ' + os + '">' + Config.OSNames[os] +
       '</span><span class="osresults">' +
       machineTypes.map(function buildHTMLForPushResultsOnOSForMachineType(machineType) {
         if (!results[machineType])
@@ -400,7 +391,6 @@ var UserInterface = {
     var ul = document.getElementById("pushes");
     ul.innerHTML = this._controller.getTimeOffset() ? '<li><a id="goForward" href="#" title="go forward by 12 hours"></a></li>' : '';
     var pushes = this._data.getPushes();
-    var oss = this._data.getOss();
     var machineTypes = this._data.getMachineTypes();
     var timeOffset = this._controller.getTimeOffset();
     ul.innerHTML += pushes.map(function buildHTMLForPush(push, pushIndex) {
@@ -409,7 +399,7 @@ var UserInterface = {
       '<span class="date">' + self._getDisplayDate(push.date) + '</span>' +
       ' (compare: <input class="revsToCompare" id="compareRevs" type="checkbox" value="' + push.patches[0].rev + '">)' +
       '</h2>\n' +
-      self._buildHTMLForPushResults(oss, push, machineTypes) +
+      self._buildHTMLForPushResults(push, machineTypes) +
       '<ul class="patches">\n' +
       push.patches.map(function buildHTMLForPushPatches(patch, patchIndex) {
         return '<li>\n' +

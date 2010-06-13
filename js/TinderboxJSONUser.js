@@ -32,7 +32,11 @@ var TinderboxJSONUser = {
       /OS\s?X.*10\.6/.test(name) ? "osx64" :
       /OS\s?X/.test(name) ? "osx" :
       /WINNT.*x86-64/i.test(name) ? "windows64" :
-      /WINNT/i.test(name) ? "windows" :
+      /WIN/i.test(name) ? "windows" :
+      /Android/.test(name) ? "android" :
+      /Maemo 5/.test(name) ? "maemo5" : 
+      /Maemo/.test(name) ? "maemo4" : 
+      /N810/.test(name) ? "maemo4" : 
       /static-analysis/.test(name) ? "linux" : "",
   
       type:

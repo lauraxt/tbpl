@@ -7,7 +7,6 @@ function TinderboxData(treeName, dataLoader, repoNames) {
 
 TinderboxData.prototype = {
 
-  oss: ["linux", "linux64", "osx", "osx64", "windows", "windows64"],
   machineTypes: [
     "Opt Build", "Debug Build", "Nightly",
     "Mochitest", "Opt Mochitest", "Debug Mochitest",

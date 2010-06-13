@@ -1,5 +1,13 @@
 var Controller = {
 
+  keysFromObject: function Controller_keysFromObject(obj) {
+    var keys = [];
+    for (var key in obj) {
+      keys.push(key);
+    }
+    return keys;
+  },
+
   treeName: Config.defaultTreeName,
   loadStatus: { pushlog: "loading", tinderbox: "loading" },
 
@@ -22,7 +30,6 @@ var Controller = {
     } 
 
     this._data = new Data(this.treeName, Config);
-    this._oss = this._data.getOss();
     this._machineTypes = this._data.getMachineTypes();
 
     UserInterface.init(this);

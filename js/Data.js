@@ -41,10 +41,6 @@ Data.prototype = {
     );
   },
 
-  getOss: function Data_getOss() {
-    return this._tinderboxData.oss;
-  },
-
   getMachineTypes: function Data_getMachineTypes() {
     return this._tinderboxData.machineTypes;
   },
@@ -167,8 +163,7 @@ Data.prototype = {
    */
   _getPerfResultsForPush: function Data__getPerfResultsForPush(push) {
     var perfResults = {};
-    this.getOss().forEach(function(os) {
-      perfResults[os] = {};
+    Controller.keysFromObject(Config.OSNames).forEach(function(os) {
       if (push.results && push.results[os]) {
         for (var buildType in push.results[os]) {
           if (buildType != "Talos")
@@ -178,6 +173,7 @@ Data.prototype = {
             var testResults = this.getMachineResults()[buildResult.runID].getTestResults();
             if (testResults) {
               testResults.forEach(function(testResult) {
+                perfResults[os] = perfResults[os] || {};
                 perfResults[os][testResult.name] = testResult.result;
               });
             }

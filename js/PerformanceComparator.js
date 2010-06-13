@@ -21,9 +21,13 @@ var PerformanceComparator = {
     // generate a structure with column headers and % difference
     // in a format ready for conversion into different formats
     function makeResultsTable(results) {
+      var usedOSKeys = {};
       var rows = [];
       rows[0] = [""];
       for (var os in osNames) {
+        if(!results[0][os] && !results[1][os])
+          continue;
+        usedOSKeys[os] = true;
         var name = osNames[os];
         rows[0].push(name + " (" + results[0].rev + ")");
         rows[0].push(name + " (" + results[1].rev + ")");
@@ -32,9 +36,9 @@ var PerformanceComparator = {
 
       testNames.forEach(function(testName) {
         var row = [testName];
-        for (var os in osNames) {
-          var rev1 = results[0][os][testName] || 0;
-          var rev2 = results[1][os][testName] || 0;
+        for (var os in usedOSKeys) {
+          var rev1 = (results[0][os] && results[0][os][testName]) || 0;
+          var rev2 = (results[1][os] && results[1][os][testName]) || 0;
           row.push(rev1);
           row.push(rev2);
           if (rev1 > 0 && rev2 > 0) {

@@ -28,9 +28,12 @@ var Config = {
   OSNames: {
     "linux": "Linux",
     "linux64": "Linux64",
-    "osx":"Mac OS X",
-    "osx64": "Mac OS X64",
+    "osx":"OS X",
+    "osx64": "OS X64",
     "windows": "Windows",
-    "windows": "Windows64"
-  },
+    "windows64": "Win64",
+    "android": "Android",
+    "maemo5": "Maemo 5",
+    "maemo4": "Maemo 4"
+  }
 };
