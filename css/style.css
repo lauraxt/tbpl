@@ -443,12 +443,15 @@ em.testfail {
 .stars .summary [data-bugid] + br {
   display: none;
 }
-.stars .summary [data-status~=RESOLVED] span,
-.stars .summary [data-status~=VERIFIED] span {
+.stars .summary [data-status~=RESOLVED],
+.stars .summary [data-status~=VERIFIED] {
   text-decoration: line-through;
 }
 .stars .summary [data-status~=UNCONFIRMED] {
   font-style: italic;
+}
+.stars .summary span.highlight {
+  font-weight: bold;
 }
 #details:not(.hasSummary) .stars .summary {
   display: none;

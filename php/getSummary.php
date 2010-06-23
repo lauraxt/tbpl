@@ -81,14 +81,16 @@ function getSummary($tree, $id, $starred) {
   return $summary;
 }
 
-function generateSuggestion($bug) {
+function generateSuggestion($bug, $line) {
   global $signature;
   $bug->summary = htmlspecialchars($bug->summary);
+  $line = htmlspecialchars(strip_tags($line));
   return "<span data-bugid=\"$bug->id\" " .
                "data-summary=\"$bug->summary\" " .
                "data-signature=\"$signature\" " .
+               "data-logline=\"$line\" " .
                "data-status=\"$bug->status $bug->resolution\"" .
-         ">Bug <span>$bug->id</span> - $bug->summary</span>\n";
+         "></span>\n";
 }
 
 function processLine(&$lines, $line) {
@@ -105,7 +107,7 @@ function processLine(&$lines, $line) {
     foreach ($bugs as $bug) {
       $lines[] = "This could be bug $bug->id. <a href=\"leak-analysis/?id=" . $_GET["id"] .
         "&tree=" . $_GET["tree"] . "\" target=\"_blank\">Analyze the leak to make sure.</a>";
-      $lines[] = generateSuggestion($bug);
+      $lines[] = generateSuggestion($bug, '');
     }
     return;
   }
@@ -114,7 +116,7 @@ function processLine(&$lines, $line) {
   $fileName = end($parts);
   $bugs = getBugsForTestFailure($fileName);
   foreach ($bugs as $bug) {
-    $lines[] = generateSuggestion($bug);
+    $lines[] = generateSuggestion($bug, $line);
   }
 }
 

@@ -34,8 +34,17 @@ var SummaryLoader = {
           status: item.attr("data-status")
         };
         result.suggestions.push(suggestion);
+        var highlightTokens = item.attr("data-logline").split(/[^a-zA-Z0-9_-]+/);
+        highlightTokens.sort(function(a, b) {
+          return b.length - a.length;
+        });
+        var summary = item.attr("data-summary");
+        highlightTokens.forEach(function(token) {
+          summary = summary.replace(new RegExp(token, "gi"), "<span class=\"highlight\">" + token + "</span>");
+        });
         item.html('<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=' +
-          item.attr("data-bugid") + '" target="_blank">' + item.html() + '</a>');
+          item.attr("data-bugid") + '" target="_blank">Bug ' +
+          item.attr("data-bugid") + ' - ' + summary + '</a>');
         item.attr("title", item.attr("data-status"));
       }
       AddCommentUI.updateUI();
