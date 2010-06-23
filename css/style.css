@@ -123,6 +123,9 @@ iframe {
 body.details > #pushes {
   bottom: 121px;
 }
+body:not(.details) > #pushes > li:last-child {
+  margin-bottom: 121px;
+}
 #pushes, .patches, .results {
   list-style: none;
 }
