@@ -80,6 +80,7 @@ p {
 .loading {
   background: url(../images/loading_16.png) center left no-repeat transparent;
   padding-left: 20px;
+  min-height: 17px;
 }
 #config a {
   cursor: pointer;
