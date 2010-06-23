@@ -25,7 +25,7 @@ p {
   top: 0;
   left: 0;
 }
-#loading {
+#loadingWrapper {
   width: 300px;
   margin: auto;
   text-align: center;
