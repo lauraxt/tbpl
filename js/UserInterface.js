@@ -590,13 +590,13 @@ var UserInterface = {
     }
     this._activeResult = resultID;
     this._markActiveResultLinks();
+    this._displayResult();
     if (this._activeResult) {
       var activeA = $('.results .machineResult[resultID="' + this._activeResult + '"]').get(0);
       if (activeA && scroll) {
         this._scrollElemIntoView(activeA, document.getElementById("pushes"), 20);
       }
     }
-    this._displayResult();
   },
   
   _scrollElemIntoView: function UserInterface__scrollElemIntoView(elem, box, margin) {
