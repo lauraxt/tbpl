@@ -3,7 +3,7 @@
 if (!isset($_GET["tree"]) || !isset($_GET["id"]))
   die("tree or id not set");
 
-if (!preg_match('/^[a-zA-Z0-9-]+$/', $_GET["tree"]))
+if (!preg_match('/^[a-zA-Z0-9\.-]+$/', $_GET["tree"]))
   die("invalid tree");
 
 if (!preg_match('/^\d+\.\d+\.\d+\.gz$/', $_GET["id"]))
