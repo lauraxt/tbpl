@@ -40,7 +40,8 @@ var SummaryLoader = {
         });
         var summary = item.attr("data-summary");
         highlightTokens.forEach(function(token) {
-          summary = summary.replace(new RegExp(token, "gi"), "<span class=\"highlight\">" + token + "</span>");
+          if (token.length > 0)
+            summary = summary.replace(new RegExp(token, "gi"), "<span class=\"highlight\">" + token + "</span>");
         });
         item.html('<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=' +
           item.attr("data-bugid") + '" target="_blank">Bug ' +
