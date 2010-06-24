@@ -32,6 +32,9 @@ var UserInterface = {
     document.getElementById("pushes").onmousedown = function pushesMouseDown(e) {
       self._clickNowhere(e);
     };
+    document.getElementById("topbar").onmousedown = function topbarMouseDown(e) {
+      self._clickNowhere(e);
+    };
 
     AddCommentUI.init("http://tinderbox.mozilla.org/addnote.cgi", this._storage);
     AddCommentUI.registerNumSendingCommentChangedCallback(function commentSendUpdater() {
