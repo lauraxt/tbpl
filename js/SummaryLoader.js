@@ -38,9 +38,20 @@ var SummaryLoader = {
         highlightTokens.sort(function(a, b) {
           return b.length - a.length;
         });
-        var summary = item.attr("data-summary");
+        var summary = item.attr("data-summary").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        function inTag(str, index, start, end) {
+          var prePart = str.substr(0, index);
+          return prePart.split(start).length > prePart.split(end).length;
+        }
         highlightTokens.forEach(function(token) {
-          summary = summary.replace(new RegExp(token, "gi"), "<span class=\"highlight\">" + token + "</span>");
+          if (token.length > 0)
+            summary = summary.replace(new RegExp(token, "gi"), function (token, index, str) {
+              if (inTag(str, index, "<", ">") ||
+                  inTag(str, index, "&", ";")) // don't replace stuff in already injected tags or entities
+                return token;
+              else
+                return "<span class=\"highlight\">" + token + "</span>";
+            });
         });
         item.html('<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=' +
           item.attr("data-bugid") + '" target="_blank">Bug ' +
