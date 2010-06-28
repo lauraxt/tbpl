@@ -17,6 +17,10 @@ var AddCommentUI = {
       self.logLinkClick();
       return false;
     });
+    $("#autoStar").live("click", function autoStarClick() {
+      self.commentWithoutUI();
+    });
+    this.updateAutoStarState();
     $("#closeAddNotePopup").bind("click", function closeAddNotePopupClick() {
       $("#addNotePopup").fadeOut('fast', function afterAddNotePopupFadeOut() {
         self.reset();
@@ -100,6 +104,33 @@ var AddCommentUI = {
       delete this.addToBuilds[UserInterface._activeResult];
     }
     this.updateUI();
+  },
+
+  commentWithoutUI: function AddCommentUI_commentWithoutUI() {
+    if (this._popupIsOpen() || !$("#autoStar").hasClass("active"))
+      return;
+    if (!this.addToBuilds[UserInterface._activeResult]) {
+      this.addToBuilds[UserInterface._activeResult] = true;
+    }
+    this.updateUI();
+    var submit = $("#addNoteForm input[type=submit]");
+    if (!submit.get(0).disabled) {
+      this.submit();
+      $("#autoStar").removeClass("active");
+    }
+  },
+
+  updateAutoStarState: function AddCommentUI_updateAutoStarState() {
+    var autoStar = $("#autoStar");
+    if ($(".starSuggestion.active").length) {
+      autoStar.addClass("active");
+      autoStar.attr("title", "Click to star this orange using the suggestions selected");
+    } else {
+      autoStar.removeClass("active");
+      autoStar.attr("title", "Select an orange, click on the star icons next to " +
+                             "suggestions, and click this icon to star the orange " +
+                             "using those suggestions in one step");
+    }
   },
 
   pendingCommentsChanged: function AddCommentUI_pendingCommentsChanged(changedBy) {

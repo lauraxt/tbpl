@@ -475,6 +475,19 @@ em.testfail {
 .stars .starSuggestion.active {
   background: url(../images/starred.png);
 }
+#autoStar {
+  float: left;
+  width: 16px;
+  height: 16px;
+  background: url(../images/star.png);
+  margin-right: 0.25em;
+  margin-left: 5px;
+  padding: 0;
+  cursor: pointer;
+}
+#autoStar.active {
+  background: url(../images/starred.png);
+}
 
 #addNotePopup {
   position: absolute;

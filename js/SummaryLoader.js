@@ -8,6 +8,7 @@ var SummaryLoader = {
     $(".stars .starSuggestion").live("click", function() {
       $(this).toggleClass("active");
       $(this).toggleClass("__active_" + $(this).parent().attr("data-bugid"));
+      AddCommentUI.updateAutoStarState();
     });
   },
 
