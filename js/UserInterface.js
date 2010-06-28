@@ -33,6 +33,7 @@ var UserInterface = {
       self._clickNowhere(e);
     });
 
+    SummaryLoader.init();
     AddCommentUI.init("http://tinderbox.mozilla.org/addnote.cgi", this._storage);
     AddCommentUI.registerNumSendingCommentChangedCallback(function commentSendUpdater() {
       self.updateStatus();
@@ -333,11 +334,14 @@ var UserInterface = {
     if (machineResults.suggestions) {
       for (var i = 0; i < machineResults.suggestions.length; ++i) {
         var item = machineResults.suggestions[i];
+        var link =
         $("<a href=\"#\">Bug " + item.id + "</a>").click(function() {
           AddCommentUI.toggleSuggestion(this.getAttribute("data-id"), this);
         }).attr("title", "[" + item.status.trim() + "] " + item.summary)
         .attr("data-id", item.id)
         .appendTo(target);
+        if ($(".__active_" + item.id).length)
+          link.click();
       }
     }
   },

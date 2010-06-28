@@ -4,6 +4,13 @@ var SummaryLoader = {
   _abortOutstandingSummaryLoadings: function empty() {},
   _cachedSummaries: {},
 
+  init: function SummaryLoader_init() {
+    $(".stars .starSuggestion").live("click", function() {
+      $(this).toggleClass("active");
+      $(this).toggleClass("__active_" + $(this).parent().attr("data-bugid"));
+    });
+  },
+
   setupSummaryLoader: function SummaryLoader_setupSummaryLoader(result, box) {
     if (result.state == "building" || result.state == "success")
       return;
@@ -53,7 +60,8 @@ var SummaryLoader = {
                 return "<span class=\"highlight\">" + token + "</span>";
             });
         });
-        item.html('<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=' +
+        item.html('<div class="starSuggestion"></div>' + 
+          '<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=' +
           item.attr("data-bugid") + '" target="_blank">Bug ' +
           item.attr("data-bugid") + ' - ' + summary + '</a>');
         item.attr("title", item.attr("data-status"));

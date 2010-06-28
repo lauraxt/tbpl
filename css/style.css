@@ -461,6 +461,20 @@ em.testfail {
   max-height: 300px;
   border-top: none;
 }
+.stars .starSuggestion {
+  float: left;
+  clear: left;
+  width: 16px;
+  height: 16px;
+  background: url(../images/star.png);
+  margin-right: 0.25em;
+  margin-top: -2px;
+  padding: 0;
+  cursor: pointer;
+}
+.stars .starSuggestion.active {
+  background: url(../images/starred.png);
+}
 
 #addNotePopup {
   position: absolute;
