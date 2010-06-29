@@ -340,7 +340,7 @@ var UserInterface = {
         }).attr("title", "[" + item.status.trim() + "] " + item.summary)
         .attr("data-id", item.id)
         .appendTo(target);
-        if ($(".__active_" + item.id).length)
+        if (AddCommentUI.shouldAutoStarBug(item.id))
           link.click();
       }
     }
@@ -569,6 +569,7 @@ var UserInterface = {
   _resultLinkClick: function UserInterface__resultLinkClick(link) {
     var resultID = link.getAttribute("resultID");
     this._setActiveResult(resultID, true);
+    AddCommentUI.clearAutoStarBugs();
   },
   
   _markActiveResultLinks: function UserInterface__markActiveResultLinks() {

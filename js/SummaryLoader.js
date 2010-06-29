@@ -7,7 +7,7 @@ var SummaryLoader = {
   init: function SummaryLoader_init() {
     $(".stars .starSuggestion").live("click", function() {
       $(this).toggleClass("active");
-      $(this).toggleClass("__active_" + $(this).parent().attr("data-bugid"));
+      AddCommentUI.toggleAutoStarBug($(this).parent().attr("data-bugid"));
       AddCommentUI.updateAutoStarState();
     });
   },
@@ -61,7 +61,12 @@ var SummaryLoader = {
                 return "<span class=\"highlight\">" + token + "</span>";
             });
         });
-        item.html('<div class="starSuggestion"></div>' + 
+        var className = '';
+        if (AddCommentUI.shouldAutoStarBug(item.attr("data-bugid"))) {
+          className = ' active';
+          AddCommentUI.updateAutoStarState();
+        }
+        item.html('<div class="starSuggestion' + className + '"></div>' + 
           '<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=' +
           item.attr("data-bugid") + '" target="_blank">Bug ' +
           item.attr("data-bugid") + ' - ' + summary + '</a>');

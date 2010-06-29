@@ -8,6 +8,7 @@ var AddCommentUI = {
   numSendingBugChangedCallback: function empty() {},
   _submitURL: "",
   _storage: {},
+  _autoStarBugs: {},
 
   init: function AddCommentUI_init(submitURL, storage) {
     this._submitURL = submitURL;
@@ -90,6 +91,7 @@ var AddCommentUI = {
       });
       this.pendingBugsChanged(1);
     }
+    this.clearAutoStarBugs();
   },
 
   logLinkClick: function AddCommentUI_logLinkClick() {
@@ -120,9 +122,25 @@ var AddCommentUI = {
     }
   },
 
+  toggleAutoStarBug: function AddCommentUI_toggleAutoStarBug(bugid) {
+    if (bugid in this._autoStarBugs) {
+      delete this._autoStarBugs[bugid];
+    } else {
+      this._autoStarBugs[bugid] = true;
+    }
+  },
+
+  clearAutoStarBugs: function AddCommentUI_clearAutoStarBugs() {
+    this._autoStarBugs = {};
+  },
+
+  shouldAutoStarBug: function AddCommentUI_shouldAutoStarBug(bugid) {
+    return bugid in this._autoStarBugs;
+  },
+
   updateAutoStarState: function AddCommentUI_updateAutoStarState() {
     var autoStar = $("#autoStar");
-    if ($(".starSuggestion.active").length) {
+    if (Controller.keysFromObject(this._autoStarBugs).length) {
       autoStar.addClass("active");
       autoStar.attr("title", "Click to star this orange using the suggestions selected");
     } else {
