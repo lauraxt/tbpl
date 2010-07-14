@@ -1,6 +1,6 @@
-function Data(treeName, config) {
+function Data(treeName, noIgnore, config) {
   this._treeName = treeName;
-  this._tinderboxData = new TinderboxData(this._treeName, config.tinderboxDataLoader, config.repoNames);
+  this._tinderboxData = new TinderboxData(this._treeName, noIgnore, config.tinderboxDataLoader, config.repoNames);
   this._hgData = new HgData(this._tinderboxData.getRepoName(), config.pushlogDataLoader);
   this._pushes = [];
   this._machines = [];

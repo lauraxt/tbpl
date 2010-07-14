@@ -1,5 +1,6 @@
-function TinderboxData(treeName, dataLoader, repoNames) {
+function TinderboxData(treeName, noIgnore, dataLoader, repoNames) {
   this._treeName = treeName;
+  this._noIgnore = noIgnore;
   this._dataLoader = dataLoader;
   this._repoNames = repoNames;
   this._data = { machines: [], machineResults: {} };
@@ -60,6 +61,7 @@ TinderboxData.prototype = {
     this._dataLoader.load(
       this._treeName,
       timeOffset,
+      this._noIgnore,
       function mainTreeLoadCallback(data) {
         self._data = data;
         loadCallback(self.getData());

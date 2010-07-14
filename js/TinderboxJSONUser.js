@@ -1,16 +1,9 @@
 var TinderboxJSONUser = {
 
-  load: function TinderboxJSONUser_load(tree, timeOffset, loadCallback, failCallback) {
+  load: function TinderboxJSONUser_load(tree, timeOffset, noIgnore, loadCallback, failCallback) {
     delete tinderbox_data;
     var self = this;
-    /**
-     * tinderbox is a little quirky with maxdate, so get 24 hours with maxdate
-     * 12 hours in the future
-     */
-    var scriptURL = timeOffset ?
-      'http://tinderbox.mozilla.org/showbuilds.cgi?tree=' + tree +
-      '&maxdate=' + (timeOffset + 12 * 3600) + '&hours=24&json=1' :
-      "http://tinderbox.mozilla.org/" + tree + "/json.js"
+    var scriptURL = this._getScriptURL(tree, timeOffset, noIgnore);
     $.getScript(scriptURL, function tinderboxJSONGetScriptCallback() {
       try {
         if (!tinderbox_data) throw "tinderbox_data is invalid";
@@ -66,7 +59,28 @@ var TinderboxJSONUser = {
       /(check|test)/.test(name) ? "Unit Test" : ""
     };
   },
-  
+
+  _getScriptURL: function TinderboxJSONUser__getScriptURL(tree, timeOffset, noIgnore) {
+    var scriptURL;
+    if (timeOffset || noIgnore) {
+      scriptURL = 'http://tinderbox.mozilla.org/showbuilds.cgi?tree=' + tree +
+                  '&json=1';
+      if (timeOffset) {
+        /**
+         * tinderbox is a little quirky with maxdate, so get 24 hours with
+         * maxdate 12 hours in the future
+         */
+        scriptURL += '&maxdate=' + (timeOffset + 12 * 3600) + '&hours=24';
+      }
+      if (noIgnore) {
+        scriptURL += '&noignore=1';
+      }
+    } else {
+      scriptURL = "http://tinderbox.mozilla.org/" + tree + "/json.js";
+    }
+    return scriptURL;
+  },
+
   getLogURL: function TinderboxJSONUser_getLogURL(tree, id, full, note) {
     return "http://tinderbox.mozilla.org/" + (note ? "addnote" : "showlog") + ".cgi?log=" + tree + "/" + id + (full ? "&fulltext=1" : "");
   },

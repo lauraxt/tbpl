@@ -21,15 +21,19 @@ var Controller = {
   _data: null,
 
   init: function Controller_init() {
+    var params = this._getParams();
+
     // Allow specifying a tree name in the URL (http://foo/?tree=Firefox3.5)
-    var match = /[?&]tree=([^&]+)/.exec(document.location.search);
-    if (match) {
-      if (!Config.repoNames[match[1]])
+    if ("tree" in params) {
+      if (!Config.repoNames[params.tree])
         throw "wrongtree"; // er, hm.
-      this.treeName = match[1];
+      this.treeName = params.tree;
     } 
 
-    this._data = new Data(this.treeName, Config);
+    // Allow specifying &noignore=1 in the URL (to pass through to tinderbox)
+    var noIgnore = ("noignore" in params) && (params.noignore == "1");
+
+    this._data = new Data(this.treeName, noIgnore, Config);
     this._machineTypes = this._data.getMachineTypes();
 
     UserInterface.init(this);
@@ -63,6 +67,22 @@ var Controller = {
         self._startStatusRequest();
       }, Config.loadInterval * 1000);
     }
+  },
+
+  _getParams: function Controller__getParams() {
+    // Get the parameters specified in the query string of the URL.
+    var params = {};
+    var search = document.location.search;
+    if (search != "") {
+      var items = search.substring(1).split("&"); // strip "?" and split on "&"
+      for (var index in items) {
+        var eqitems = items[index].split("=");
+        if (eqitems.length >= 2) {
+          params[eqitems[0]] = eqitems.slice(1).join("=");
+        }
+      }
+    }
+    return params;
   },
 
   _startStatusRequest: function Controller__startStatusRequest() {
