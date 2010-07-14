@@ -31,8 +31,10 @@ var TinderboxJSONUser = {
       /Fedora/.test(name) ? "linux" :
       /OS\s?X.*10\.6/.test(name) ? "osx64" :
       /OS\s?X/.test(name) ? "osx" :
-      /WINNT.*x86-64/i.test(name) ? "windows64" :
-      /WIN/i.test(name) ? "windows" :
+      /WINNT 6\.1 x64/i.test(name) ? "windows7-64" :
+      /WINNT 6\.1/i.test(name) ? "windows7" :
+      /WINNT 5\.2/i.test(name) ? "windows2003" :
+      /WINNT 5\.1/i.test(name) ? "windowsxp" :
       /Android/.test(name) ? "android" :
       /Maemo 5/.test(name) ? "maemo5" : 
       /Maemo/.test(name) ? "maemo4" : 

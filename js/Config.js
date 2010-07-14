@@ -30,8 +30,10 @@ var Config = {
     "linux64": "Linux64",
     "osx":"OS X",
     "osx64": "OS X64",
-    "windows": "Windows",
-    "windows64": "Win64",
+    "windowsxp": "WinXP",
+    "windows2003": "Win2003",
+    "windows7": "Win7",
+    "windows7-64": "Win7-64",
     "android": "Android",
     "maemo5": "Maemo 5",
     "maemo4": "Maemo 4"
