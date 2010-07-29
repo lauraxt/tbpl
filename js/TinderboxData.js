@@ -13,6 +13,7 @@ TinderboxData.prototype = {
     "Mochitest", "Opt Mochitest", "Debug Mochitest",
     "Crashtest", "Opt Crashtest", "Debug Crashtest",
     "Reftest", "Opt Reftest", "Debug Reftest",
+    "Reftest-D2D", "Opt Reftest-D2D", "Debug Reftest-D2D",
     "JSReftest", "Opt JSReftest", "Debug JSReftest",
     "XPCShellTest", "Opt XPCShellTest", "Debug XPCShellTest",
     "Unit Test",

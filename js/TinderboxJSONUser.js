@@ -46,6 +46,9 @@ var TinderboxJSONUser = {
       /opt.*jsreftest/i.test(name) ? "Opt JSReftest" :
       /debug.*jsreftest/i.test(name) ? "Debug JSReftest" :
       /jsreftest/i.test(name) ? "JSReftest" :
+      /opt.*reftest-d2d/i.test(name) ? "Opt Reftest-D2D" :
+      /debug.*reftest-d2d/i.test(name) ? "Debug Reftest-D2D" :
+      /reftest-d2d/i.test(name) ? "Reftest-D2D" :
       /opt.*reftest/i.test(name) ? "Opt Reftest" :
       /debug.*reftest/i.test(name) ? "Debug Reftest" :
       /reftest/i.test(name) ? "Reftest" :

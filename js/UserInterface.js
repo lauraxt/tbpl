@@ -163,6 +163,7 @@ var UserInterface = {
       "Mochitest", "Opt Mochitest", "Debug Mochitest",
       "Crashtest", "Opt Crashtest", "Debug Crashtest",
       "Reftest", "Opt Reftest", "Debug Reftest",
+      "Reftest-D2D", "Opt Reftest-D2D", "Debug Reftest-D2D",
       "JSReftest", "Opt JSReftest", "Debug JSReftest",
       "XPCShellTest", "Opt XPCShellTest", "Debug XPCShellTest",
       "Unit Test",
@@ -302,11 +303,17 @@ var UserInterface = {
     ["Opt ", "Debug "].some(function (p) {
       if (type.indexOf(p) == 0) {
         prefix = p;
+        type = type.substring(prefix.length);
         return true;
       }
       return false;
     });
-    return type.charAt(prefix.length) + prefix.charAt(0).toLowerCase();
+    if (type == "Reftest-D2D") {
+      type = "RD2D";
+    } else {
+      type = type.charAt(0);
+    }
+    return type + prefix.charAt(0).toLowerCase();
   },
 
   _numberForMachine: function UserInterface__numberForMachine(machine) {
