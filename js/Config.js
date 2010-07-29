@@ -17,6 +17,9 @@ var Config = {
     "Mobile": "mozilla-central",
     "MozillaTry": "try",
     "AddonsMgr": "projects/addonsmgr",
+    "Birch": "projects/birch",
+    "Cedar": "projects/cedar",
+    "Maple": "projects/maple",
   },
   // These "groups" are machine types that are grouped like M(12345).
   treesWithGroups: {
