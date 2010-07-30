@@ -27,6 +27,9 @@ var Config = {
     "TraceMonkey": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
     "AddonsMgr": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
     "MozillaTry": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
+    "Birch": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
+    "Cedar": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
+    "Maple": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
   },
   OSNames: {
     "linux": "Linux",
