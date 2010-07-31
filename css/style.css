@@ -229,22 +229,22 @@ span.logtags span.inbranchtag {
   color: white !important;
   text-decoration: none;
 }
-.machineResult.success    { color: #0C0; }
-.machineResult.testfailed { color: #F80; }
+.machineResult.success    { color: #390; }
+.machineResult.testfailed { color: #F60; }
 .machineResult.busted     { color: #D00; }
 .machineResult.building   { color: #CCC; }
-.machineResult.success:hover    { background-color: #0D0; }
-.machineResult.testfailed:hover { background-color: #F91; }
+.machineResult.success:hover    { background-color: #4A0; }
+.machineResult.testfailed:hover { background-color: #F70; }
 .machineResult.busted:hover     { background-color: #E00; }
 .machineResult.building:hover   { background-color: #DDD; }
-.machineResult.success:active    { background-color: #0B0; }
-.machineResult.testfailed:active { background-color: #E70; }
-.machineResult.busted:active     { background-color: #C00; }
-.machineResult.building:active   { background-color: #BBB; }
-.machineResult.success[active=true]    { background-color: #0C0; }
-.machineResult.testfailed[active=true] { background-color: #F80; }
+.machineResult.success:active    { background-color: #5B1; }
+.machineResult.testfailed:active { background-color: #F81; }
+.machineResult.busted:active     { background-color: #F00; }
+.machineResult.building:active   { background-color: #EEE; }
+.machineResult.success[active=true]    { background-color: #4A0; }
+.machineResult.testfailed[active=true] { background-color: #F70; }
 .machineResult.busted[active=true]     { background-color: #D00; }
-.machineResult.building[active=true]   { background-color: #CCC; }
+.machineResult.building[active=true]   { background-color: #DDD; }
 
 #pushes .machineResultGroup .machineResult {
   padding: 0 2px 2px;
@@ -332,7 +332,7 @@ body.details > #details
 }
 
 #status a.testfailed {
-  background-color: #F90 !important;
+  background-color: #F70 !important;
 }
 #status a.busted {
   background-color: #D00 !important;
@@ -379,10 +379,10 @@ body.details > #details
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3), inset 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
-.state.building   { color: #AAA; }
-.state.success    { color: #0B0; }
-.state.testfailed { color: #D70; }
-.state.busted     { color: #B00; }
+.state.building   { color: #CCC; }
+.state.success    { color: #390; }
+.state.testfailed { color: #F60; }
+.state.busted     { color: #E00; }
 .duration {
   font-weight: normal;
   position: absolute;
