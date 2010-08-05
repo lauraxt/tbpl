@@ -1,16 +1,4 @@
 var NetUtils = {
-
-  loadDom: function NetUtils_loadDom(url, loadCallback, failCallback, timeoutCallback, timeout) {
-    NetUtils.loadText(url, function sourceForDOMLoaded(html) {
-      var iframe = document.createElement("iframe");
-      iframe.style.display = "none"
-      document.body.appendChild(iframe);
-      iframe.contentDocument.documentElement.innerHTML = html;
-      loadCallback(iframe.contentDocument);
-      iframe.parentNode.removeChild(iframe);
-    }, failCallback, timeoutCallback, timeout);
-  },
-
   loadText: function NetUtils_loadText(url, loadCallback, failCallback, timeoutCallback, timeout) {
     if (timeout === undefined) {
       timeout = 30; // seconds

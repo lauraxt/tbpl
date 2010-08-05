@@ -146,12 +146,6 @@ var UserInterface = {
     this._buildPushesList();
   },
 
-  _stripTags: function UserInterface__stripTags(text) {
-    var div = document.createElement("div");
-    div.innerHTML = text;
-    return div.textContent.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  },
-
   _linkBugs: function UserInterface__linkBugs(text) {
     return text.replace(/(bug\s*|b=)([1-9][0-9]*)\b/ig, '<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=$2">$1$2</a>')
            .replace(/(changeset\s*)?([0-9a-f]{12})\b/ig, '<a href="'+this._revURL('')+'$2">$1$2</a>');

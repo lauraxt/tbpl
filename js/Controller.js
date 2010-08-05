@@ -1,11 +1,14 @@
 var Controller = {
-
   keysFromObject: function Controller_keysFromObject(obj) {
     var keys = [];
     for (var key in obj) {
       keys.push(key);
     }
     return keys;
+  },
+
+  stripTags: function Controller_stripTags(text) {
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   },
 
   treeName: Config.defaultTreeName,
