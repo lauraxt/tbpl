@@ -400,11 +400,11 @@ var UserInterface = {
   _writePushesListHTML: function UserInterface__writePushesListHTML() {
     var self = this;
     var ul = document.getElementById("pushes");
-    ul.innerHTML = this._controller.getTimeOffset() ? '<li><a id="goForward" href="#" title="go forward by 12 hours"></a></li>' : '';
+    var html = this._controller.getTimeOffset() ? '<li><a id="goForward" href="#" title="go forward by 12 hours"></a></li>' : '';
     var pushes = this._data.getPushes();
     var machineTypes = this._data.getMachineTypes();
     var timeOffset = this._controller.getTimeOffset();
-    ul.innerHTML += pushes.map(function buildHTMLForPush(push, pushIndex) {
+    html += pushes.map(function buildHTMLForPush(push, pushIndex) {
       return '<li>\n' +
       '<h2><span class="pusher">' + push.pusher + '</span> &ndash; ' +
       '<span class="date">' + self._getDisplayDate(push.date) + '</span>' +
@@ -434,7 +434,8 @@ var UserInterface = {
       self._getDisplayDate(timeOffset ? new Date((timeOffset-12*3600)*1000) :
       new Date(((new Date()).getTime()-12*3600*1000)))+'</em> and <em>' +
       self._getDisplayDate(timeOffset ? new Date(timeOffset*1000) : new Date())+'</em></li>' : '');
-    ul.innerHTML+= '<li><a id="goBack" href="#" title="go back by 12 hours"></a></li>';
+    html += '<li><a id="goBack" href="#" title="go back by 12 hours"></a></li>';
+    ul.innerHTML = html;
   },
 
   _installHistoryArrowClickHandlers: function UserInterface__installHistoryArrowClickHandlers() {
