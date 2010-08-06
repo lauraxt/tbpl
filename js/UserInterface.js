@@ -429,7 +429,7 @@ var UserInterface = {
       }).join("\n") +
       '</ul>\n' +
       '</li>';
-    }).join("\n") || (self._controller.loadStatus.pushlog != 'loading' ? '<li>There were no pushes between <em>' + 
+    }).join("\n") || (self._controller.loadStatus.pushlog != 'loading' ? '<li>There were no pushes between <em>' +
       self._getDisplayDate(timeOffset ? new Date((timeOffset-12*3600)*1000) :
       new Date(((new Date()).getTime()-12*3600*1000)))+'</em> and <em>' +
       self._getDisplayDate(timeOffset ? new Date(timeOffset*1000) : new Date())+'</em></li>' : '');
