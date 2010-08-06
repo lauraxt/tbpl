@@ -205,7 +205,7 @@ var UserInterface = {
       '<strong>' + failing.length + '</strong> Jobs are failing:<br />' +
       failing.map(function(machineResult) {
         return '<a href="' +
-               machineResult.briefLogURL + '" class="machineResult ' + machineResult.state +
+               machineResult.briefLogURL + '" onclick="UserInterface.clickMachineResult(event, this)" class="machineResult ' + machineResult.state +
                (machineResult.note ? ' hasNote" title="(starred) ' : '" title="') +
                self._resultTitle(machineResult) + '" resultID="' + machineResult.runID + '">' +
                self._resultTitle(machineResult) + '</a>';
@@ -286,7 +286,6 @@ var UserInterface = {
 
   _uninstallPushesListClickHandlers: function UserInterface__uninstallPushesListClickHandlers() {
     $(".patches > li").unbind();
-    $(".machineResult").unbind();
     $("#goForward").unbind();
     $("#goBack").unbind();
   },
@@ -330,7 +329,7 @@ var UserInterface = {
   _machineResultLink: function UserInterface__machineResultLink(machineResult, onlyNumber) {
     return '<a href="' + machineResult.briefLogURL +
     '" resultID="' + machineResult.runID +
-    '" class="machineResult ' + machineResult.state +
+    '" onclick="UserInterface.clickMachineResult(event, this)" class="machineResult ' + machineResult.state +
     '" title="' + this._resultTitle(machineResult) +
     '">' + this._shortNameForMachine(machineResult.machine, onlyNumber) +
     (machineResult.note ? '*' : '') +
@@ -459,12 +458,9 @@ var UserInterface = {
     });
   },
 
-  _installMachineResultClickHandler: function UserInterface__installMachineResultClickHandler() {
-    var self = this;
-    $(".machineResult").bind("click", function clickMachineResult(e) {
-      self._resultLinkClick(this);
-      e.preventDefault();
-    });
+  clickMachineResult: function UserInterface_clickMachineResult(e, result) {
+    this._resultLinkClick(result);
+    e.preventDefault();
   },
 
   /**
@@ -563,7 +559,6 @@ var UserInterface = {
     this._uninstallPushesListClickHandlers();
     this._writePushesListHTML();
     this._installHistoryArrowClickHandlers();
-    this._installMachineResultClickHandler();
     this._installComparisonClickHandler();
     this._installTooltips();
     this._setActiveResult(this._activeResult, false);
