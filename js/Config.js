@@ -22,17 +22,17 @@ var Config = {
     "Cedar": "projects/cedar",
     "Maple": "projects/maple",
   },
-  // These "groups" are machine types that are grouped like M(12345).
-  treesWithGroups: {
-    "Firefox": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
-    "TraceMonkey": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
-    "Jaegermonkey": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
-    "AddonsMgr": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
-    "MozillaTry": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
-    "Birch": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
-    "Cedar": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
-    "Maple": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
-  },
+  // Trees that have split mochitests like M(12345).
+  treesWithGroups: [
+    "Firefox",
+    "TraceMonkey",
+    "Jaegermonkey",
+    "AddonsMgr",
+    "MozillaTry",
+    "Birch",
+    "Cedar",
+    "Maple",
+  ],
   OSNames: {
     "linux": "Linux",
     "linux64": "Linux64",

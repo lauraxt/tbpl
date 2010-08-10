@@ -20,6 +20,9 @@ TinderboxData.prototype = {
     "Talos",
     "Static Analysis"
   ],
+  groupedMachineTypes: [
+    "Mochitest", "Opt Mochitest", "Debug Mochitest",
+  ],
   testNames: [
     "tdhtml",
     "tdhtml_nochrome",
