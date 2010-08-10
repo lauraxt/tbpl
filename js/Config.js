@@ -12,6 +12,7 @@ var Config = {
     "Firefox3.5": "releases/mozilla-1.9.1",
     "Firefox-Lorentz": "projects/firefox-lorentz",
     "TraceMonkey": "tracemonkey",
+    "Jaegermonkey": "projects/jaegermonkey",
     "Electrolysis": "projects/electrolysis",
     "Places": "projects/places/",
     "Mobile": "mozilla-central",
@@ -25,6 +26,7 @@ var Config = {
   treesWithGroups: {
     "Firefox": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
     "TraceMonkey": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
+    "Jaegermonkey": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
     "AddonsMgr": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
     "MozillaTry": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
     "Birch": ["Mochitest", "Opt Mochitest", "Debug Mochitest"],
