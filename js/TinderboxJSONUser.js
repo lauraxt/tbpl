@@ -127,9 +127,11 @@ var TinderboxJSONUser = {
     var notes = td.note_array.map(self.processNote);
   
     var machineResults = {};
-    td.build_table.forEach(function forEachTinderboxTableColumn(row) { row.forEach(function forEachTinderboxTableRow(build, machineIndex) {
+    for (var rowIndex = 0; rowIndex < td.build_table.length; rowIndex++) {
+    for (var machineIndex = 0; machineIndex < td.build_table[rowIndex].length; machineIndex++) {
+      var build = td.build_table[rowIndex][machineIndex];
       if (build === -1 || build.buildstatus == "null" || !machines[machineIndex])
-        return;
+        continue;
       var state = build.buildstatus; /* building, success, testfailed, busted */
       var rev = "";
       var startTime = new Date(build.buildtime * 1000);
@@ -139,10 +141,10 @@ var TinderboxJSONUser = {
       var rev = self.findRevInScrape(buildScrape);
   
       if (machineResults[machineRunID])
-        return;
+        continue;
   
       if (state != "building" && !rev)
-        return;
+        continue;
   
       var note = build.hasnote ? notes[build.noteid * 1] : "";
   
@@ -176,7 +178,7 @@ var TinderboxJSONUser = {
           };
         }
       }
-    }); });
+    } }
   
     machines.forEach(function setAverageCycleTimeOnMachine(machine) {
       if (machine.runs) {
