@@ -27,6 +27,7 @@ var Config = {
     "Firefox",
     "TraceMonkey",
     "Jaegermonkey",
+    "Electrolysis",
     "AddonsMgr",
     "MozillaTry",
     "Birch",
