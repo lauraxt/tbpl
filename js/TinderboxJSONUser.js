@@ -138,7 +138,7 @@ var TinderboxJSONUser = {
       var endTime = (state != "building") ? new Date(build.endtime * 1000) : 0;
       var machineRunID = build.logfile;
       var buildScrape = self.getBuildScrape(td, machineRunID);
-      var rev = self.findRevInScrape(buildScrape);
+      var rev = (state != "building") && self.findRevInScrape(buildScrape);
   
       if (machineResults[machineRunID])
         continue;
