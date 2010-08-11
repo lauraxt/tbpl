@@ -135,7 +135,7 @@ var TinderboxJSONUser = {
   
     var machineResults = {};
     td.build_table.forEach(function forEachTinderboxTableColumn(row) { row.forEach(function forEachTinderboxTableRow(build, machineIndex) {
-      if (!build.buildstatus || build.buildstatus == "null" || !machines[machineIndex])
+      if (build === -1 || build.buildstatus == "null" || !machines[machineIndex])
         return;
       var state = build.buildstatus; /* building, success, testfailed, busted */
       var rev = "";
