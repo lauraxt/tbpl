@@ -19,11 +19,12 @@ var SummaryLoader = {
     var summaryLoader = $("#summaryLoader").get(0);
     summaryLoader.innerHTML = "Retrieving summary..."
     summaryLoader.className = "loading";
+    $(box).addClass("hasSummary");
     this._fetchSummary(result.runID, result.tree, !!result.note, function fetchSummaryLoadCallback(summary) {
       summaryLoader.innerHTML = summary ? "" : "Summary is empty.";
       summaryLoader.className = "";
-      if (summary)
-        box.className += " hasSummary";
+      if (!summary)
+        $(box).removeClass("hasSummary");
       var summaryPlaceholder = $(".stars .summary").get(0);
       summaryPlaceholder.innerHTML = summary.replace(/ALSA.*device\n/g, "").replace(/\n/g, "<br>\n");
       result.suggestions = [];
