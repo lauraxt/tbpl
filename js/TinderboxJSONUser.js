@@ -94,19 +94,12 @@ var TinderboxJSONUser = {
   findRevInScrape: function TinderboxJSONUser_findRevInScrape(scrape) {
     if (!scrape)
       return "";
-    var cell = document.createElement("td");
-    cell.innerHTML = scrape.join("<br>\n");
-    var revLinks = $('a[href^="http://hg.mozilla.org"]', cell).get();
-    for (var i = 0; i < revLinks.length; i++) {
-      var linkText = revLinks[i].textContent;
-      if (linkText.indexOf("mobile") == -1) {
-        return linkText.substr(4, 12);
-      }
+    for (var i = 1; i < scrape.length; i++) {
+      var match = scrape[i].match(/http:\/\/hg.mozilla.org\/[^"]*\/rev\/([0-9a-f]{12})/);
+      if (match)
+        return match[1];
     }
-
-    // Tryserver uses try-c49054c95eba instead
-    match = scrape.join("").match(/try\-([0-9a-f]{12})/);
-    return match ? match[1] : null;
+    return "";
   },
   
   getBuildScrape: function TinderboxJSONUser_getBuildScrape(td, machineRunID) {
