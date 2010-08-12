@@ -19,7 +19,7 @@ var PushlogHTMLParser = {
     return Config.baseURL + "php/pipePushlog.php?url=" + repoName + "/pushloghtml%3Fstartdate=" + startDate + "%26enddate=" + endDate;
   },
 
-  _pad: function UserInterface__pad(n) {
+  _pad: function PushlogHTMLParser__pad(n) {
     return n < 10 ? '0' + n : n;
   },
 
