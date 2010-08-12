@@ -246,6 +246,9 @@ span.logtags span.inbranchtag {
 .machineResult.busted[active=true]     { background-color: #D00; }
 .machineResult.building[active=true]   { background-color: #DDD; }
 
+/* helps the color-blind */
+.machineResult.busted, .machineResult.testfailed { text-decoration: underline }
+
 #pushes .machineResultGroup .machineResult {
   padding: 0 2px 2px;
 }
