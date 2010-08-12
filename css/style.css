@@ -453,10 +453,10 @@ em.testfail {
 .stars .summary span.highlight {
   font-weight: bold;
 }
-#details:not(.hasSummary) .stars .summary {
+#details:not([state="testfailed"]):not([state="busted"]) .stars .summary {
   display: none;
 }
-#details:not(.hasSummary) .stars .note,
+#details:not([state="testfailed"]):not([state="busted"]) .stars .note,
 #details:not(.hasStar) .stars .summary {
   max-height: 300px;
   border-top: none;

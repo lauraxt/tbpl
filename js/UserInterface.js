@@ -647,7 +647,6 @@ var UserInterface = {
 
     body.addClass("details");
     box.attr("state", result.state);
-    box.removeClass("hasSummary");
     box.removeClass("hasStar");
     if (result.note)
       box.addClass("hasStar");
