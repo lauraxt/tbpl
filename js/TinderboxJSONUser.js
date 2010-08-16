@@ -92,14 +92,15 @@ var TinderboxJSONUser = {
   },
   
   findRevInScrape: function TinderboxJSONUser_findRevInScrape(scrape) {
+    var revs = {};
     if (!scrape)
-      return "";
+      return revs;
     for (var i = 1; i < scrape.length; i++) {
-      var match = scrape[i].match(/http:\/\/hg.mozilla.org\/[^"]*\/rev\/([0-9a-f]{12})/);
+      var match = scrape[i].match(/http:\/\/hg.mozilla.org\/([^"]*)\/rev\/([0-9a-f]{12})/);
       if (match)
-        return match[1];
+        revs[match[1]] = match[2];
     }
-    return "";
+    return revs;
   },
   
   getBuildScrape: function TinderboxJSONUser_getBuildScrape(td, machineRunID) {
@@ -138,7 +139,8 @@ var TinderboxJSONUser = {
       var endTime = (state != "building") ? new Date(build.endtime * 1000) : 0;
       var machineRunID = build.logfile;
       var buildScrape = self.getBuildScrape(td, machineRunID);
-      var rev = (state != "building") && self.findRevInScrape(buildScrape);
+      var revs = (state != "building") && self.findRevInScrape(buildScrape);
+      var rev = revs && revs[Config.repoNames[tree]];
   
       if (machineResults[machineRunID])
         continue;
@@ -164,6 +166,7 @@ var TinderboxJSONUser = {
         "state": state,
         "startTime": startTime,
         "endTime": endTime,
+        "revs": revs,
         "rev": rev,
         "guessedRev": rev,
         "note": note,

@@ -459,8 +459,8 @@ var UserInterface = {
   },
 
   clickMachineResult: function UserInterface_clickMachineResult(e, result) {
-    this._resultLinkClick(result);
     e.preventDefault();
+    this._resultLinkClick(result);
   },
 
   /**
@@ -651,10 +651,18 @@ var UserInterface = {
     if (result.note)
       box.addClass("hasStar");
     box.html((function htmlForResultInBottomBar() {
-      var rev = result.rev || result.guessedRev;
+      var revs = result.revs || {};
+      if(!result.revs)
+        revs[Config.repoNames[Controller.treeName]] = result.rev || result.guessedRev;
       return '<div><h3>' + result.machine.name +
       ' [<span class="state ' + result.state + '">' + result.state + '</span>]</h3>\n' +
-      '<span>using revision: <a href="' + self._revURL(rev) + '">' + rev + '</a></span>' +
+      '<span>using revisions: ' + (function(){
+        var ret = [];
+        for(var repo in revs) {
+          ret.push('<a href="http://hg.mozilla.org/' + repo + '/rev/">' + repo + '/' + revs[repo] + '</a>');
+        }
+        return ret;
+      })().join(', ') + '</span>' +
       '<a href="' + result.briefLogURL + '">view brief log</a>' +
       '<a href="' + result.fullLogURL + '">view full log</a>' +
       '<div id="autoStar"></div>' +
