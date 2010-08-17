@@ -202,7 +202,7 @@ var UserInterface = {
       }
     });
     $('#status').html(
-      '<strong>' + failing.length + '</strong> Jobs are failing:<br />' +
+      '<strong>' + failing.length + '</strong> Job' + (failing.length != 1 ? 's are' : ' is') + ' failing:<br />' +
       failing.map(function(machineResult) {
         return '<a href="' +
                machineResult.briefLogURL + '" onclick="UserInterface.clickMachineResult(event, this)" class="machineResult ' + machineResult.state +
@@ -656,7 +656,7 @@ var UserInterface = {
         revs[Config.repoNames[Controller.treeName]] = result.rev || result.guessedRev;
       return '<div><h3>' + result.machine.name +
       ' [<span class="state ' + result.state + '">' + result.state + '</span>]</h3>\n' +
-      '<span>using revisions: ' + (function(){
+      '<span>using revision' + (Controller.keysFromObject(revs).length != 1 ? 's' : '') + ': ' + (function(){
         var ret = [];
         for(var repo in revs) {
           ret.push('<a href="http://hg.mozilla.org/' + repo + '/rev/">' + repo + '/' + revs[repo] + '</a>');
