@@ -164,6 +164,8 @@ var UserInterface = {
       "Crashtest", "Opt Crashtest", "Debug Crashtest",
       "Reftest", "Opt Reftest", "Debug Reftest",
       "Reftest-D2D", "Opt Reftest-D2D", "Debug Reftest-D2D",
+      "Reftest-D3D", "Opt Reftest-D3D", "Debug Reftest-D3D",
+      "Reftest-OGL", "Opt Reftest-OGL", "Debug Reftest-OGL",
       "JSReftest", "Opt JSReftest", "Debug JSReftest",
       "XPCShellTest", "Opt XPCShellTest", "Debug XPCShellTest",
       "Unit Test",
@@ -309,6 +311,10 @@ var UserInterface = {
     });
     if (type == "Reftest-D2D") {
       type = "RD2D";
+    } else if (type == "Reftest-D3D") {
+      type = "RD3D";
+    } else if (type == "Reftest-OGL") {
+      type = "ROGL";
     } else {
       type = type.charAt(0);
     }
