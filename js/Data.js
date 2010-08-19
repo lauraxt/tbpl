@@ -80,14 +80,14 @@ Data.prototype = {
   
     var machineType = machineResult.machine.type;
   
-    if (machineType == "Talos" || machineType == "Unit Test") {
+    if (machineType != "Build" && machineType != "Nightly") {
       // Talos and Unit Test boxes use the builds provided
       // by build boxes and sync their start time with them.
       // If there's a build machine with the same start time,
       // use the same revision.
       for (var j in this._machineResults) {
         var bMachine = this._machineResults[j].machine;
-        if ((bMachine.type == "Build" || bMachine.type == "Leak Test") &&
+        if ((bMachine.type == "Build") &&
           this._machineResults[j].startTime.getTime() == machineResult.startTime.getTime()) {
           return this._machineResults[j].guessedRev;
         }
@@ -120,7 +120,7 @@ Data.prototype = {
     $(this._pushes).each(function deletePush() {
       delete this.results;
     });
-    this._tinderboxData.machineTypes.forEach(function addMachineTypeToPushes(machineType) {
+    Controller.keysFromObject(Config.testNames).forEach(function addMachineTypeToPushes(machineType) {
       for (var i in self._machineResults) {
         var machineResult = self._machineResults[i];
         if (machineResult.machine.type != machineType)
@@ -133,13 +133,17 @@ Data.prototype = {
           // Ignore.
           continue;
         }
+        var machine = machineResult.machine;
+        var debug = machine.debug ? "debug" : "opt";
         if (!push.results)
           push.results = {};
-        if (!push.results[machineResult.machine.os])
-          push.results[machineResult.machine.os] = {};
-        if (!push.results[machineResult.machine.os][machineResult.machine.type])
-          push.results[machineResult.machine.os][machineResult.machine.type] = [];
-        push.results[machineResult.machine.os][machineResult.machine.type].push(machineResult);
+        if (!push.results[machine.os])
+          push.results[machine.os] = {};
+        if (!push.results[machine.os][debug])
+          push.results[machine.os][debug] = {};
+        if (!push.results[machine.os][debug][machine.type])
+          push.results[machine.os][debug][machine.type] = [];
+        push.results[machine.os][debug][machine.type].push(machineResult);
       }
     });
 

@@ -207,8 +207,10 @@ span.logtags span.inbranchtag {
 }
 .results .os {
   float: left;
-  width: 60px;
+  width: 100px;
   word-spacing: 0;
+  white-space: nowrap;
+  overflow: hidden;
 }
 .osresults {
   display: block;

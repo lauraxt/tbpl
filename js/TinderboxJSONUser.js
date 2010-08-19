@@ -33,32 +33,23 @@ var TinderboxJSONUser = {
       /Maemo/.test(name) ? "maemo4" : 
       /N810/.test(name) ? "maemo4" : 
       /static-analysis/.test(name) ? "linux" : "",
-  
+
+      debug: /debug/i.test(name) || /(leak|bloat)/i.test(name),
+
+      // see Config.testNames
       type:
-      /talos/i.test(name) ? "Talos" :
+      /talos/i.test(name) ? "Talos Performance" :
       /nightly/i.test(name) ? "Nightly" :
-      /opt.*mochitest/i.test(name) ? "Opt Mochitest" :
-      /debug.*mochitest/i.test(name) ? "Debug Mochitest" :
       /mochitest/i.test(name) ? "Mochitest" :
-      /opt.*crashtest/i.test(name) ? "Opt Crashtest" :
-      /debug.*crashtest/i.test(name) ? "Debug Crashtest" :
       /crashtest/i.test(name) ? "Crashtest" :
-      /opt.*jsreftest/i.test(name) ? "Opt JSReftest" :
-      /debug.*jsreftest/i.test(name) ? "Debug JSReftest" :
       /jsreftest/i.test(name) ? "JSReftest" :
-      /opt.*reftest-d2d/i.test(name) ? "Opt Reftest-D2D" :
-      /debug.*reftest-d2d/i.test(name) ? "Debug Reftest-D2D" :
-      /reftest-d2d/i.test(name) ? "Reftest-D2D" :
-      /opt.*reftest/i.test(name) ? "Opt Reftest" :
-      /debug.*reftest/i.test(name) ? "Debug Reftest" :
+      /reftest-d2d/i.test(name) ? "Reftest-Direct2D" :
+      /direct3d/i.test(name) ? "Reftest-Direct3D" :
+      /opengl/i.test(name) ? "Reftest-OpenGL" :
       /reftest/i.test(name) ? "Reftest" :
-      /opt.*xpcshell/i.test(name) ? "Opt XPCShellTest" :
-      /debug.*xpcshell/i.test(name) ? "Debug XPCShellTest" :
       /xpcshell/i.test(name) ? "XPCShellTest" :
-      /depend/i.test(name) ? "Opt Build" :
-      /(leak|bloat)/i.test(name) ? "Debug Build" :
-      /build/i.test(name) ? "Opt Build" :
-      /static-analysis/.test(name) ? "Static Analysis" :
+      /depend/i.test(name) ? "Build" :
+      /build/i.test(name) ? "Build" :
       /(check|test)/.test(name) ? "Unit Test" : ""
     };
   },
@@ -119,6 +110,7 @@ var TinderboxJSONUser = {
         "name": name,
         "os": machinetype.os,
         "type": machinetype.type,
+        "debug": machinetype.debug,
         latestFinishedRun: { id: "", startTime: -1 },
         "runs": 0,
         "runtime": 0

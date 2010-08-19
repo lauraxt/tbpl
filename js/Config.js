@@ -46,5 +46,19 @@ var Config = {
     "android": "Android",
     "maemo5": "Maemo 5",
     "maemo4": "Maemo 4"
+  },
+  testNames: {
+    "Build" : "B",
+    "Nightly" : "N",
+    "Mochitest" : "M",
+    "Crashtest" : "C",
+    "Reftest-Direct2D" : "R2D",
+    "Reftest-Direct3D" : "R3D",
+    "Reftest-OpenGL" : "RGL",
+    "Reftest" : "R",
+    "JSReftest" : "J",
+    "XPCShellTest" : "X",
+    "Talos Performance" : "T",
+    "Unit Test" : "U"
   }
 };

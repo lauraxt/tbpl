@@ -150,31 +150,7 @@ var UserInterface = {
     return text.replace(/(bug\s*|b=)([1-9][0-9]*)\b/ig, '<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=$2">$1$2</a>')
            .replace(/(changeset\s*)?([0-9a-f]{12})\b/ig, '<a href="'+this._revURL('')+'$2">$1$2</a>');
   },
-  
-  _groupedMachineTypes: {
-    "Build": ["Opt Build", "Debug Build", "Nightly"],
-    "Test": [
-      "Mochitest", "Opt Mochitest", "Debug Mochitest",
-      "Crashtest", "Opt Crashtest", "Debug Crashtest",
-      "Reftest", "Opt Reftest", "Debug Reftest",
-      "Reftest-D2D", "Opt Reftest-D2D", "Debug Reftest-D2D",
-      "Reftest-D3D", "Opt Reftest-D3D", "Debug Reftest-D3D",
-      "Reftest-OGL", "Opt Reftest-OGL", "Debug Reftest-OGL",
-      "JSReftest", "Opt JSReftest", "Debug JSReftest",
-      "XPCShellTest", "Opt XPCShellTest", "Debug XPCShellTest",
-      "Unit Test",
-    ],
-    "Talos": ["Talos"],
-  },
-  
-  _getMachineTypeGroupForMachineType: function UserInterface__getMachineTypeGroupForMachineType(machineType) {
-    for (var group in this._groupedMachineTypes) {
-      if (this._groupedMachineTypes[group].indexOf(machineType) != -1)
-        return group;
-    }
-    return null;
-  },
-  
+
   _updateTreeStatus: function UserInterface__updateTreeStatus() {
     var machines = this._data.getMachines();
     var machineResults = this._data.getMachineResults();
@@ -257,7 +233,7 @@ var UserInterface = {
   },
 
   _resultTitle: function UserInterface__resultTitle(result) {
-    var type = result.machine.type;
+    var type = result.machine.type + " " + this._numberForMachine(result.machine) + (result.machine.debug ? " debug" : " opt");
     return {
       "building": type + ' is still running',
       "success": type + ' was successful',
@@ -285,35 +261,6 @@ var UserInterface = {
     $("#goForward").unbind();
     $("#goBack").unbind();
   },
-  
-  _shortNameForMachine: function UserInterface__shortNameForMachines(machine, onlyNumber) {
-    if (onlyNumber)
-      return this._numberForMachine(machine);
-    return this._shortNameForMachineWithoutNumber(machine) + this._numberForMachine(machine);
-  },
-
-  _shortNameForMachineWithoutNumber: function UserInterface__shortNameForMachineWithoutNumber(machine) {
-    var type = machine.type;
-    var prefix = "";
-    ["Opt ", "Debug "].some(function (p) {
-      if (type.indexOf(p) == 0) {
-        prefix = p;
-        type = type.substring(prefix.length);
-        return true;
-      }
-      return false;
-    });
-    if (type == "Reftest-D2D") {
-      type = "RD2D";
-    } else if (type == "Reftest-D3D") {
-      type = "RD3D";
-    } else if (type == "Reftest-OGL") {
-      type = "ROGL";
-    } else {
-      type = type.charAt(0);
-    }
-    return type + prefix.charAt(0).toLowerCase();
-  },
 
   _numberForMachine: function UserInterface__numberForMachine(machine) {
     var match = /([0-9]+)\/[0-9]/.exec(machine.name);
@@ -327,11 +274,13 @@ var UserInterface = {
   },
 
   _machineResultLink: function UserInterface__machineResultLink(machineResult, onlyNumber) {
+    var machine = machineResult.machine;
     return '<a href="' + machineResult.briefLogURL +
     '" resultID="' + machineResult.runID +
     '" onclick="UserInterface.clickMachineResult(event, this)" class="machineResult ' + machineResult.state +
     '" title="' + this._resultTitle(machineResult) +
-    '">' + this._shortNameForMachine(machineResult.machine, onlyNumber) +
+    '">' + (machine.type == "Mochitest" && onlyNumber ? this._numberForMachine(machine) :
+      Config.testNames[machine.type] + this._numberForMachine(machine)) +
     (machineResult.note ? '*' : '') +
     '</a>';
   },
@@ -353,45 +302,53 @@ var UserInterface = {
   },
 
   _machineGroupResultLink: function UserInterface__machineGroupResultLink(machineResults) {
+    if (!machineResults.length)
+      return "";
     var self = this;
+    var machine = machineResults[0].machine;
     return '<span class="machineResultGroup" machineType="' +
-    self._shortNameForMachineWithoutNumber(machineResults[0].machine) +
+    Config.testNames[machine.type] +
     '"> ' +
     machineResults.map(function linkMachineResult(a) { return self._machineResultLink(a, true); }).join(" ") +
     ' </span>';
   },
 
-  _buildHTMLForPushResults: function UserInterface__buildHTMLForPushResults(push, machineTypes) {
+  _buildHTMLForOS: function UserInterface__buildHTMLForOS(os, debug, results) {
+    var self = this;
+    return '<li><span class="os ' + os + '">' + Config.OSNames[os] + debug +
+    '</span><span class="osresults">' +
+    Controller.keysFromObject(Config.testNames).map(function buildHTMLForPushResultsOnOSForMachineType(machineType) {
+      if (!results[machineType])
+        return '';
+
+      // Sort results.
+      if (self._data.machineTypeIsGrouped(machineType)) {
+        results[machineType].sort(function machineResultSortOrderComparison(a, b) {
+          var numA = self._numberForMachine(a.machine);
+          var numB = self._numberForMachine(b.machine);
+          if (numA == numB)
+            return a.startTime.getTime() - b.startTime.getTime();
+
+          return numA > numB ? 1 : -1;
+        });
+        return self._machineGroupResultLink(results[machineType]);
+      }
+      results[machineType].sort(function machineResultSortTimeComparison(a, b) {
+        return a.startTime.getTime() - b.startTime.getTime();
+      });
+      return results[machineType].map(function linkMachineResults(a) { return self._machineResultLink(a); }).join(" ");
+    }).join("\n") +
+    '</span></li>';
+  },
+
+  _buildHTMLForPushResults: function UserInterface__buildHTMLForPushResults(push) {
     var self = this;
     return '<ul class="results">\n' +
     Controller.keysFromObject(Config.OSNames).map(function buildHTMLForPushResultsOnOS(os) {
       if (!push.results || !push.results[os])
         return '';
-      var results = push.results[os];
-      return '<li><span class="os ' + os + '">' + Config.OSNames[os] +
-      '</span><span class="osresults">' +
-      machineTypes.map(function buildHTMLForPushResultsOnOSForMachineType(machineType) {
-        if (!results[machineType])
-          return '';
-
-        // Sort results.
-        if (self._data.machineTypeIsGrouped(machineType)) {
-          results[machineType].sort(function machineResultSortOrderComparison(a, b) {
-            var numA = self._numberForMachine(a.machine);
-            var numB = self._numberForMachine(b.machine);
-            if (numA == numB)
-              return a.startTime.getTime() - b.startTime.getTime();
-
-            return numA > numB ? 1 : -1;
-          });
-          return self._machineGroupResultLink(results[machineType]);
-        }
-        results[machineType].sort(function machineResultSortTimeComparison(a, b) {
-          return a.startTime.getTime() - b.startTime.getTime();
-        });
-        return results[machineType].map(function linkMachineResults(a) { return self._machineResultLink(a); }).join(" ");
-      }).join("\n") +
-      '</span></li>';
+      return (push.results[os].opt   ? self._buildHTMLForOS(os, " opt"  , push.results[os].opt  ) : '') + 
+             (push.results[os].debug ? self._buildHTMLForOS(os, " debug", push.results[os].debug) : '');
     }).join("\n") +
     '</ul>';
   },
@@ -401,7 +358,6 @@ var UserInterface = {
     var ul = document.getElementById("pushes");
     var html = this._controller.getTimeOffset() ? '<li><a id="goForward" href="#" title="go forward by 12 hours"></a></li>' : '';
     var pushes = this._data.getPushes();
-    var machineTypes = this._data.getMachineTypes();
     var timeOffset = this._controller.getTimeOffset();
     html += pushes.map(function buildHTMLForPush(push, pushIndex) {
       return '<li>\n' +
@@ -409,7 +365,7 @@ var UserInterface = {
       '<span class="date">' + self._getDisplayDate(push.date) + '</span>' +
       ' (compare: <input class="revsToCompare" id="compareRevs" type="checkbox" value="' + push.patches[0].rev + '">)' +
       '</h2>\n' +
-      self._buildHTMLForPushResults(push, machineTypes) +
+      self._buildHTMLForPushResults(push) +
       '<ul class="patches">\n' +
       push.patches.map(function buildHTMLForPushPatches(patch, patchIndex) {
         return '<li>\n' +
