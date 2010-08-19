@@ -10,8 +10,8 @@ var PushlogJSONParser = {
         for (var i in push.changesets) {
           var patch = push.changesets[i];
           // dont show the default branch and tag
-          var tags = $(patch.tags).map(function(tag) {
-            return tag != 'tip' ? {type: 'tagtag', name: tag} : null;
+          var tags = $(patch.tags).map(function() {
+            return this != 'tip' ? {type: 'tagtag', name: this} : null;
           });
           if (patch.branch != 'default')
             tags.push({type: 'inbranchtag', name: patch.branch});
