@@ -37,7 +37,7 @@ p {
   right: 0;
   text-align: right;
 }
-#mruList, #mruList li, #moreListContainer, #moreListContainer h2 {
+#mruList, #mruList li, #moreListContainer, #moreListContainer h2, #legend, #legendContainer h2 {
   margin: 0;
   padding: 0;
   display: inline;
@@ -48,15 +48,15 @@ p {
 #mruList a, #mruList strong {
   font-weight: bold;
 }
-#moreListContainer h2 {
+#moreListContainer h2, #legendContainer h2 {
   font-size: 1em;
   font-weight: normal;
   cursor: pointer;
 }
-#moreListContainer {
+#moreListContainer, #legendContainer {
   position: relative;
 }
-#moreList {
+#moreList, #legend {
   position: absolute;
   left: -5px;
   top: 100%;
@@ -66,7 +66,7 @@ p {
   -moz-box-shadow: 1px 1px 5px #ccc;
   box-shadow: 1px 1px 5px #ccc;
 }
-#moreListContainer:not(:hover) #moreList {
+#moreListContainer:not(:hover) #moreList, #legendContainer:not(:hover) #legend {
   display: none;
 }
 #moreList, #moreList li {
@@ -76,6 +76,13 @@ p {
 }
 #moreList a {
   padding: 5px 0;
+}
+#legend dt {
+  position: absolute;
+  font-weight: bold;
+}
+#legend dd {
+  margin-left: 6em;
 }
 .loading {
   background: url(../images/loading_16.png) center left no-repeat transparent;
@@ -231,10 +238,10 @@ span.logtags span.inbranchtag {
   color: white !important;
   text-decoration: none;
 }
-.machineResult.success    { color: #390; }
-.machineResult.testfailed { color: #F60; }
-.machineResult.busted     { color: #D00; }
-.machineResult.building   { color: #CCC; }
+.success    { color: #390; }
+.testfailed { color: #F60; }
+.busted     { color: #D00; }
+.building   { color: #CCC; }
 .machineResult.success:hover    { background-color: #4A0; }
 .machineResult.testfailed:hover { background-color: #F70; }
 .machineResult.busted:hover     { background-color: #E00; }
@@ -249,7 +256,7 @@ span.logtags span.inbranchtag {
 .machineResult.building[active=true]   { background-color: #DDD; }
 
 /* helps the color-blind */
-.machineResult.busted, .machineResult.testfailed { text-decoration: underline }
+.busted, .testfailed { text-decoration: underline }
 
 #pushes .machineResultGroup .machineResult {
   padding: 0 2px 2px;
@@ -384,10 +391,6 @@ body.details > #details
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3), inset 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
-.state.building   { color: #CCC; }
-.state.success    { color: #390; }
-.state.testfailed { color: #F60; }
-.state.busted     { color: #E00; }
 .duration {
   font-weight: normal;
   position: absolute;

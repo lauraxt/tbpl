@@ -18,6 +18,7 @@ var UserInterface = {
 
     this._refreshMostRecentlyUsedTrees();
     this._buildTreeSwitcher();
+    this._buildLegend();
 
     $("#localTime").bind("click", function localTimeClick() {
       self._switchTimezone(true);
@@ -133,6 +134,18 @@ var UserInterface = {
         "<a href='" + (i == 0 ? "./" : "?tree=" + tree) + "'>" + tree + "</a>";
       $("<li>" + treeLink + "</li>").appendTo(isMostRecentlyUsedTree ? mruList : moreList);
     });
+  },
+
+  _buildLegend: function UserInterface__buildLegend() {
+    var legend = $('#legend');
+    for (var name in Config.testNames) {
+      $('<dt>' + Config.testNames[name] + '</dt><dd>' + name + '</dd>').appendTo(legend);
+    }
+    $('<dt>…*</dt><dd>commented</dd>' +  
+      '<dt class="building">gray</dt><dd>building</dd>' +
+      '<dt class="success">green</dt><dd>success</dd>' +
+      '<dt class="testfailed">orange</dt><dd>tests failed</dd>' +
+      '<dt class="busted">red</dt><dd>build error</dd>').appendTo(legend);
   },
 
   _updateTimezoneDisplay: function UserInterface__updateTimezoneDisplay() {
