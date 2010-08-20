@@ -4,8 +4,14 @@ var PushlogJSONParser = {
     var self = this;
     $.getJSON(this._getLogUrl(repoName, timeOffset), function(data) {
       var pushes = [];
-      for (var i in data) {
-        var push = data[i];
+      // data is keyed by a numerical ID which increases in chronological order.
+      // However, data isn't sorted by that ID, so we need to do it here.
+      var sorted = [];
+      for (var pushID in data)
+        sorted.push(+pushID);
+      sorted.sort();
+      sorted.forEach(function addPush(pushID) {
+        var push = data[pushID];
         var patches = [];
         for (var i in push.changesets) {
           var patch = push.changesets[i];
@@ -25,7 +31,7 @@ var PushlogJSONParser = {
                   desc: Controller.stripTags(patch.desc), tags: tags});
         }
         pushes.unshift({pusher: push.user, date: new Date(push.date * 1000), toprev: patches[0].rev, patches: patches});
-      }
+      });
       loadCallback(pushes);
     });
   },
