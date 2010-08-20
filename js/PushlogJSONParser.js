@@ -9,7 +9,7 @@ var PushlogJSONParser = {
       var sorted = [];
       for (var pushID in data)
         sorted.push(+pushID);
-      sorted.sort();
+      sorted.sort(function(a, b){ return a - b; });
       sorted.forEach(function addPush(pushID) {
         var push = data[pushID];
         var patches = [];
