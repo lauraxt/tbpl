@@ -23,8 +23,8 @@ var PushlogJSONParser = {
             tags.push({type: 'inbranchtag', name: patch.branch});
           
           // The new json output includes the email adress in <brackets>
-          var author = /([^<]+) /.exec(patch.author)[1];
-          
+          var author = $.trim(/([^<]+)/.exec(patch.author)[1]);
+
           // Revert the order because we want most recent pushes / patches to
           // come first.
           patches.unshift({rev: patch.node.substr(0,12), author: author,
