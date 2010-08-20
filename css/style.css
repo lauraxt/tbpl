@@ -238,10 +238,10 @@ span.logtags span.inbranchtag {
   color: white !important;
   text-decoration: none;
 }
-.success    { color: #390; }
-.testfailed { color: #F60; }
-.busted     { color: #D00; }
-.building   { color: #CCC; }
+.success    { color: #390 !important; }
+.testfailed { color: #F60 !important; }
+.busted     { color: #D00 !important; }
+.building   { color: #CCC !important; }
 .machineResult.success:hover    { background-color: #4A0; }
 .machineResult.testfailed:hover { background-color: #F70; }
 .machineResult.busted:hover     { background-color: #E00; }
