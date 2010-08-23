@@ -109,12 +109,8 @@ function processLine(&$lines, $line) {
   $parts = preg_split("/[\\/\\\\]/", $testPath);
   if (count($parts) < 2 &&
       preg_match('/^leaked/i', $tokens[2])) {
-    $bugs = getLeaksForTestFailure($line);
-    foreach ($bugs as $bug) {
-      $lines[] = "This could be bug $bug->id. <a href=\"leak-analysis/?id=" . $_GET["id"] .
-        "&tree=" . $_GET["tree"] . "\" target=\"_blank\">Analyze the leak to make sure.</a>";
-      $lines[] = generateSuggestion($bug, '');
-    }
+    $lines[] = "<a href=\"leak-analysis/?id=" . $_GET["id"] .
+      "&tree=" . $_GET["tree"] . "\" target=\"_blank\">Analyze the leak.</a>";
     return;
   }
 
@@ -147,24 +143,6 @@ function getBugsForTestFailure($fileName) {
     if (isset($bugs->bugs)) {
       $bugsCache[$fileName] = $bugs->bugs;
       return $bugs->bugs;
-    }
-  }
-  return array();
-}
-
-$leaksCache = array();
-function getLeaksForTestFailure($line) {
-  global $leaksCache;
-  if (isset($leaksCache["automationutils.processLeakLog"]))
-    return array();
-  if (strpos($line, "automationutils.processLeakLog")) {
-    $bugs_json = file_get_contents("https://api-dev.bugzilla.mozilla.org/latest/bug?id=538462");
-    if ($bugs_json !== false) {
-      $bugs = parseJSON($bugs_json);
-      if (isset($bugs->bugs)) {
-        $leaksCache["automationutils.processLeakLog"] = true;
-        return $bugs->bugs;
-      }
     }
   }
   return array();
