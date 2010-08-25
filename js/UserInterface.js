@@ -628,7 +628,7 @@ var UserInterface = {
       '<span>using revision' + (Controller.keysFromObject(revs).length != 1 ? 's' : '') + ': ' + (function(){
         var ret = [];
         for(var repo in revs) {
-          ret.push('<a href="http://hg.mozilla.org/' + repo + '/rev/">' + repo + '/' + revs[repo] + '</a>');
+          ret.push('<a href="http://hg.mozilla.org/' + repo + '/rev/' + revs[repo] + '">' + repo + '/' + revs[repo] + '</a>');
         }
         return ret;
       })().join(', ') + '</span>' +
