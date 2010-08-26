@@ -374,7 +374,7 @@ var UserInterface = {
       return '<li>\n' +
       '<h2><span class="pusher">' + push.pusher + '</span> &ndash; ' +
       '<span class="date">' + self._getDisplayDate(push.date) + '</span>' +
-      ' (compare: <input class="revsToCompare" id="compareRevs" type="checkbox" value="' + push.patches[0].rev + '">)' +
+      ' (<label>compare: <input class="revsToCompare" type="checkbox" value="' + push.patches[0].rev + '"></label>)' +
       '</h2>\n' +
       self._buildHTMLForPushResults(push) +
       '<ul class="patches">\n' +
@@ -432,19 +432,14 @@ var UserInterface = {
 
   /**
    * Finds pushes with checked boxes in the UI, gets the first revision number
-   * from each, aggregates the performance test results for them, and displays
-   * the results in a table overlaying TBPL.
+   * from each, and opens mconnors talos compare script in a new window.
    *
    * Usage:
    * - Selecting two pushes will trigger the comparison.
-   * - Clicking on the overlay makes it go away.
    *
    * TODO:
-   * - show revision comment somewhere
-   * - red/green colors for changes greater than n%
-   * - add a "close" button
-   * - support multiple runs per test
-   * - support copy/paste of the table
+   * - allow to select multiple revs, show them somewhere in the ui with a
+   *   button that does the compare
    */
   _installComparisonClickHandler: function UserInterface__installComparisonClickHandler() {
     $(".revsToCompare").bind("click", function clickRevsToCompare(e) {
@@ -452,30 +447,16 @@ var UserInterface = {
       var revs = $(".revsToCompare").map(function() {
         return this.checked ? this.value : null;
       }).get();
+      // the new rev is first in the dom
 
       if (revs.length < 2)
         return;
 
-      PerformanceComparator.compareRevisions(revs, function(resultTable) {
-        function arrayToHTMLTable(a) {
-          return "<table style='border: 1px solid black;'>" +
-            a.map(function(row) {
-              return "<tr><td>" + row.join("</td><td>") + "</td></tr>";
-            }).join("\n") +
-            "</table>";
-        }
-
-        var resultHTML = arrayToHTMLTable(resultTable);
-
-        $("<div></div>")
-          .addClass("performanceComparatorResult")
-          .html(resultHTML)
-          .bind("click", function () {
-            $(this).remove();
-            $(".revsToCompare").each(function(){ this.checked = false; })
-          })
-          .appendTo(document.body);
-      });
+      // I dont like popups, but I dont see a better way right now
+      var perfwin = window.open("http://perf.snarkfest.net/compare-talos/index.php?oldRevs=" +
+                                revs.slice(1).join(",") + "&newRev=" + revs[0] + "&tests=" +
+                                Config.talosTestNames.join(",") + "&submit=true");
+      perfwin.focus();
     });
   },
 

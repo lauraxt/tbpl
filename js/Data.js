@@ -139,43 +139,5 @@ Data.prototype = {
         push.results[machine.os][debug][machine.type].push(machineResult);
       }
     });
-
-    // generate performance results for each push
-    this._pushes.forEach(function(push) {
-      push.perfResults = this._getPerfResultsForPush(push);
-    }, this);
-  },
-
-  /**
-   * Aggregate test results for a push into an easy-to-use result set:
-   *
-   * [
-   *  {
-   *   os1: {
-   *         ts: 200.3,
-   *         tp4: 3002.21
-   *        }
-   *   }
-   * ]
-   */
-  _getPerfResultsForPush: function Data__getPerfResultsForPush(push) {
-    var perfResults = {};
-    Controller.keysFromObject(Config.OSNames).forEach(function(os) {
-      // talos are only run on opt builds, for now at least
-      if (push.results && push.results[os] && push.results[os]["opt"] &&
-          push.results[os]["opt"]["Talos Performance"]) {
-        var buildResults = push.results[os]["opt"]["Talos Performance"];
-        buildResults.forEach(function(buildResult) {
-          var testResults = this.getMachineResults()[buildResult.runID].getTestResults();
-          if (testResults) {
-            testResults.forEach(function(testResult) {
-              perfResults[os] = perfResults[os] || {};
-              perfResults[os][testResult.name] = testResult.result;
-            });
-          }
-        }, this);
-      }
-    }, this);
-    return perfResults;
   }
 }
