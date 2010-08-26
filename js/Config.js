@@ -70,7 +70,6 @@ var Config = {
     "tdhtml_nochrome",
     "tgfx",
     "tgfx_nochrome",
-    "tjss",
     "tp4",
     "tp4_pbytes",
     "tp4_rss",

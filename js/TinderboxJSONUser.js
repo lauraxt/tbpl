@@ -219,7 +219,7 @@ MachineResult.prototype = {
       "Opt Everythingelse Test": self.getUnitTestResults,
       "Debug Everythingelse Test": self.getUnitTestResults,
       "Everythingelse Test": self.getUnitTestResults,
-      "Talos": self.getTalosResults,
+      "Talos Performance": self.getTalosResults,
       "Debug Build": self.getScrapeResults,
       "Opt Build": self.getScrapeResults,
       "generic": self.getScrapeResults

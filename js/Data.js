@@ -161,21 +161,19 @@ Data.prototype = {
   _getPerfResultsForPush: function Data__getPerfResultsForPush(push) {
     var perfResults = {};
     Controller.keysFromObject(Config.OSNames).forEach(function(os) {
-      if (push.results && push.results[os]) {
-        for (var buildType in push.results[os]) {
-          if (buildType != "Talos")
-            continue;
-          var buildResults = push.results[os][buildType];
-          buildResults.forEach(function(buildResult) {
-            var testResults = this.getMachineResults()[buildResult.runID].getTestResults();
-            if (testResults) {
-              testResults.forEach(function(testResult) {
-                perfResults[os] = perfResults[os] || {};
-                perfResults[os][testResult.name] = testResult.result;
-              });
-            }
-          }, this);
-        }
+      // talos are only run on opt builds, for now at least
+      if (push.results && push.results[os] && push.results[os]["opt"] &&
+          push.results[os]["opt"]["Talos Performance"]) {
+        var buildResults = push.results[os]["opt"]["Talos Performance"];
+        buildResults.forEach(function(buildResult) {
+          var testResults = this.getMachineResults()[buildResult.runID].getTestResults();
+          if (testResults) {
+            testResults.forEach(function(testResult) {
+              perfResults[os] = perfResults[os] || {};
+              perfResults[os][testResult.name] = testResult.result;
+            });
+          }
+        }, this);
       }
     }, this);
     return perfResults;
