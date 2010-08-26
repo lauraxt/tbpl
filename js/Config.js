@@ -35,6 +35,9 @@ var Config = {
     "Cedar",
     "Maple",
   ],
+  groupedMachineTypes: [
+    "Mochitest",
+  ],
   OSNames: {
     "linux": "Linux",
     "linux64": "Linux64",
@@ -61,5 +64,37 @@ var Config = {
     "XPCShellTest" : "X",
     "Talos Performance" : "T",
     "Unit Test" : "U"
-  }
+  },
+  talosTestNames: [
+    "tdhtml",
+    "tdhtml_nochrome",
+    "tgfx",
+    "tgfx_nochrome",
+    "tjss",
+    "tp4",
+    "tp4_pbytes",
+    "tp4_rss",
+    "tp4_shutdown",
+    "ts",
+    "ts_shutdown",
+    "ts_cold",
+    "ts_cold_shutdown",
+    "ts_cold_generated_min",
+    "ts_cold_generated_min_shutdown",
+    "ts_cold_generated_med",
+    "ts_cold_generated_med_shutdown",
+    "ts_cold_generated_max",
+    "ts_cold_generated_max_shutdown",
+    "ts_places_generated_min",
+    "ts_places_generated_min_shutdown",
+    "ts_places_generated_med",
+    "ts_places_generated_med_shutdown",
+    "ts_places_generated_max",
+    "ts_places_generated_max_shutdown",
+    "tsspider",
+    "tsspider_nochrome",
+    "tsvg",
+    "tsvg_opacity",
+    "twinopen"
+  ]
 };

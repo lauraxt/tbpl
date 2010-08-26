@@ -16,7 +16,7 @@ var PerformanceComparator = {
     });
 
     var osNames = Config.OSNames;
-    var testNames = Controller._data._tinderboxData.testNames;
+    var testNames = Config.talosTestNames;
 
     // generate a structure with column headers and % difference
     // in a format ready for conversion into different formats

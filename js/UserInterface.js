@@ -161,7 +161,7 @@ var UserInterface = {
 
   _linkBugs: function UserInterface__linkBugs(text) {
     return text.replace(/(bug\s*|b=)([1-9][0-9]*)\b/ig, '<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=$2">$1$2</a>')
-           .replace(/(changeset\s*)?([0-9a-f]{12})\b/ig, '<a href="'+this._revURL('')+'$2">$1$2</a>');
+           .replace(/(changeset\s*)?([0-9a-f]{12})\b/ig, '<a href="http://hg.mozilla.org/' + Config.repoNames[this._treeName] + '/rev/$2">$1$2</a>');
   },
 
   _updateTreeStatus: function UserInterface__updateTreeStatus() {
@@ -239,10 +239,6 @@ var UserInterface = {
     var d = this._getTimezoneAdaptedDate(date);
     var pad = this._pad;
     return pad(d.getHours()) + ":" + pad(d.getMinutes());
-  },
-  
-  _revURL: function UserInterface__revURL(rev) {
-    return this._data.getRevUrl(rev);
   },
 
   _resultTitle: function UserInterface__resultTitle(result) {
@@ -382,7 +378,7 @@ var UserInterface = {
       '<ul class="patches">\n' +
       push.patches.map(function buildHTMLForPushPatches(patch, patchIndex) {
         return '<li>\n' +
-        '<a class="revlink" href="' + self._revURL(patch.rev) + '">' + patch.rev +
+        '<a class="revlink" href="http://hg.mozilla.org/' + Config.repoNames[self._treeName] + '/rev/' + patch.rev + '">' + patch.rev +
         '</a>\n<div class="popup"><span><span class="author">' + patch.author + '</span> &ndash; ' +
         '<span class="desc">' + self._linkBugs(patch.desc.split("\n")[0]) + '</span>' +
         (function buildHTMLForPatchTags() {

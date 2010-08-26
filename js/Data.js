@@ -1,7 +1,6 @@
 function Data(treeName, noIgnore, config) {
   this._treeName = treeName;
-  this._tinderboxData = new TinderboxData(this._treeName, noIgnore, config.tinderboxDataLoader, config.repoNames);
-  this._hgData = new HgData(this._tinderboxData.getRepoName(), config.pushlogDataLoader);
+  this._noIgnore = noIgnore;
   this._pushes = [];
   this._machines = [];
   this._machineResults = {};
@@ -9,14 +8,10 @@ function Data(treeName, noIgnore, config) {
 };
 
 Data.prototype = {
-
-  getRevUrl: function Data_getRevUrl(rev) {
-    return this._hgData.getRevUrl(rev);
-  },
-
   loadPushes: function Data_loadPushes(timeOffset, loadCallback, failCallback) {
     var self = this;
-    return this._hgData.load(
+    return Config.pushlogDataLoader.load(
+      Config.repoNames[this._treeName],
       timeOffset,
       function hgDataLoadCallback(data) {
         self._pushes = data;
@@ -29,8 +24,10 @@ Data.prototype = {
 
   loadMachineResults: function Data_loadMachineResults(timeOffset, loadCallback, failCallback) {
     var self = this;
-    return this._tinderboxData.load(
+    return Config.tinderboxDataLoader.load(
+      this._treeName,
       timeOffset,
+      this._noIgnore,
       function tinderboxDataLoadCallback(data) {
         self._machines = data.machines;
         self._machineResults = data.machineResults;
@@ -41,13 +38,9 @@ Data.prototype = {
     );
   },
 
-  getMachineTypes: function Data_getMachineTypes() {
-    return this._tinderboxData.machineTypes;
-  },
-
   machineTypeIsGrouped: function Data_machineTypeIsGrouped(machineType) {
     return this._config.treesWithGroups.indexOf(this._treeName) != -1 &&
-      this._tinderboxData.groupedMachineTypes.indexOf(machineType) != -1;
+      this._config.groupedMachineTypes.indexOf(machineType) != -1;
   },
 
   getMachines: function Data_getMachines() {
