@@ -46,7 +46,12 @@ var PushlogJSONParser = {
     return n < 10 ? '0' + n : n;
   },
 
-  _formattedDate: function PushlogJSONParser__formattedDate(d) {
+  _formattedDate: function PushlogHTMLParser__formattedDate(date) {
+    var pad = this._pad;
+    // this is annoying, pushlog expects the dates to be MVT time
+    var hoursdiff = date.getTimezoneOffset() / 60 + Config.mvtTimezoneOffset;
+    var d = new Date(date.getTime() + hoursdiff * 60 * 60 * 1000);
+
     var pad = this._pad;
     return pad(d.getFullYear()) + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + "+" +
            pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
