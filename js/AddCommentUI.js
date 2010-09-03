@@ -79,7 +79,7 @@ var AddCommentUI = {
           header: suggestion.signature,
           log: suggestion.log,
           email: email.replace("@", "%"),
-          logLink: machineResults[i].briefLogURL
+          logLink: 'http://tinderbox.mozilla.org/showlog.cgi?log=' + Controller.treeName + '/' + machineResults[i].runID
         };
       }
     }

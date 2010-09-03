@@ -75,9 +75,6 @@ var TinderboxJSONUser = {
     return scriptURL;
   },
 
-  getLogURL: function TinderboxJSONUser_getLogURL(tree, id, full, note) {
-    return "http://tinderbox.mozilla.org/" + (note ? "addnote" : "showlog") + ".cgi?log=" + tree + "/" + id + (full ? "&fulltext=1" : "");
-  },
   processNote: function TinderboxJSONUser_processNote(note) {
     return note.replace(/<\/?pre>/g, "").trim().replace(/\n/g, "<br>");
   },
@@ -152,9 +149,6 @@ var TinderboxJSONUser = {
         "tree" : tree,
         "machine": machines[machineIndex],
         "runID": machineRunID,
-        "fullLogURL": self.getLogURL(tree, machineRunID, true, false),
-        "briefLogURL": self.getLogURL(tree, machineRunID, false, false),
-        "addNoteURL": self.getLogURL(tree, machineRunID, false, true),
         "state": state,
         "startTime": startTime,
         "endTime": endTime,

@@ -233,7 +233,10 @@ span.logtags span.inbranchtag {
   float: left;
   outline: none !important;
 }
-.machineResult:hover, .machineResult[active=true],
+.machineResult:hover {
+  text-decoration: none;
+}
+.machineResult:hover:not(.building):not(.pending), .machineResult[active=true],
 #logNoteSuggestions a:hover {
   color: white !important;
   text-decoration: none;
@@ -247,17 +250,14 @@ span.logtags span.inbranchtag {
 .machineResult.testfailed:hover { background-color: #F70; }
 .machineResult.busted:hover     { background-color: #E00; }
 .machineResult.exception:hover  { background-color: #818; }
-.machineResult.building:hover   { background-color: #DDD; }
 .machineResult.success:active    { background-color: #5B1; }
 .machineResult.testfailed:active { background-color: #F81; }
 .machineResult.busted:active     { background-color: #F00; }
 .machineResult.exception:active  { background-color: #928; }
-.machineResult.building:active   { background-color: #EEE; }
 .machineResult.success[active=true]    { background-color: #4A0; }
 .machineResult.testfailed[active=true] { background-color: #F70; }
 .machineResult.busted[active=true]     { background-color: #D00; }
 .machineResult.exception[active=true]  { background-color: #818; }
-.machineResult.building[active=true]   { background-color: #DDD; }
 
 /* helps the color-blind */
 .busted, .testfailed, .exception { text-decoration: underline }
