@@ -48,41 +48,33 @@ var UserInterface = {
 
   },
 
-  loadedData: function UserInterface_loadedData(kind) {
-    if (kind == "machineResults")
-      this._updateTreeStatus();
+  loadedData: function UserInterface_loadedData() {
+    this._updateTreeStatus();
     this._buildPushesList();
   },
 
-  updateStatus: function UserInterface_updateStatus() {
-    var loading = [];
-    for (i in this._controller.loadStatus) {
-      if (this._controller.loadStatus[i] == "loading")
-        loading.push({ tinderbox: "Tinderbox", pushlog: "pushlog" }[i]);
-    }
-    var text = loading.join(" and ");
+  updateStatus: function UserInterface_updateStatus(status) {
     var statusSpan = $("#loading");
     statusSpan.removeClass("loading");
     statusSpan.removeClass("fail");
-    if (loading.length) {
-      text = "Loading " + text + "...";
-      statusSpan.addClass("loading");
-    }
-    if (this._controller.loadStatus.tinderbox == "fail") {
-      text += " Parsing Tinderbox failed. :-(";
-      statusSpan.addClass("fail");
-    } else if (this._controller.loadStatus.pushlog == "fail") {
-      text += " Parsing Pushlog failed. :-(";
-      statusSpan.addClass("fail");
+    var text = "";
+    if (status) {
+      if (status.loadpercent < 1) {
+        text += "Loading " + Math.ceil(status.loadpercent * 100) + "% …";
+        statusSpan.addClass("loading");
+      } else if (status.failed) {
+        text += "Loading failed: " + status.failed.join(", ");
+        statusSpan.addClass("fail");
+      }
     }
     var numComments = AddCommentUI.numSendingComments;
     if (numComments) {
-      text += " Sending " + numComments + " " + (numComments == 1 ? "comment" : "comments") + "...";
+      text += " Sending " + numComments + " " + (numComments == 1 ? "comment" : "comments") + "…";
       statusSpan.addClass("loading");
     }
     var numBugs = AddCommentUI.numSendingBugs;
     if (numBugs) {
-      text += " Marking " + numBugs + " " + (numBugs == 1 ? "bug" : "bugs") + "...";
+      text += " Marking " + numBugs + " " + (numBugs == 1 ? "bug" : "bugs") + "…";
       statusSpan.addClass("loading");
     }
     statusSpan.css("visibility", text ? "visible" : "hidden");

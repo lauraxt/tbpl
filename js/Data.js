@@ -8,31 +8,43 @@ function Data(treeName, noIgnore, config) {
 };
 
 Data.prototype = {
-  loadPushes: function Data_loadPushes(timeOffset, loadCallback, failCallback) {
+  load: function Data_load(timeOffset, statusCallback, successCallback) {
     var self = this;
-    return Config.pushlogDataLoader.load(
+    // we can provide progress info, once we load more sources
+    var loadTotal = 2;
+    var loaded = 0;
+    var failed = [];
+    var checkLoaded = function() {
+      if (failed.length)
+        return;
+      else if (++loaded < loadTotal)
+        statusCallback({loadpercent: loaded/loadTotal});
+      else {
+        self._combineResults();
+        statusCallback({loadpercent: 1});
+        successCallback();
+      }
+    };
+    var failCallback = function(what) {
+      failed.push(what);
+      statusCallback({failed: failed});
+    };
+    Config.pushlogDataLoader.load(
       Config.repoNames[this._treeName],
       timeOffset,
       function hgDataLoadCallback(data) {
         self._pushes = data;
-        self._loadedData();
-        loadCallback();
-      },
-      failCallback
+        checkLoaded();
+      }
     );
-  },
-
-  loadMachineResults: function Data_loadMachineResults(timeOffset, loadCallback, failCallback) {
-    var self = this;
-    return Config.tinderboxDataLoader.load(
+    Config.tinderboxDataLoader.load(
       this._treeName,
       timeOffset,
       this._noIgnore,
       function tinderboxDataLoadCallback(data) {
         self._machines = data.machines;
         self._machineResults = data.machineResults;
-        self._loadedData();
-        loadCallback();
+        checkLoaded();
       },
       failCallback
     );
@@ -53,10 +65,6 @@ Data.prototype = {
 
   getPushes: function Data_getPushes() {
     return this._pushes;
-  },
-
-  _loadedData: function Data__loadedData() {
-    this._combineResults();
   },
 
   _getPushForRev: function Data__getPushForRev(rev) {

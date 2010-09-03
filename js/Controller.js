@@ -12,7 +12,6 @@ var Controller = {
   },
 
   treeName: Config.defaultTreeName,
-  loadStatus: { pushlog: "loading", tinderbox: "loading" },
 
   /**
    * Used to browse the history. This is a timestamp from which we go 12 hours
@@ -31,7 +30,7 @@ var Controller = {
       if (!Config.repoNames[params.tree])
         throw "wrongtree"; // er, hm.
       this.treeName = params.tree;
-    } 
+    }
 
     // Allow specifying &noignore=1 in the URL (to pass through to tinderbox)
     var noIgnore = ("noignore" in params) && (params.noignore == "1");
@@ -88,38 +87,8 @@ var Controller = {
   },
 
   _startStatusRequest: function Controller__startStatusRequest() {
-    var self = this;
-    this.loadStatus = { pushlog: "loading", tinderbox: "loading" };
-    UserInterface.updateStatus();
-  
-    this._data.loadPushes(
-      this._timeOffset,
-      function loaded() {
-        self.loadStatus.pushlog = "complete";
-        self._loadedData("pushes");
-      },
-      function failed() {
-        self.loadStatus.pushlog = "fail";
-        UserInterface.updateStatus();
-      }
-    );
-  
-    this._data.loadMachineResults(
-      this._timeOffset,
-      function loaded() {
-        self.loadStatus.tinderbox = "complete";
-        self._loadedData("machineResults");
-      },
-      function failed() {
-        self.loadStatus.tinderbox = "fail";
-        UserInterface.updateStatus();
-      }
-    );
-  },
-
-  _loadedData: function Controller__loadedData(kind) {
-    UserInterface.updateStatus();
-    UserInterface.loadedData(kind);
-  },
-
+    // the callbacks need to be wrapped in a function, otherwise their "this" will be messed up.
+    this._data.load(this._timeOffset, function(status) { UserInterface.updateStatus(status); },
+                    function() { UserInterface.loadedData(); });
+  }
 };

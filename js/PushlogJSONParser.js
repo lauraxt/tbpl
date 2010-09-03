@@ -1,6 +1,6 @@
 var PushlogJSONParser = {
 
-  load: function PushlogJSONParser_load(repoName, timeOffset, loadCallback, failCallback) {
+  load: function PushlogJSONParser_load(repoName, timeOffset, loadCallback) {
     var self = this;
     $.getJSON(this._getLogUrl(repoName, timeOffset), function(data) {
       var pushes = [];
