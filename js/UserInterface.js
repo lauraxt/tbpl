@@ -145,6 +145,7 @@ var UserInterface = {
       '<dt class="building">gray</dt><dd>building</dd>' +
       '<dt class="success">green</dt><dd>success</dd>' +
       '<dt class="testfailed">orange</dt><dd>tests failed</dd>' +
+      '<dt class="exception">purple</dt><dd>infrastructure exception</dd>' +
       '<dt class="busted">red</dt><dd>build error</dd>').appendTo(legend);
   },
 
@@ -178,7 +179,7 @@ var UserInterface = {
       // errors in front, failures in back
       switch(result.state)
       {
-        case 'busted':
+        case 'busted', 'exception':
           failing.unshift(result);
         break;
         case 'testfailed':
@@ -247,6 +248,7 @@ var UserInterface = {
       "building": type + ' is still running',
       "success": type + ' was successful',
       "testfailed": 'Tests failed on ' + type + ' on ' + Config.OSNames[result.machine.os],
+      "exception": 'Infrastruction exception on ' + type + ' on ' + Config.OSNames[result.machine.os],
       "busted": type + ' on ' + Config.OSNames[result.machine.os] + ' is burning'
     }[result.state] + ', ' + this._timeString(result);
   },

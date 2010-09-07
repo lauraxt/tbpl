@@ -241,22 +241,26 @@ span.logtags span.inbranchtag {
 .success    { color: #390 !important; }
 .testfailed { color: #F60 !important; }
 .busted     { color: #D00 !important; }
+.exception  { color: #708 !important; }
 .building   { color: #CCC !important; }
 .machineResult.success:hover    { background-color: #4A0; }
 .machineResult.testfailed:hover { background-color: #F70; }
 .machineResult.busted:hover     { background-color: #E00; }
+.machineResult.exception:hover  { background-color: #818; }
 .machineResult.building:hover   { background-color: #DDD; }
 .machineResult.success:active    { background-color: #5B1; }
 .machineResult.testfailed:active { background-color: #F81; }
 .machineResult.busted:active     { background-color: #F00; }
+.machineResult.exception:active  { background-color: #928; }
 .machineResult.building:active   { background-color: #EEE; }
 .machineResult.success[active=true]    { background-color: #4A0; }
 .machineResult.testfailed[active=true] { background-color: #F70; }
 .machineResult.busted[active=true]     { background-color: #D00; }
+.machineResult.exception[active=true]  { background-color: #818; }
 .machineResult.building[active=true]   { background-color: #DDD; }
 
 /* helps the color-blind */
-.busted, .testfailed { text-decoration: underline }
+.busted, .testfailed, .exception { text-decoration: underline }
 
 #pushes .machineResultGroup .machineResult {
   padding: 0 2px 2px;
@@ -348,6 +352,9 @@ body.details > #details
 }
 #status a.busted {
   background-color: #D00 !important;
+}
+#status a.exception {
+  background-color: #708 !important;
 }
 #status a {
   float: left;
@@ -461,10 +468,10 @@ em.testfail {
 .stars .summary span.highlight {
   font-weight: bold;
 }
-#details:not([state="testfailed"]):not([state="busted"]) .stars .summary {
+#details:not([state="testfailed"]):not([state="busted"]):not([state="exception"]) .stars .summary {
   display: none;
 }
-#details:not([state="testfailed"]):not([state="busted"]) .stars .note,
+#details:not([state="testfailed"]):not([state="busted"]):not([state="exception"]) .stars .note,
 #details:not(.hasStar) .stars .summary {
   max-height: 300px;
   border-top: none;
