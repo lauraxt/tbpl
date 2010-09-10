@@ -171,7 +171,8 @@ var UserInterface = {
       // errors in front, failures in back
       switch(result.state)
       {
-        case 'busted', 'exception':
+        case 'busted':
+        case 'exception':
           failing.unshift(result);
         break;
         case 'testfailed':
