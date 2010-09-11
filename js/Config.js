@@ -48,8 +48,8 @@ var Config = {
     "windows7": "Win7",
     "windows7-64": "Win7-64",
     "android": "Android",
-    "maemo5": "Maemo 5",
-    "maemo4": "Maemo 4"
+    "maemo4": "Maemo 4",
+    "maemo5": "Maemo 5"
   },
   testNames: {
     "Build" : "B",

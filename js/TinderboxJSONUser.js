@@ -32,6 +32,7 @@ var TinderboxJSONUser = {
       /Maemo 5/.test(name) ? "maemo5" : 
       /Maemo/.test(name) ? "maemo4" : 
       /N810/.test(name) ? "maemo4" : 
+      /n900/.test(name) ? "maemo5" :
       /static-analysis/.test(name) ? "linux" : "",
 
       debug: /debug/i.test(name) || /(leak|bloat)/i.test(name),
