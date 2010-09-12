@@ -41,6 +41,7 @@ var TinderboxJSONUser = {
       type:
       /talos/i.test(name) ? "Talos Performance" :
       /nightly/i.test(name) ? "Nightly" :
+      /shark/i.test(name) ? "Nightly" :
       /mochitest/i.test(name) ? "Mochitest" :
       /crashtest/i.test(name) ? "Crashtest" :
       /jsreftest/i.test(name) ? "JSReftest" :
