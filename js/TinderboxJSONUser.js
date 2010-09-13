@@ -91,11 +91,7 @@ var TinderboxJSONUser = {
     }
     return revs;
   },
-  
-  getBuildScrape: function TinderboxJSONUser_getBuildScrape(td, machineRunID) {
-    return td.scrape[machineRunID];
-  },
-  
+
   parseTinderbox: function TinderboxJSONUser_parseTinderbox(tree, td) {
     var self = this;
     var machines = [];
@@ -118,6 +114,7 @@ var TinderboxJSONUser = {
     var notes = td.note_array.map(self.processNote);
   
     var machineResults = {};
+    var index = 0;
     for (var rowIndex = 0; rowIndex < td.build_table.length; rowIndex++) {
     for (var machineIndex = 0; machineIndex < td.build_table[rowIndex].length; machineIndex++) {
       var build = td.build_table[rowIndex][machineIndex];
@@ -127,14 +124,11 @@ var TinderboxJSONUser = {
       var rev = "";
       var startTime = new Date(build.buildtime * 1000);
       var endTime = (state != "building") ? new Date(build.endtime * 1000) : 0;
-      var machineRunID = build.logfile;
-      var buildScrape = self.getBuildScrape(td, machineRunID);
+      var logID = build.logfile;
+      var buildScrape = td.scrape[logID];
       var revs = (state != "building") && self.findRevInScrape(buildScrape);
       var rev = revs && revs[Config.repoNames[tree]];
-  
-      if (machineResults[machineRunID])
-        continue;
-  
+
       if (state != "building" && !rev)
         continue;
   
@@ -145,11 +139,13 @@ var TinderboxJSONUser = {
         machines[machineIndex].runtime+=
           (endTime.getTime() - startTime.getTime())/1000;
       }
-  
-      machineResults[machineRunID] = new MachineResult ({
+
+      var runID = index++;
+      machineResults[runID] = new MachineResult ({
+        "id" : runID,
         "tree" : tree,
         "machine": machines[machineIndex],
-        "runID": machineRunID,
+        "logID" : logID,
         "state": state,
         "startTime": startTime,
         "endTime": endTime,
@@ -163,7 +159,7 @@ var TinderboxJSONUser = {
       if (state != "building") {
         if (startTime.getTime() > machines[machineIndex].latestFinishedRun.startTime) {
           machines[machineIndex].latestFinishedRun = {
-            id: machineRunID,
+            id: runID,
             "startTime": startTime.getTime()
           };
         }
@@ -209,14 +205,9 @@ MachineResult.prototype = {
     })({
       "Unit Test": self.getUnitTestResults,
       "Mochitest": self.getUnitTestResults,
-      "Opt Mochitest": self.getUnitTestResults,
-      "Debug Mochitest": self.getUnitTestResults,
-      "Opt Everythingelse Test": self.getUnitTestResults,
-      "Debug Everythingelse Test": self.getUnitTestResults,
       "Everythingelse Test": self.getUnitTestResults,
       "Talos Performance": self.getTalosResults,
-      "Debug Build": self.getScrapeResults,
-      "Opt Build": self.getScrapeResults,
+      "Build": self.getScrapeResults,
       "generic": self.getScrapeResults
     });
   },
@@ -225,8 +216,8 @@ MachineResult.prototype = {
     return $(scrape).map(function parseGenericTestScrapeLine() {
       if (this.match(/rev\:/) || this.match(/s\:/) || this.match(/try\-/))
         return null;
-      var match = this.match(/(.*)\:(.*)/);
-      return (match ? { name: match[1], result: match[2]} : { name: this });
+      var match = this.match(/(.*)(\:|<br\/>)(.*)/);
+      return (match ? { name: match[1], result: match[3]} : { name: this });
     }).filter(function filterNull() { return this; }).get();
   },
   

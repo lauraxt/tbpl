@@ -79,7 +79,7 @@ var AddCommentUI = {
           header: suggestion.signature,
           log: suggestion.log,
           email: email.replace("@", "%"),
-          logLink: 'http://tinderbox.mozilla.org/showlog.cgi?log=' + Controller.treeName + '/' + machineResults[i].runID
+          logLink: 'http://tinderbox.mozilla.org/showlog.cgi?log=' + Controller.treeName + '/' + machineResults[i].logID
         };
       }
     }
@@ -245,7 +245,7 @@ var AddCommentUI = {
       buildname: machineResult.machine.name,
       buildtime: machineResult.startTime.getTime() / 1000,
       errorparser: machineResult.errorParser,
-      logfile: machineResult.runID,
+      logfile: machineResult.logID,
       tree: machineResult.tree,
       who: email,
       note: comment,
