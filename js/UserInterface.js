@@ -236,7 +236,8 @@ var UserInterface = {
   },
 
   _resultTitle: function UserInterface__resultTitle(result) {
-    var type = result.machine.type + " " + this._numberForMachine(result.machine) + (result.machine.debug ? " debug" : " opt");
+    var number = this._numberForMachine(result.machine);
+    var type = result.machine.type + (number ? " " + number : "") + (result.machine.debug ? " debug" : " opt");
     return {
       "building": type + ' is still running',
       "success": type + ' was successful',
@@ -312,13 +313,12 @@ var UserInterface = {
     }
   },
 
-  _machineGroupResultLink: function UserInterface__machineGroupResultLink(machineResults) {
+  _machineGroupResultLink: function UserInterface__machineGroupResultLink(machineType, machineResults) {
     if (!machineResults.length)
       return "";
     var self = this;
-    var machine = machineResults[0].machine;
     return '<span class="machineResultGroup" machineType="' +
-    Config.testNames[machine.type] +
+    Config.testNames[machineType] +
     '"> ' +
     machineResults.map(function linkMachineResult(a) { return self._machineResultLink(a, true); }).join(" ") +
     ' </span>';
@@ -333,16 +333,18 @@ var UserInterface = {
         return '';
 
       // Sort results.
-      if (self._data.machineTypeIsGrouped(machineType)) {
+      if (Config.treesWithGroups.indexOf(self._treeName) != -1 &&
+          Controller.keysFromObject(Config.groupedMachineTypes).indexOf(machineType) != -1) {
         results[machineType].sort(function machineResultSortOrderComparison(a, b) {
-          var numA = self._numberForMachine(a.machine);
-          var numB = self._numberForMachine(b.machine);
+          // machine.type does not mess up the numeric/alphabetic sort
+          var numA = a.machine.type + self._numberForMachine(a.machine);
+          var numB = b.machine.type + self._numberForMachine(b.machine);
           if (numA == numB)
             return a.startTime.getTime() - b.startTime.getTime();
 
           return numA > numB ? 1 : -1;
         });
-        return self._machineGroupResultLink(results[machineType]);
+        return self._machineGroupResultLink(machineType, results[machineType]);
       }
       results[machineType].sort(function machineResultSortTimeComparison(a, b) {
         return a.startTime.getTime() - b.startTime.getTime();

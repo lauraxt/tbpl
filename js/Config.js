@@ -35,9 +35,11 @@ var Config = {
     "Cedar",
     "Maple",
   ],
-  groupedMachineTypes: [
-    "Mochitest",
-  ],
+  groupedMachineTypes: {
+    "Mochitest" : ["Mochitest"],
+    "Reftest" : ["Crashtest", "Reftest-Direct2D", "Reftest-Direct3D",
+      "Reftest-OpenGL", "Reftest", "JSReftest"]
+  },
   OSNames: {
     "linux": "Linux",
     "linux64": "Linux64",

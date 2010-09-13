@@ -51,9 +51,14 @@ Data.prototype = {
     );
   },
 
-  machineTypeIsGrouped: function Data_machineTypeIsGrouped(machineType) {
-    return this._config.treesWithGroups.indexOf(this._treeName) != -1 &&
-      this._config.groupedMachineTypes.indexOf(machineType) != -1;
+  machineGroup: function Data_machineGroup(machineType) {
+    if (this._config.treesWithGroups.indexOf(this._treeName) == -1)
+      return machineType;
+    for (var groupname in this._config.groupedMachineTypes) {
+      if (this._config.groupedMachineTypes[groupname].indexOf(machineType) != -1)
+        return groupname;
+    }
+    return machineType;
   },
 
   getMachines: function Data_getMachines() {
@@ -137,15 +142,16 @@ Data.prototype = {
         }
         var machine = machineResult.machine;
         var debug = machine.debug ? "debug" : "opt";
+        var group = self.machineGroup(machine.type);
         if (!push.results)
           push.results = {};
         if (!push.results[machine.os])
           push.results[machine.os] = {};
         if (!push.results[machine.os][debug])
           push.results[machine.os][debug] = {};
-        if (!push.results[machine.os][debug][machine.type])
-          push.results[machine.os][debug][machine.type] = [];
-        push.results[machine.os][debug][machine.type].push(machineResult);
+        if (!push.results[machine.os][debug][group])
+          push.results[machine.os][debug][group] = [];
+        push.results[machine.os][debug][group].push(machineResult);
       }
     });
   }
