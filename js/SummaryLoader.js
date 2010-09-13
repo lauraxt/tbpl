@@ -19,7 +19,7 @@ var SummaryLoader = {
     var summaryLoader = $("#summaryLoader").get(0);
     summaryLoader.innerHTML = "Retrieving summary..."
     summaryLoader.className = "loading";
-    this._fetchSummary(result.runID, result.tree, !!result.note, function fetchSummaryLoadCallback(summary) {
+    this._fetchSummary(result.logID, result.tree, !!result.note, function fetchSummaryLoadCallback(summary) {
       var summaryPlaceholder = $(".stars .summary").get(0);
       summaryPlaceholder.innerHTML = summary ? summary.replace(/\n/g, "<br>\n") : "Summary is empty.";
       result.suggestions = [];
