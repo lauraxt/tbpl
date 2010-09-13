@@ -12,7 +12,7 @@ Data.prototype = {
     var self = this;
     // we can provide progress info, once we load more sources
     var loadTotal = 2;
-    var loaded = 0;
+    var loaded = -1;
     var failed = [];
     var checkLoaded = function() {
       if (failed.length)
@@ -25,6 +25,7 @@ Data.prototype = {
         successCallback();
       }
     };
+    checkLoaded();
     var failCallback = function(what) {
       failed.push(what);
       statusCallback({failed: failed});
