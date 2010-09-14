@@ -242,7 +242,7 @@ var UserInterface = {
       "building": type + ' is still running',
       "success": type + ' was successful',
       "testfailed": 'Tests failed on ' + type + ' on ' + Config.OSNames[result.machine.os],
-      "exception": 'Infrastruction exception on ' + type + ' on ' + Config.OSNames[result.machine.os],
+      "exception": 'Infrastructure exception on ' + type + ' on ' + Config.OSNames[result.machine.os],
       "busted": type + ' on ' + Config.OSNames[result.machine.os] + ' is burning'
     }[result.state] + ', ' + this._timeString(result);
   },
