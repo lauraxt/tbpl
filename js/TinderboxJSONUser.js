@@ -25,8 +25,8 @@ var TinderboxJSONUser = {
       /OS\s?X.*10\.6/.test(name) ? "osx64" :
       /OS\s?X/.test(name) ? "osx" :
       /WINNT 6\.1 x64/i.test(name) ? "windows7-64" :
-      /WINNT 6\.1/i.test(name) ? "windows7" :
-      /WINNT 5\.2/i.test(name) ? "windows2003" :
+      /WINNT 6\.1/i.test(name) ? "windows" :
+      /WINNT 5\.2/i.test(name) ? "windows" :
       /WINNT 5\.1/i.test(name) ? "windowsxp" :
       /Android/.test(name) ? "android" :
       /Maemo 5/.test(name) ? "maemo5" : 
@@ -41,6 +41,7 @@ var TinderboxJSONUser = {
       type:
       /talos/i.test(name) ? "Talos Performance" :
       /nightly/i.test(name) ? "Nightly" :
+      /shark/i.test(name) ? "Nightly" :
       /mochitest/i.test(name) ? "Mochitest" :
       /crashtest/i.test(name) ? "Crashtest" :
       /jsreftest/i.test(name) ? "JSReftest" :
