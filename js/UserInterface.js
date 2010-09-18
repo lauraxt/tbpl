@@ -183,10 +183,10 @@ var UserInterface = {
     $('#status').html(
       '<strong>' + failing.length + '</strong> Job' + (failing.length != 1 ? 's are' : ' is') + ' failing:<br />' +
       failing.map(function(machineResult) {
-        return '<a href="http://tinderbox.mozilla.org/showlog.cgi?log=' + self._treeName + '/' + machineResult.logID +
+        return '<a href="http://tinderbox.mozilla.org/showlog.cgi?log=' + self._treeName + '/' + machineResult.runID +
                '" onclick="UserInterface.clickMachineResult(event, this)" class="machineResult ' + machineResult.state +
                (machineResult.note ? ' hasNote" title="(starred) ' : '" title="') +
-               self._resultTitle(machineResult) + '" resultID="' + machineResult.id + '">' +
+               self._resultTitle(machineResult) + '" resultID="' + machineResult.runID + '">' +
                self._resultTitle(machineResult) + '</a>';
       }).join('\n')
     );
@@ -282,12 +282,12 @@ var UserInterface = {
     var machine = machineResult.machine;
     /*
      * pending or running builds should not link to a log and should not open
-     * the details panel because the logID will change once the run is finished
+     * the details panel because the runID will change once the run is finished
      * and because the details show no more info than the tooltip
      */
     return '<a' + (['building', 'pending'].indexOf(machineResult.state) == -1 ? 
-      ' href="http://tinderbox.mozilla.org/showlog.cgi?log=' + this._treeName + '/' + machineResult.logID +
-      '" resultID="' + machineResult.id +
+      ' href="http://tinderbox.mozilla.org/showlog.cgi?log=' + this._treeName + '/' + machineResult.runID +
+      '" resultID="' + machineResult.runID +
       '" onclick="UserInterface.clickMachineResult(event, this)"' : "") + 
     ' class="machineResult ' + machineResult.state +
     '" title="' + this._resultTitle(machineResult) +
@@ -613,10 +613,10 @@ var UserInterface = {
         }
         return ret;
       })().join(', ') + '</span>' +
-      '<a href="http://tinderbox.mozilla.org/showlog.cgi?log=' + self._treeName + '/' + result.logID + '">view brief log</a>' +
-      '<a href="http://tinderbox.mozilla.org/showlog.cgi?log=' + self._treeName + '/' + result.logID + '&fulltext=1">view full log</a>' +
+      '<a href="http://tinderbox.mozilla.org/showlog.cgi?log=' + self._treeName + '/' + result.runID + '">view brief log</a>' +
+      '<a href="http://tinderbox.mozilla.org/showlog.cgi?log=' + self._treeName + '/' + result.runID + '&fulltext=1">view full log</a>' +
       '<div id="autoStar"></div>' +
-      '<a class="addNote" href="http://tinderbox.mozilla.org/addnote.cgi?log=' + self._treeName + '/' + result.logID + '">add a comment</a>' +
+      '<a class="addNote" href="http://tinderbox.mozilla.org/addnote.cgi?log=' + self._treeName + '/' + result.runID + '">add a comment</a>' +
       '<span class="duration">' + self._durationDisplay(result) + '</span></div>' +
       (function htmlForTestResults() {
         var testResults = result.getTestResults();

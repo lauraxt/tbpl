@@ -91,7 +91,11 @@ var TinderboxJSONUser = {
     }
     return revs;
   },
-
+  
+  getBuildScrape: function TinderboxJSONUser_getBuildScrape(td, machineRunID) {
+    return td.scrape[machineRunID];
+  },
+  
   parseTinderbox: function TinderboxJSONUser_parseTinderbox(tree, td) {
     var self = this;
     var machines = [];
@@ -114,7 +118,6 @@ var TinderboxJSONUser = {
     var notes = td.note_array.map(self.processNote);
   
     var machineResults = {};
-    var index = 0;
     for (var rowIndex = 0; rowIndex < td.build_table.length; rowIndex++) {
     for (var machineIndex = 0; machineIndex < td.build_table[rowIndex].length; machineIndex++) {
       var build = td.build_table[rowIndex][machineIndex];
@@ -124,11 +127,14 @@ var TinderboxJSONUser = {
       var rev = "";
       var startTime = new Date(build.buildtime * 1000);
       var endTime = (state != "building") ? new Date(build.endtime * 1000) : 0;
-      var logID = build.logfile;
-      var buildScrape = td.scrape[logID];
+      var machineRunID = build.logfile;
+      var buildScrape = self.getBuildScrape(td, machineRunID);
       var revs = (state != "building") && self.findRevInScrape(buildScrape);
       var rev = revs && revs[Config.repoNames[tree]];
-
+  
+      if (machineResults[machineRunID])
+        continue;
+  
       if (state != "building" && !rev)
         continue;
   
@@ -139,13 +145,11 @@ var TinderboxJSONUser = {
         machines[machineIndex].runtime+=
           (endTime.getTime() - startTime.getTime())/1000;
       }
-
-      var runID = index++;
-      machineResults[runID] = new MachineResult ({
-        "id" : runID,
+  
+      machineResults[machineRunID] = new MachineResult ({
         "tree" : tree,
         "machine": machines[machineIndex],
-        "logID" : logID,
+        "runID": machineRunID,
         "state": state,
         "startTime": startTime,
         "endTime": endTime,
@@ -159,7 +163,7 @@ var TinderboxJSONUser = {
       if (state != "building") {
         if (startTime.getTime() > machines[machineIndex].latestFinishedRun.startTime) {
           machines[machineIndex].latestFinishedRun = {
-            id: runID,
+            id: machineRunID,
             "startTime": startTime.getTime()
           };
         }
