@@ -1,5 +1,5 @@
 <?php
-/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+/* -*- Mode: PHP; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 /* vim: set sw=2 ts=2 et tw=80 : */
 
 if (!isset($_GET["tree"]) || !isset($_GET["id"]))
