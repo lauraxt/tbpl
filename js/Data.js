@@ -1,4 +1,4 @@
-function Data(treeName, noIgnore, config, pusher) {
+function Data(treeName, noIgnore, config, pusher, rev) {
   this._treeName = treeName;
   this._noIgnore = noIgnore;
   this._pushes = [];
@@ -6,6 +6,7 @@ function Data(treeName, noIgnore, config, pusher) {
   this._machineResults = {};
   this._config = config;
   this._pusher = pusher;
+  this._rev = rev;
 };
 
 Data.prototype = {
@@ -38,7 +39,8 @@ Data.prototype = {
         self._pushes = data;
         checkLoaded();
       },
-      this._pusher
+      this._pusher,
+      this._rev
     );
     Config.tinderboxDataLoader.load(
       this._treeName,

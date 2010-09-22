@@ -1,6 +1,6 @@
 var PushlogJSONParser = {
 
-  load: function PushlogJSONParser_load(repoName, timeOffset, loadCallback, pusher) {
+  load: function PushlogJSONParser_load(repoName, timeOffset, loadCallback, pusher, rev) {
     var self = this;
     $.getJSON(this._getLogUrl(repoName, timeOffset), function(data) {
       var pushes = [];
@@ -19,8 +19,15 @@ var PushlogJSONParser = {
         }
 
         var patches = [];
+        var revFound = false;
         for (var i in push.changesets) {
           var patch = push.changesets[i];
+          patch.rev = patch.node.substr(0, 12);
+
+          if (rev && patch.rev == rev) {
+            revFound = true;
+          }
+
           // dont show the default branch and tag
           var tags = $(patch.tags).map(function() {
             return this != 'tip' ? {type: 'tagtag', name: this} : null;
@@ -33,9 +40,15 @@ var PushlogJSONParser = {
 
           // Revert the order because we want most recent pushes / patches to
           // come first.
-          patches.unshift({rev: patch.node.substr(0,12), author: author,
+          patches.unshift({rev: patch.rev, author: author,
                   desc: Controller.stripTags(patch.desc), tags: tags});
         }
+
+        // Ignore this push if the filtering rev isn't there.
+        if (rev && !revFound) {
+          return;
+        }
+
         pushes.unshift({pusher: push.user, date: new Date(push.date * 1000), toprev: patches[0].rev, patches: patches});
       });
       loadCallback(pushes);
