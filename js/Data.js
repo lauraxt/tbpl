@@ -1,10 +1,11 @@
-function Data(treeName, noIgnore, config) {
+function Data(treeName, noIgnore, config, pusher) {
   this._treeName = treeName;
   this._noIgnore = noIgnore;
   this._pushes = [];
   this._machines = [];
   this._machineResults = {};
   this._config = config;
+  this._pusher = pusher;
 };
 
 Data.prototype = {
@@ -36,7 +37,8 @@ Data.prototype = {
       function hgDataLoadCallback(data) {
         self._pushes = data;
         checkLoaded();
-      }
+      },
+      this._pusher
     );
     Config.tinderboxDataLoader.load(
       this._treeName,

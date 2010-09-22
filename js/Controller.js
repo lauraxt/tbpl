@@ -32,10 +32,15 @@ var Controller = {
       this.treeName = params.tree;
     }
 
+    var pusher = null;
+    if ("pusher" in params) {
+      pusher = params.pusher;
+    }
+
     // Allow specifying &noignore=1 in the URL (to pass through to tinderbox)
     var noIgnore = ("noignore" in params) && (params.noignore == "1");
 
-    this._data = new Data(this.treeName, noIgnore, Config);
+    this._data = new Data(this.treeName, noIgnore, Config, pusher);
 
     UserInterface.init(this);
 

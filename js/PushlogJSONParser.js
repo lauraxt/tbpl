@@ -1,6 +1,6 @@
 var PushlogJSONParser = {
 
-  load: function PushlogJSONParser_load(repoName, timeOffset, loadCallback) {
+  load: function PushlogJSONParser_load(repoName, timeOffset, loadCallback, pusher) {
     var self = this;
     $.getJSON(this._getLogUrl(repoName, timeOffset), function(data) {
       var pushes = [];
@@ -12,6 +12,12 @@ var PushlogJSONParser = {
       sorted.sort(function(a, b){ return a - b; });
       sorted.forEach(function addPush(pushID) {
         var push = data[pushID];
+
+        // Filter by pusher if requested.
+        if (pusher && push.user != pusher) {
+          return;
+        }
+
         var patches = [];
         for (var i in push.changesets) {
           var patch = push.changesets[i];
