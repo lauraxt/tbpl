@@ -1,3 +1,6 @@
+/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+/* vim: set sw=2 ts=2 et tw=80 : */
+
 var TinderboxJSONUser = {
 
   load: function TinderboxJSONUser_load(tree, timeOffset, noIgnore, loadCallback, failCallback) {
