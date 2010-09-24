@@ -149,9 +149,17 @@ var UserInterface = {
   },
 
   _switchTimezone: function UserInterface__switchTimezone(local) {
+    var self = this;
     this._setUseLocalTime(local);
     this._updateTimezoneDisplay();
-    this._regeneratePushesList();
+    $(".date").each(function() {
+      var elem = $(this);
+      if (!elem.attr("data-timestamp"))
+        return;
+      var date = new Date();
+      date.setTime(elem.attr("data-timestamp"));
+      elem.html(self._getDisplayDate(date));
+    });
   },
 
   _linkBugs: function UserInterface__linkBugs(text) {
@@ -366,7 +374,8 @@ var UserInterface = {
     var self = this;
     var nodeHtml = '<li id="' + push.patches[0].rev + '">\n' +
       '<h2><span class="pusher">' + push.pusher + '</span> &ndash; ' +
-      '<span class="date">' + self._getDisplayDate(push.date) + '</span>' +
+      '<span class="date" data-timestamp="' + push.date.getTime() + '">' +
+      self._getDisplayDate(push.date) + '</span>' +
       ' (<label>compare: <input class="revsToCompare" type="checkbox" value="' + push.patches[0].rev + '"></label>)' +
       '</h2>\n' +
       self._buildHTMLForPushResults(push) +
@@ -500,11 +509,16 @@ var UserInterface = {
     var timeOffset = this._controller.getTimeOffset();
     if (timeOffset)
       pushes.append($('<li><a id="goForward" href="#" title="go forward by 12 hours"></a></li>'));
-    if (!this._data.getPushes().length)
-      pushes.append($('<li>There were no pushes between <em>' + 
-        self._getDisplayDate(timeOffset ? new Date((timeOffset-12*3600)*1000) :
-        new Date(((new Date()).getTime()-12*3600*1000)))+'</em> and <em>' +
-        self._getDisplayDate(timeOffset ? new Date(timeOffset*1000) : new Date())+'</em></li>'));
+    if (!this._data.getPushes().length) {
+      var from = timeOffset ? new Date((timeOffset - 12 * 3600) * 1000) :
+        new Date(((new Date()).getTime() - 12 * 3600 * 1000));
+      var and = timeOffset ? new Date(timeOffset * 1000) : new Date();
+      pushes.append($('<li>There were no pushes between ' +
+        '<em class="date" data-timestamp="' + from.getTime() + '">' +
+        self._getDisplayDate(from) + '</em> and ' +
+        '<em class="date" data-timestamp="' + and.getTime() + '">' +
+        self._getDisplayDate(and) + '</em></li>'));
+    }
     else
       this._data.getPushes().forEach(function(push) {
         pushes.append(self._generatePushNode(push));
