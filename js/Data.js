@@ -103,8 +103,8 @@ Data.prototype = {
 
     var latestPushRev = "", latestPushTime = -1;
     var machineTime = machineResult.startTime.getTime();
-    for (var i in this._pushes) {
-      var push = this._pushes[i];
+    for (var toprev in this._pushes) {
+      var push = this._pushes[toprev];
       var pushTime = push.date.getTime();
       if (pushTime < machineTime) {
         if (latestPushTime < pushTime) {
@@ -121,13 +121,13 @@ Data.prototype = {
       this._machines = data.machines;
     var self = this;
     var newRunning = {};
-    // TODO: make this a map to avoid adding a push twice
-    var updatedPushes = [];
-    for (var i in data.pushes) {
+    var updatedPushes = {};
+    this._pushes = {}; //for now
+    for (var toprev in data.pushes) {
       // TODO: do not add already existing pushes to updatedPushes
       //if (!(data.pushes[i].toprev in this._pushes)) {
-        this._pushes[data.pushes[i].toprev] = data.pushes[i];
-        updatedPushes.push(data.pushes[i]);
+        this._pushes[toprev] = data.pushes[toprev];
+        updatedPushes[toprev] = data.pushes[toprev];
       //}
     }
 
@@ -157,8 +157,8 @@ Data.prototype = {
           break;
         }
       }
-      // TODO: add the push to the updatedPushes
-      delete result.push;
+      updatedPushes[push.toprev] = push;
+      result.push = null;
     }
     function linkPush(result) {
       var push = result.push;
@@ -174,7 +174,7 @@ Data.prototype = {
       if (!push.results[machine.os][debug][group])
         push.results[machine.os][debug][group] = [];
       push.results[machine.os][debug][group].push(result);
-      // TODO: add the push to the updatedPushes
+      updatedPushes[push.toprev] = push;
     }
 
     /* TODO: reevaluate orphanResults when we go back in time
@@ -195,6 +195,9 @@ Data.prototype = {
     for (var i in newRunning)
       linkPush(newRunning[i]);
 
-    return updatedPushes;
+    var pushArray = [];
+    for (var toprev in updatedPushes)
+      pushArray.push(updatedPushes[toprev]);
+    return pushArray;
   }
 }

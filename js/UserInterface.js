@@ -52,7 +52,10 @@ var UserInterface = {
 
   loadedData: function UserInterface_loadedData(machines, pushes) {
     this._updateTreeStatus(machines);
+
+    pushes.sort(function(a,b) { return b.date - a.date; });
     this._regeneratePushesList(pushes);
+    
   },
 
   updateStatus: function UserInterface_updateStatus(status) {

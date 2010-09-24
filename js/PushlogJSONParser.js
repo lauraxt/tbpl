@@ -6,14 +6,8 @@ var PushlogJSONParser = {
   load: function PushlogJSONParser_load(repoName, timeOffset, loadCallback, pusher, rev) {
     var self = this;
     $.getJSON(this._getLogUrl(repoName, timeOffset), function(data) {
-      var pushes = [];
-      // data is keyed by a numerical ID which increases in chronological order.
-      // However, data isn't sorted by that ID, so we need to do it here.
-      var sorted = [];
-      for (var pushID in data)
-        sorted.push(+pushID);
-      sorted.sort(function(a, b){ return a - b; });
-      sorted.forEach(function addPush(pushID) {
+      var pushes = {};
+      for (var pushID in data) {
         var push = data[pushID];
 
         // Filter by pusher if requested.
@@ -52,8 +46,9 @@ var PushlogJSONParser = {
           return;
         }
 
-        pushes.unshift({pusher: push.user, date: new Date(push.date * 1000), toprev: patches[0].rev, patches: patches});
-      });
+        var toprev = patches[0].rev;
+        pushes[toprev] = {pusher: push.user, date: new Date(push.date * 1000), toprev: toprev, patches: patches};
+      }
       loadCallback(pushes);
     });
   },

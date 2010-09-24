@@ -8,13 +8,10 @@ var TinderboxJSONUser = {
     var self = this;
     var scriptURL = this._getScriptURL(tree, timeOffset, noIgnore);
     $.getScript(scriptURL, function tinderboxJSONGetScriptCallback() {
-      try {
-        if (!tinderbox_data) throw "tinderbox_data is invalid";
+      if (!tinderbox_data)
+        failCallback("tinderbox_data is invalid");
+      else
         loadCallback(self.parseTinderbox(tree, tinderbox_data));
-      } catch (e) {
-        window.tinderboxException = e;
-        failCallback(e);
-      }
     });
   },
 
