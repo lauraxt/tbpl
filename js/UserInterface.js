@@ -21,6 +21,7 @@ var UserInterface = {
     this._refreshMostRecentlyUsedTrees();
     this._buildTreeSwitcher();
     this._buildLegend();
+    this._buildTreeInfo();
 
     $("#localTime").bind("click", function localTimeClick() {
       self._switchTimezone(true);
@@ -181,6 +182,61 @@ var UserInterface = {
       '<dt class="testfailed">orange</dt><dd>tests failed</dd>' +
       '<dt class="exception">purple</dt><dd>infrastructure exception</dd>' +
       '<dt class="busted">red</dt><dd>build error</dd>').appendTo(legend);
+  },
+
+  _buildTreeInfo: function UserInterface__buildTreeInfo() {
+    google.setOnLoadCallback(function() {
+      var service = new google.gdata.calendar.CalendarService("mozilla-tinderbox");
+
+      var items = [
+        {
+          elem: document.getElementById("current-sheriff"),
+          calendar: "http://www.google.com/calendar/feeds/j6tkvqkuf9elual8l2tbuk2umk%40group.calendar.google.com/public/full",
+          fallback: "#developers"
+        },
+        {
+          elem: document.getElementById("current-releng"),
+          calendar: "http://www.google.com/calendar/feeds/aelh98g866kuc80d5nbfqo6u54%40group.calendar.google.com/public/full",
+          fallback: "#build"
+        }
+      ];
+
+      function refreshItem(item) {
+        // Ignore DST and find Mozilla Standard Time
+        var mst = new Date(Date.now() +
+                           (new Date()).getTimezoneOffset() * 60 * 1000 +
+                           Config.mvtTimezoneOffset * 60 * 60 * 1000);
+
+        var query = new google.gdata.calendar.CalendarEventQuery(item.calendar);
+        query.setMinimumStartTime(new google.gdata.DateTime(mst, true));
+        query.setOrderBy("starttime");
+        query.setSortOrder("ascending");
+        query.setMaxResults("1");
+        query.setSingleEvents(true);
+
+        service.getEventsFeed(query, function(root) {
+          var result = root.feed.getEntries();
+          if (!!result.length)
+            result = result[0].getTitle().getText();
+          else
+            result = item.fallback;
+
+          if (result.indexOf("#") == 0)
+            result = '<a href="irc://irc.mozilla.org/' + result.slice(1) + '">' + result + '</a>';
+
+          item.elem.innerHTML = result;
+        }, function(error) {
+          item.elem.innerHTML = '<span style="color:red; text-decoration:underline" title="Error: ' + ((error.cause) ? error.cause.statusText : error.message) + '">probably ' + item.fallback + '</span>';
+        });
+      }
+
+      for (var i in items) {
+        var item = items[i];
+        refreshItem(item);
+        setInterval(refreshItem, 1000 * 60 * 60 /* every hour */, item);
+      }
+    });
+    google.load("gdata", "1.s");
   },
 
   _updateTimezoneDisplay: function UserInterface__updateTimezoneDisplay() {

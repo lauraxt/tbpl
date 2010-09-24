@@ -37,7 +37,12 @@ p {
   right: 0;
   text-align: right;
 }
-#mruList, #mruList li, #moreListContainer, #moreListContainer h2, #legend, #legendContainer h2 {
+#legendContainer, #treeInfoContainer {
+  display: inline-block;
+  margin-right: 1em;
+}
+#mruList, #mruList li, #moreListContainer, #moreListContainer h2,
+#legend, #legendContainer h2, #treeInfo, #treeInfoContainer h2 {
   margin: 0;
   padding: 0;
   display: inline;
@@ -48,16 +53,17 @@ p {
 #mruList a, #mruList strong {
   font-weight: bold;
 }
-#moreListContainer h2, #legendContainer h2 {
+#moreListContainer h2, #legendContainer h2, #treeInfoContainer h2 {
   font-size: 1em;
   font-weight: normal;
   cursor: pointer;
 }
-#moreListContainer, #legendContainer {
+#moreListContainer, #legendContainer, #treeInfoContainer {
   position: relative;
 }
-#moreList, #legend {
+#moreList, #legend, #treeInfo {
   position: absolute;
+  z-index: 1; /* must be above rel-pos #moreListContainer, etc. */
   left: -5px;
   top: 100%;
   padding: 5px !important;
@@ -66,7 +72,8 @@ p {
   -moz-box-shadow: 1px 1px 5px #ccc;
   box-shadow: 1px 1px 5px #ccc;
 }
-#moreListContainer:not(:hover) #moreList, #legendContainer:not(:hover) #legend {
+#moreListContainer:not(:hover) #moreList, #legendContainer:not(:hover) #legend,
+#treeInfoContainer:not(:hover) #treeInfo {
   display: none;
 }
 #moreList, #moreList li {
@@ -83,6 +90,10 @@ p {
 }
 #legend dd {
   margin-left: 6em;
+}
+#treeInfo li {
+  display: block;
+  margin: 0;
 }
 .loading {
   background: url(../images/loading_16.png) center left no-repeat transparent;
