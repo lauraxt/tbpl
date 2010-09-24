@@ -17,7 +17,7 @@ p {
   padding: 4px;
   font-size: 0.8em;
   background-color: rgba(255, 255, 255, 0.8);
-  height: 70px;
+  height: 42px;
 }
 #config {
   padding: 4px;
@@ -134,7 +134,7 @@ iframe {
   padding: 10px 20px;
   position: absolute;
   margin: 0;
-  top: 78px;
+  top: 50px;
   bottom: 0px;
   overflow: auto;
   left: 0;
