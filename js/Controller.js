@@ -10,6 +10,14 @@ var Controller = {
     return keys;
   },
 
+  valuesFromObject: function Controller_valuesFromObject(obj) {
+    var values = [];
+    for (var key in obj) {
+      values.push(obj[key]);
+    }
+    return values;
+  },
+
   stripTags: function Controller_stripTags(text) {
     return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   },

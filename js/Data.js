@@ -8,7 +8,7 @@ function Data(treeName, noIgnore, config, pusher, rev) {
   this._pusher = pusher;
   this._rev = rev;
   this._pushes = {};
-  this._machines = [];
+  this._machines = {};
   this._finishedResults = {};
   this._runningAndPendingResults = {};
   this._orphanResults = {};
@@ -30,7 +30,8 @@ Data.prototype = {
       else {
         var updatedPushes = self._combineResults(loadedData, timeOffset);
         statusCallback({loadpercent: 1});
-        successCallback(self._machines, updatedPushes);
+        successCallback(Controller.valuesFromObject(self._machines),
+          Controller.valuesFromObject(updatedPushes));
       }
     };
     checkLoaded();
@@ -53,8 +54,7 @@ Data.prototype = {
       timeOffset,
       this._noIgnore,
       function tinderboxDataLoadCallback(data) {
-        loadedData.machines = data.machines;
-        loadedData.machineResults = data.machineResults;
+        loadedData.machineResults = data;
         checkLoaded();
       },
       failCallback
@@ -117,8 +117,6 @@ Data.prototype = {
   },
   
   _combineResults: function Data__combineResults(data, goingIntoPast) {
-    if (!goingIntoPast)
-      this._machines = data.machines;
     var self = this;
     var newRunning = {};
     var updatedPushes = {};
@@ -132,6 +130,14 @@ Data.prototype = {
     }
 
     function categorizeResult(result) {
+      if (!(result.machine.name in self._machines))
+        self._machines[result.machine.name] = {name: result.machine.name,
+          os: result.machine.os, type: result.machine.type,
+          debug: result.machine.debug, latestFinishedRun: null, runs: 0,
+          runtime: 0, averageCycleTime: 0};
+      var machine = self._machines[result.machine.name];
+      result.machine = machine;
+
       result.guessedRev = self._getRevForResult(result);
       if (!(result.push = self._pushes[result.guessedRev])) {
         // This test run started before any of the pushes in the pushlog.
@@ -141,8 +147,18 @@ Data.prototype = {
       if (~["building", "pending"].indexOf(result.state))
         newRunning[result.runID] = result;
       else {
+        linkPush(result); // for now, we regenerate the push list every time
+        if (result.runID in self._finishedResults)
+          return;
         self._finishedResults[result.runID] = result;
-        linkPush(result);
+        if (!machine.latestFinishedRun || result.startTime > machine.latestFinishedRun.startTime) {
+          machine.latestFinishedRun = result;
+        }
+        if (result.state != "success")
+          return;
+        machine.runs++;
+        machine.runtime+= (result.endTime.getTime() - result.startTime.getTime())/1000;
+        machine.averageCycleTime = Math.ceil(machine.runtime/machine.runs);
       }
     }
     function unlinkPush(result) {
@@ -195,9 +211,6 @@ Data.prototype = {
     for (var i in newRunning)
       linkPush(newRunning[i]);
 
-    var pushArray = [];
-    for (var toprev in updatedPushes)
-      pushArray.push(updatedPushes[toprev]);
-    return pushArray;
+    return updatedPushes;
   }
 }

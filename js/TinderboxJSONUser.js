@@ -109,10 +109,7 @@ var TinderboxJSONUser = {
         "name": name,
         "os": machinetype.os,
         "type": machinetype.type,
-        "debug": machinetype.debug,
-        latestFinishedRun: null,
-        "runs": 0,
-        "runtime": 0
+        "debug": machinetype.debug
       };
     });
   
@@ -140,13 +137,7 @@ var TinderboxJSONUser = {
         continue;
   
       var note = build.hasnote ? notes[build.noteid * 1] : "";
-  
-      if (state == 'success' && endTime) {
-        machines[machineIndex].runs++;
-        machines[machineIndex].runtime+=
-          (endTime.getTime() - startTime.getTime())/1000;
-      }
-  
+
       var result = machineResults[machineRunID] = new MachineResult ({
         "tree" : tree,
         "machine": machines[machineIndex],
@@ -161,22 +152,8 @@ var TinderboxJSONUser = {
         "errorParser": build.errorparser,
         "_scrape": buildScrape,
       });
-      if (state != "building") {
-        if (!machines[machineIndex].latestFinishedRun || startTime > machines[machineIndex].latestFinishedRun.startTime) {
-          machines[machineIndex].latestFinishedRun = result;
-        }
-      }
     } }
-  
-    machines.forEach(function setAverageCycleTimeOnMachine(machine) {
-      if (machine.runs) {
-        machine.averageCycleTime = Math.ceil(machine.runtime/machine.runs);
-      }
-      delete machine.runs;
-      delete machine.runtime;
-    });
-  
-    return { "machines": machines, "machineResults": machineResults };
+    return machineResults;
   }
 };
 
