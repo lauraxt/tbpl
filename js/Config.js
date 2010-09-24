@@ -8,6 +8,7 @@ var Config = {
   mvtTimezoneOffset: -7,
   mvtTimezoneName: "PDT",
   loadInterval: 120, // seconds
+  goBackHours: 12,
   baseURL: "",
   repoNames: {
     "Firefox": "mozilla-central",

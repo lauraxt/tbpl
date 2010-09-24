@@ -118,15 +118,13 @@ Data.prototype = {
   
   _combineResults: function Data__combineResults(data, goingIntoPast) {
     var self = this;
-    var newRunning = {};
+    var currentlyRunning = {};
     var updatedPushes = {};
-    this._pushes = {}; //for now
     for (var toprev in data.pushes) {
-      // TODO: do not add already existing pushes to updatedPushes
-      //if (!(data.pushes[i].toprev in this._pushes)) {
+      if (!(data.pushes[toprev].toprev in this._pushes)) {
         this._pushes[toprev] = data.pushes[toprev];
         updatedPushes[toprev] = data.pushes[toprev];
-      //}
+      }
     }
 
     function categorizeResult(result) {
@@ -145,11 +143,17 @@ Data.prototype = {
         return;
       }
       if (~["building", "pending"].indexOf(result.state))
-        newRunning[result.runID] = result;
+        currentlyRunning[result.runID] = result;
       else {
-        linkPush(result); // for now, we regenerate the push list every time
-        if (result.runID in self._finishedResults)
+        if (result.runID in self._finishedResults) {
+          var existing = self._finishedResults[result.runID];
+          if (result.note != existing.note) {
+            existing.note = result.note;
+            updatedPushes[existing.push.toprev] = existing.push;
+          }
           return;
+        }
+        linkPush(result);
         self._finishedResults[result.runID] = result;
         if (!machine.latestFinishedRun || result.startTime > machine.latestFinishedRun.startTime) {
           machine.latestFinishedRun = result;
@@ -168,7 +172,7 @@ Data.prototype = {
       var group = self.machineGroup(machine.type);
       var grouparr = push.results[machine.os][debug][group]
       for (var i in grouparr) {
-        if (grouparr[i] == result) {
+        if (grouparr[i].runID == result.runID) {
           grouparr.splice(i, 1);
           break;
         }
@@ -193,23 +197,35 @@ Data.prototype = {
       updatedPushes[push.toprev] = push;
     }
 
-    /* TODO: reevaluate orphanResults when we go back in time
-    var oldorphans = this._orphanResults;
-    this._orphanResults = {};
-    for (var i in oldorphans) {
-      categorizeResult(oldorphans[i]);
+    if (goingIntoPast) {
+      var oldorphans = this._orphanResults;
+      this._orphanResults = {};
+      for (var i in oldorphans) {
+        categorizeResult(oldorphans[i]);
+      }
     }
-    */
 
     for (var i in data.machineResults)
       categorizeResult(data.machineResults[i]);
 
-    this._runningAndPendingResults = newRunning;
+    // returns elements in a that are not in b
+    function objdiff(a, b) {
+      var c = {};
+      for (var k in a)
+        if (!(k in b))
+          c[k] = a[k];
+      return c;
+    }
 
-    // TODO: remove old runningAndPendingResults from their pushes
-    // and only evaluate newRunning (not when we are loading the past)
-    for (var i in newRunning)
-      linkPush(newRunning[i]);
+    if (!goingIntoPast) {
+      var notRunningAnyMore = objdiff(this._runningAndPendingResults, currentlyRunning);
+      for (var i in notRunningAnyMore)
+        unlinkPush(notRunningAnyMore[i]);
+      var newRunning = objdiff(currentlyRunning, this._runningAndPendingResults);
+      for (var i in newRunning)
+        linkPush(newRunning[i]);
+      this._runningAndPendingResults = currentlyRunning;
+    }
 
     return updatedPushes;
   }

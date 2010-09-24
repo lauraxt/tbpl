@@ -48,14 +48,50 @@ var UserInterface = {
 
     this._updateTimezoneDisplay();
 
+    $("#pushes").append(
+      $('<li><a id="goBack" href="#" title="add another ' + Config.goBackHours + ' hours of history"></a></li>')
+        .children().first().bind('click', function goBack() {
+          self._controller.requestHistory(function UserInterface__requestHistory(machines, pushes) {
+            self._updateTreeStatus(machines);
+
+            pushes.sort(function(a,b) { return b.date - a.date; });
+            var goback = $("#goBack").parent();
+            if (pushes.length) {
+              $("#nopushes").remove();
+              var pushesElem = $("#pushes");
+              pushes.forEach(function(push) {
+                var exists = document.getElementById("push-" + push.toprev);
+                if (exists)
+                  $(exists).replaceWith(self._generatePushNode(push));
+                else
+                  goback.before(self._generatePushNode(push));
+              });
+              self._setActiveResult(this._activeResult, false);
+            }
+          });
+          return false;
+        }).parent());
+
+    return {status: self.updateStatus, refresh: function (machines, pushes) {self.handleRefresh(machines, pushes); } };
   },
 
-  loadedData: function UserInterface_loadedData(machines, pushes) {
+  handleRefresh: function UserInterface_loadedData(machines, pushes) {
     this._updateTreeStatus(machines);
 
-    pushes.sort(function(a,b) { return b.date - a.date; });
-    this._regeneratePushesList(pushes);
-    
+    pushes.sort(function(a,b) { return a.date - b.date; });
+    if (pushes.length) {
+      $("#nopushes").remove();
+      var pushesElem = $("#pushes");
+      var self = this;
+      pushes.forEach(function(push) {
+        var exists = document.getElementById("push-" + push.toprev);
+        if (exists)
+          $(exists).replaceWith(self._generatePushNode(push));
+        else
+          pushesElem.prepend(self._generatePushNode(push));
+      });
+      this._setActiveResult(this._activeResult, false);
+    }
   },
 
   updateStatus: function UserInterface_updateStatus(status) {
@@ -404,27 +440,6 @@ var UserInterface = {
     return node;
   },
 
-  _installHistoryArrowClickHandlers: function UserInterface__installHistoryArrowClickHandlers() {
-    var self = this;
-    var timeOffset = this._controller.getTimeOffset();
-    if (timeOffset) {
-      $('#goForward').bind('click', function goForward() {
-        if (!timeOffset)
-          return false;
-        if (timeOffset + 12 * 3600 > (new Date()).getTime() / 1000) {
-          self._controller.setTimeOffset(0);
-        }
-        else
-          self._controller.setTimeOffset(timeOffset + 12 * 3600);
-        return false;
-      });
-    }
-    $('#goBack').bind('click', function goBack() {
-      self._controller.setTimeOffset(timeOffset ? timeOffset - 12 * 3600 : Math.round((new Date()).getTime() / 1000) - 12 * 3600);
-      return false;
-    });
-  },
-
   clickMachineResult: function UserInterface_clickMachineResult(e, result) {
     e.preventDefault();
     this._resultLinkClick(result);
@@ -501,31 +516,6 @@ var UserInterface = {
         popup.fadeIn(200);
       }
     });
-  },
-
-  _regeneratePushesList: function UserInterface__regeneratePushesList(pushes) {
-    var self = this;
-    var pushesElem = $("#pushes").empty();
-    var timeOffset = this._controller.getTimeOffset();
-    if (timeOffset)
-      pushesElem.append($('<li><a id="goForward" href="#" title="go forward by 12 hours"></a></li>'));
-    if (!pushes.length) {
-      var from = timeOffset ? new Date((timeOffset - 12 * 3600) * 1000) :
-        new Date(((new Date()).getTime() - 12 * 3600 * 1000));
-      var and = timeOffset ? new Date(timeOffset * 1000) : new Date();
-      pushesElem.append($('<li>There were no pushes between ' +
-        '<em class="date" data-timestamp="' + from.getTime() + '">' +
-        self._getDisplayDate(from) + '</em> and ' +
-        '<em class="date" data-timestamp="' + and.getTime() + '">' +
-        self._getDisplayDate(and) + '</em></li>'));
-    }
-    else
-      pushes.forEach(function(push) {
-        pushesElem.append(self._generatePushNode(push));
-      });
-    pushesElem.append($('<li><a id="goBack" href="#" title="go back by 12 hours"></a></li>'));
-    this._installHistoryArrowClickHandlers();
-    this._setActiveResult(this._activeResult, false);
   },
 
   _clickNowhere: function UserInterface__clickNowhere(e) {

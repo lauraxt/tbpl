@@ -29,6 +29,8 @@ var Controller = {
    * into the past. Or zero if we want to show the most recent changes.
    */
   _timeOffset: 0,
+  _statusCallback: null,
+  _refreshCallback: null,
 
   _loadInterval: null,
   _data: null,
@@ -58,37 +60,26 @@ var Controller = {
 
     this._data = new Data(this.treeName, noIgnore, Config, pusher, rev);
 
-    UserInterface.init(this);
+    var uiConf = UserInterface.init(this);
+    this._statusCallback = uiConf.status;
+    this._refreshCallback = uiConf.refresh;
 
-    this.forceRefresh();
+    this._timeOffset = (new Date()).getTime() / 1000;
+
+    var self = this;
+    this._startStatusRequest();
+    this._loadInterval = setInterval(function startStatusRequestIntervalCallback() {
+      self._startStatusRequest();
+    }, Config.loadInterval * 1000);
   },
 
   getData: function Controller_getData() {
     return this._data;
   },
 
-  getTimeOffset: function Controller_getTimeOffset() {
-    return this._timeOffset;
-  },
-
-  setTimeOffset: function Controller_setTimeOffset(timeOffset) {
-    this._timeOffset = timeOffset;
-    this.forceRefresh();
-  },
-
-  forceRefresh: function Controller_forceRefresh() {
-    var self = this;
-    this._startStatusRequest();
-    if (this._loadInterval) {
-      clearInterval(this._loadInterval);
-      this._loadInterval = null;
-    }
-    if (!this._timeOffset) {
-      // Don't bother refreshing the past.
-      this._loadInterval = setInterval(function startStatusRequestIntervalCallback() {
-        self._startStatusRequest();
-      }, Config.loadInterval * 1000);
-    }
+  requestHistory: function Controller_requestHistory(callback) {
+    this._timeOffset-= Config.goBackHours * 3600;
+    this._data.load(this._timeOffset, this._statusCallback, callback);
   },
 
   _getParams: function Controller__getParams() {
@@ -108,8 +99,6 @@ var Controller = {
   },
 
   _startStatusRequest: function Controller__startStatusRequest() {
-    // the callbacks need to be wrapped in a function, otherwise their "this" will be messed up.
-    this._data.load(this._timeOffset, function(status) { UserInterface.updateStatus(status); },
-                    function(machines, pushes) { UserInterface.loadedData(machines, pushes); });
+    this._data.load(0, this._statusCallback, this._refreshCallback);
   }
 };

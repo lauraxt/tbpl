@@ -62,11 +62,7 @@ var TinderboxJSONUser = {
       scriptURL = 'http://tinderbox.mozilla.org/showbuilds.cgi?tree=' + tree +
                   '&json=1';
       if (timeOffset) {
-        /**
-         * tinderbox is a little quirky with maxdate, so get 24 hours with
-         * maxdate 12 hours in the future
-         */
-        scriptURL += '&maxdate=' + (timeOffset + 12 * 3600) + '&hours=24';
+        scriptURL += '&maxdate=' + timeOffset + '&hours=' + Config.goBackHours;
       }
       if (noIgnore) {
         scriptURL += '&noignore=1';

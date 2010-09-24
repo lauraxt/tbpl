@@ -54,7 +54,7 @@ var PushlogJSONParser = {
   },
 
   _getLogUrl: function PushlogJSONParser__getLogUrl(repoName, timeOffset) {
-    var startDate = timeOffset ? this._formattedDate(new Date((timeOffset - 12 * 3600) * 1000)) : '12+hours+ago';
+    var startDate = timeOffset ? this._formattedDate(new Date((timeOffset - Config.goBackHours * 3600) * 1000)) : '12+hours+ago';
     var endDate = timeOffset ? this._formattedDate(new Date(timeOffset * 1000)) : 'now';
     return "http://hg.mozilla.org/" + repoName + "/json-pushes?full=1&startdate=" + startDate + "&enddate=" + endDate;
   },
