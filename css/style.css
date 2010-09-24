@@ -98,18 +98,19 @@ p {
   text-decoration: none !important;
 }
 
-#goForward, #goBack {
+#goBack {
   display: block;
   width: 16px;
   height: 16px;
   margin: auto;
-  background: url(../images/tango-updown.png) no-repeat;
+  background: url(../images/tango-updown.png) no-repeat bottom left;
 }
-#goForward {
-  background-position: top left;
+
+#nopushes {
+  text-align: center;
 }
-#goBack {
-  background-position: bottom left;
+.initialload #nopushes {
+  display: none;
 }
 
 iframe {

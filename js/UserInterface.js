@@ -76,12 +76,13 @@ var UserInterface = {
   },
 
   handleRefresh: function UserInterface_loadedData(machines, pushes) {
+    var pushesElem = $("#pushes");
+    pushesElem.removeClass("initialload");
     this._updateTreeStatus(machines);
 
     pushes.sort(function(a,b) { return a.date - b.date; });
     if (pushes.length) {
       $("#nopushes").remove();
-      var pushesElem = $("#pushes");
       var self = this;
       pushes.forEach(function(push) {
         var exists = document.getElementById("push-" + push.toprev);

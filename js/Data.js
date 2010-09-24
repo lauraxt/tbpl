@@ -11,6 +11,9 @@ function Data(treeName, noIgnore, config, pusher, rev) {
   this._machines = {};
   this._finishedResults = {};
   this._runningAndPendingResults = {};
+  // These results could not be associated to any push yet. Keep track of them
+  // and try again on the next refresh, the corresponding push may be there by
+  // then.
   this._orphanResults = {};
 };
 
@@ -127,6 +130,9 @@ Data.prototype = {
       }
     }
 
+    // Adds the result to either _orphanResults, currentlyRunning or
+    // _finishedResults. Also takes care of keeping track of the machine and
+    // makes sure new notes are correctly forwarded to already linked jobs.
     function categorizeResult(result) {
       if (!(result.machine.name in self._machines))
         self._machines[result.machine.name] = {name: result.machine.name,
@@ -138,11 +144,10 @@ Data.prototype = {
 
       result.guessedRev = self._getRevForResult(result);
       if (!(result.push = self._pushes[result.guessedRev])) {
-        // This test run started before any of the pushes in the pushlog.
         self._orphanResults[result.runID] = result;
         return;
       }
-      if (~["building", "pending"].indexOf(result.state))
+      if (["building", "pending"].indexOf(result.state) != -1)
         currentlyRunning[result.runID] = result;
       else {
         if (result.runID in self._finishedResults) {
@@ -165,6 +170,10 @@ Data.prototype = {
         machine.averageCycleTime = Math.ceil(machine.runtime/machine.runs);
       }
     }
+
+    // Removes a run from a push. This is needed for running jobs that are
+    // removed in favor of the finished counterpart. For now, the same job
+    // has different runIDs depending on the status.
     function unlinkPush(result) {
       var push = result.push;
       var machine = result.machine;
@@ -180,6 +189,8 @@ Data.prototype = {
       updatedPushes[push.toprev] = push;
       result.push = null;
     }
+
+    // Add a run to the corresponding push so it is displayed in the ui.
     function linkPush(result) {
       var push = result.push;
       var machine = result.machine;
