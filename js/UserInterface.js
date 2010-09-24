@@ -369,7 +369,7 @@ var UserInterface = {
 
   _generatePushNode: function UserInterface__generatePushNode(push) {
     var self = this;
-    var nodeHtml = '<li id="' + push.patches[0].rev + '">\n' +
+    var nodeHtml = '<li id="push-' + push.patches[0].rev + '">\n' +
       '<h2><span class="pusher">' + push.pusher + '</span> &ndash; ' +
       '<span class="date" data-timestamp="' + push.date.getTime() + '">' +
       self._getDisplayDate(push.date) + '</span>' +
