@@ -113,7 +113,7 @@ var TinderboxJSONUser = {
         "os": machinetype.os,
         "type": machinetype.type,
         "debug": machinetype.debug,
-        latestFinishedRun: { id: "", startTime: -1 },
+        latestFinishedRun: null,
         "runs": 0,
         "runtime": 0
       };
@@ -150,7 +150,7 @@ var TinderboxJSONUser = {
           (endTime.getTime() - startTime.getTime())/1000;
       }
   
-      machineResults[machineRunID] = new MachineResult ({
+      var result = machineResults[machineRunID] = new MachineResult ({
         "tree" : tree,
         "machine": machines[machineIndex],
         "runID": machineRunID,
@@ -165,11 +165,8 @@ var TinderboxJSONUser = {
         "_scrape": buildScrape,
       });
       if (state != "building") {
-        if (startTime.getTime() > machines[machineIndex].latestFinishedRun.startTime) {
-          machines[machineIndex].latestFinishedRun = {
-            id: machineRunID,
-            "startTime": startTime.getTime()
-          };
+        if (!machines[machineIndex].latestFinishedRun || startTime > machines[machineIndex].latestFinishedRun.startTime) {
+          machines[machineIndex].latestFinishedRun = result;
         }
       }
     } }

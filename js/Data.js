@@ -27,7 +27,7 @@ Data.prototype = {
       else {
         self._combineResults();
         statusCallback({loadpercent: 1});
-        successCallback();
+        successCallback(self._machines, self._pushes);
       }
     };
     checkLoaded();
@@ -68,16 +68,8 @@ Data.prototype = {
     return machineType;
   },
 
-  getMachines: function Data_getMachines() {
-    return this._machines;
-  },
-
-  getMachineResults: function Data_getMachineResults() {
-    return this._machineResults;
-  },
-
-  getPushes: function Data_getPushes() {
-    return this._pushes;
+  getMachineResult: function Data_getMachineResult(id) {
+    return this._machineResults[id];
   },
 
   _getPushForRev: function Data__getPushForRev(rev) {

@@ -102,6 +102,6 @@ var Controller = {
   _startStatusRequest: function Controller__startStatusRequest() {
     // the callbacks need to be wrapped in a function, otherwise their "this" will be messed up.
     this._data.load(this._timeOffset, function(status) { UserInterface.updateStatus(status); },
-                    function() { UserInterface.loadedData(); });
+                    function(machines, pushes) { UserInterface.loadedData(machines, pushes); });
   }
 };

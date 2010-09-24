@@ -50,9 +50,9 @@ var UserInterface = {
 
   },
 
-  loadedData: function UserInterface_loadedData() {
-    this._updateTreeStatus();
-    this._regeneratePushesList();
+  loadedData: function UserInterface_loadedData(machines, pushes) {
+    this._updateTreeStatus(machines);
+    this._regeneratePushesList(pushes);
   },
 
   updateStatus: function UserInterface_updateStatus(status) {
@@ -167,17 +167,14 @@ var UserInterface = {
            .replace(/(changeset\s*)?([0-9a-f]{12})\b/ig, '<a href="http://hg.mozilla.org/' + Config.repoNames[this._treeName] + '/rev/$2">$1$2</a>');
   },
 
-  _updateTreeStatus: function UserInterface__updateTreeStatus() {
-    var machines = this._data.getMachines();
-    var machineResults = this._data.getMachineResults();
+  _updateTreeStatus: function UserInterface__updateTreeStatus(machines) {
     var self = this;
     var failing = [];
     machines.forEach(function addMachineToTreeStatus1(machine) {
-      if (!machine.latestFinishedRun.id) {
+      var result = machine.latestFinishedRun;
+      if (!result)
         // Ignore machines without run information.
         return;
-      }
-      var result = machineResults[machine.latestFinishedRun.id];
       // errors in front, failures in back
       switch(result.state)
       {
@@ -503,27 +500,27 @@ var UserInterface = {
     });
   },
 
-  _regeneratePushesList: function UserInterface__regeneratePushesList() {
+  _regeneratePushesList: function UserInterface__regeneratePushesList(pushes) {
     var self = this;
-    var pushes = $("#pushes").empty();
+    var pushesElem = $("#pushes").empty();
     var timeOffset = this._controller.getTimeOffset();
     if (timeOffset)
-      pushes.append($('<li><a id="goForward" href="#" title="go forward by 12 hours"></a></li>'));
-    if (!this._data.getPushes().length) {
+      pushesElem.append($('<li><a id="goForward" href="#" title="go forward by 12 hours"></a></li>'));
+    if (!pushes.length) {
       var from = timeOffset ? new Date((timeOffset - 12 * 3600) * 1000) :
         new Date(((new Date()).getTime() - 12 * 3600 * 1000));
       var and = timeOffset ? new Date(timeOffset * 1000) : new Date();
-      pushes.append($('<li>There were no pushes between ' +
+      pushesElem.append($('<li>There were no pushes between ' +
         '<em class="date" data-timestamp="' + from.getTime() + '">' +
         self._getDisplayDate(from) + '</em> and ' +
         '<em class="date" data-timestamp="' + and.getTime() + '">' +
         self._getDisplayDate(and) + '</em></li>'));
     }
     else
-      this._data.getPushes().forEach(function(push) {
-        pushes.append(self._generatePushNode(push));
+      pushes.forEach(function(push) {
+        pushesElem.append(self._generatePushNode(push));
       });
-    pushes.append($('<li><a id="goBack" href="#" title="go back by 12 hours"></a></li>'));
+    pushesElem.append($('<li><a id="goBack" href="#" title="go back by 12 hours"></a></li>'));
     this._installHistoryArrowClickHandlers();
     this._setActiveResult(this._activeResult, false);
   },
@@ -599,7 +596,7 @@ var UserInterface = {
   
   _displayResult: function UserInterface__displayResult() {
     var self = this;
-    var result = this._data.getMachineResults()[this._activeResult];
+    var result = this._data.getMachineResult(this._activeResult);
     var box = $("#details");
     var body = $("body");
     if (!result) {
