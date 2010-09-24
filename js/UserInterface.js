@@ -52,7 +52,7 @@ var UserInterface = {
 
   loadedData: function UserInterface_loadedData() {
     this._updateTreeStatus();
-    this._buildPushesList();
+    this._regeneratePushesList();
   },
 
   updateStatus: function UserInterface_updateStatus(status) {
@@ -151,7 +151,7 @@ var UserInterface = {
   _switchTimezone: function UserInterface__switchTimezone(local) {
     this._setUseLocalTime(local);
     this._updateTimezoneDisplay();
-    this._buildPushesList();
+    this._regeneratePushesList();
   },
 
   _linkBugs: function UserInterface__linkBugs(text) {
@@ -263,12 +263,6 @@ var UserInterface = {
       + 'mins';
   },
 
-  _uninstallPushesListClickHandlers: function UserInterface__uninstallPushesListClickHandlers() {
-    $(".patches > li").unbind();
-    $("#goForward").unbind();
-    $("#goBack").unbind();
-  },
-
   _numberForMachine: function UserInterface__numberForMachine(machine) {
     var match = /([0-9]+)\/[0-9]/.exec(machine.name);
     if (match)
@@ -368,14 +362,9 @@ var UserInterface = {
     '</ul>';
   },
 
-  _writePushesListHTML: function UserInterface__writePushesListHTML() {
+  _generatePushNode: function UserInterface__generatePushNode(push) {
     var self = this;
-    var ul = document.getElementById("pushes");
-    var html = this._controller.getTimeOffset() ? '<li><a id="goForward" href="#" title="go forward by 12 hours"></a></li>' : '';
-    var pushes = this._data.getPushes();
-    var timeOffset = this._controller.getTimeOffset();
-    html += pushes.map(function buildHTMLForPush(push, pushIndex) {
-      return '<li>\n' +
+    var nodeHtml = '<li id="' + push.patches[0].rev + '">\n' +
       '<h2><span class="pusher">' + push.pusher + '</span> &ndash; ' +
       '<span class="date">' + self._getDisplayDate(push.date) + '</span>' +
       ' (<label>compare: <input class="revsToCompare" type="checkbox" value="' + push.patches[0].rev + '"></label>)' +
@@ -400,12 +389,10 @@ var UserInterface = {
       }).join("\n") +
       '</ul>\n' +
       '</li>';
-    }).join("\n") || '<li>There were no pushes between <em>' +
-      self._getDisplayDate(timeOffset ? new Date((timeOffset-12*3600)*1000) :
-      new Date(((new Date()).getTime()-12*3600*1000)))+'</em> and <em>' +
-      self._getDisplayDate(timeOffset ? new Date(timeOffset*1000) : new Date())+'</em></li>';
-    html += '<li><a id="goBack" href="#" title="go back by 12 hours"></a></li>';
-    ul.innerHTML = html;
+    var node = $(nodeHtml);
+    this._installComparisonClickHandler(node);
+    this._installTooltips(node);
+    return node;
   },
 
   _installHistoryArrowClickHandlers: function UserInterface__installHistoryArrowClickHandlers() {
@@ -445,8 +432,8 @@ var UserInterface = {
    * - allow to select multiple revs, show them somewhere in the ui with a
    *   button that does the compare
    */
-  _installComparisonClickHandler: function UserInterface__installComparisonClickHandler() {
-    $(".revsToCompare").bind("click", function clickRevsToCompare(e) {
+  _installComparisonClickHandler: function UserInterface__installComparisonClickHandler(context) {
+    $(".revsToCompare", context).bind("click", function clickRevsToCompare(e) {
       // get selected revisions
       var revs = $(".revsToCompare").map(function() {
         return this.checked ? this.value : null;
@@ -464,8 +451,8 @@ var UserInterface = {
     });
   },
 
-  _installTooltips: function UserInterface__installTooltips() {
-    $(".patches > li").bind("mouseenter", function startFadeInTimeout() {
+  _installTooltips: function UserInterface__installTooltips(context) {
+    $(".patches > li", context).bind("mouseenter", function startFadeInTimeout() {
       var div = $(".popup:not(.hovering)", this);
       if (div.width() - div.children().width() > 10)
         return; // There's enough space; no need to show the popup.
@@ -507,12 +494,23 @@ var UserInterface = {
     });
   },
 
-  _buildPushesList: function UserInterface__buildPushesList() {
-    this._uninstallPushesListClickHandlers();
-    this._writePushesListHTML();
+  _regeneratePushesList: function UserInterface__regeneratePushesList() {
+    var self = this;
+    var pushes = $("#pushes").empty();
+    var timeOffset = this._controller.getTimeOffset();
+    if (timeOffset)
+      pushes.append($('<li><a id="goForward" href="#" title="go forward by 12 hours"></a></li>'));
+    if (!this._data.getPushes().length)
+      pushes.append($('<li>There were no pushes between <em>' + 
+        self._getDisplayDate(timeOffset ? new Date((timeOffset-12*3600)*1000) :
+        new Date(((new Date()).getTime()-12*3600*1000)))+'</em> and <em>' +
+        self._getDisplayDate(timeOffset ? new Date(timeOffset*1000) : new Date())+'</em></li>'));
+    else
+      this._data.getPushes().forEach(function(push) {
+        pushes.append(self._generatePushNode(push));
+      });
+    pushes.append($('<li><a id="goBack" href="#" title="go back by 12 hours"></a></li>'));
     this._installHistoryArrowClickHandlers();
-    this._installComparisonClickHandler();
-    this._installTooltips();
     this._setActiveResult(this._activeResult, false);
   },
 
