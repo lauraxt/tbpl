@@ -61,28 +61,29 @@ var AddCommentUI = {
 
   submit: function AddCommentUI_submit() {
     var self = this;
-    var machineResults = UserInterface._data.getMachineResults(); // XXX hack
+    var data = Controller.getData();
     var email = $("#logNoteEmail").get(0).value;
     var comment = $("#logNoteText").get(0).value;
     for (var i in this.addToBuilds) {
-      this._postOneComment(email, comment, machineResults[i], function oneLessCommentPending() {
+      this._postOneComment(email, comment, data.getMachineResult(i), function oneLessCommentPending() {
         self.pendingCommentsChanged(-1);
       });
       this.pendingCommentsChanged(1);
     }
     var bugsSubmitData = {};
     for (var i in this.addToBuilds) {
-      if (!machineResults[i].suggestions)
+      var machineResult = data.getMachineResult(i);
+      if (!machineResult.suggestions)
         continue;
-      for (var j = 0; j < machineResults[i].suggestions.length; ++j) {
-        var suggestion = machineResults[i].suggestions[j];
+      for (var j = 0; j < machineResult.suggestions.length; ++j) {
+        var suggestion = machineResult.suggestions[j];
         if (!(suggestion.id in this.addToBugs))
           continue;
         bugsSubmitData[suggestion.id] = {
           header: suggestion.signature,
           log: suggestion.log,
           email: email.replace("@", "%"),
-          logLink: 'http://tinderbox.mozilla.org/showlog.cgi?log=' + Controller.treeName + '/' + machineResults[i].runID
+          logLink: 'http://tinderbox.mozilla.org/showlog.cgi?log=' + Controller.treeName + '/' + machineResult.runID
         };
       }
     }
@@ -206,7 +207,7 @@ var AddCommentUI = {
   _updateBuildList: function AddCommentUI__updateBuildList() {
     var html = "";
     for (var i in this.addToBuilds) {
-      html += UserInterface._machineResultLink(Controller.getData().getMachineResults()[i])
+      html += UserInterface._machineResultLink(Controller.getData().getMachineResult(i))
     }
     $("#logNoteRuns").html(html ? html : "(none selected)");
     UserInterface._markActiveResultLinks(); // XXX fix this
@@ -217,7 +218,7 @@ var AddCommentUI = {
     var added = false;
     for (var i in this.addToBuilds) {
       added = true;
-      UserInterface._addSuggestionLink(Controller.getData().getMachineResults()[i],
+      UserInterface._addSuggestionLink(Controller.getData().getMachineResult(i),
                                        $("#logNoteSuggestions"));
     }
     if (added)
