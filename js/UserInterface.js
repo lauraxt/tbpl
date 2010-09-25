@@ -8,6 +8,7 @@ var UserInterface = {
   _data: null,
   _activeResult: "",
   _storage: null,
+  _machines: [],
 
   init: function UserInterface_init(controller) {
     var self = this;
@@ -39,9 +40,10 @@ var UserInterface = {
 
     SummaryLoader.init();
     AddCommentUI.init("http://tinderbox.mozilla.org/addnote.cgi", this._storage);
-    AddCommentUI.registerNumSendingCommentChangedCallback(function commentSendUpdater() {
+    AddCommentUI.registerNumSendingCommentChangedCallback(function commentSendUpdater(changedResult) {
       self.updateStatus();
-      self.loadedData("machineResults");
+      if (changedResult)
+        self.handleRefresh(self._machines, [changedResult.push]);
     });
     AddCommentUI.registerNumSendingBugChangedCallback(function bugSendUpdater() {
       self.updateStatus();
@@ -73,10 +75,11 @@ var UserInterface = {
           return false;
         }).parent());
 
-    return {status: self.updateStatus, refresh: function (machines, pushes) {self.handleRefresh(machines, pushes); } };
+    return {status: self.updateStatus, refresh: function (machines, pushes) { self.handleRefresh(machines, pushes); } };
   },
 
   handleRefresh: function UserInterface_loadedData(machines, pushes) {
+    this._machines = machines;
     var pushesElem = $("#pushes");
     pushesElem.removeClass("initialload");
     this._updateTreeStatus(machines);

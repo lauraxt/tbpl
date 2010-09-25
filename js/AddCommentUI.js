@@ -64,12 +64,13 @@ var AddCommentUI = {
     var data = Controller.getData();
     var email = $("#logNoteEmail").get(0).value;
     var comment = $("#logNoteText").get(0).value;
-    for (var i in this.addToBuilds) {
-      this._postOneComment(email, comment, data.getMachineResult(i), function oneLessCommentPending() {
-        self.pendingCommentsChanged(-1);
+    Controller.keysFromObject(this.addToBuilds).forEach(function(id) {
+      var result = data.getMachineResult(id)
+      self._postOneComment(email, comment, result, function oneLessCommentPending() {
+        self.pendingCommentsChanged(-1, result);
       });
-      this.pendingCommentsChanged(1);
-    }
+      self.pendingCommentsChanged(1);
+    });
     var bugsSubmitData = {};
     for (var i in this.addToBuilds) {
       var machineResult = data.getMachineResult(i);
@@ -155,9 +156,9 @@ var AddCommentUI = {
     }
   },
 
-  pendingCommentsChanged: function AddCommentUI_pendingCommentsChanged(changedBy) {
+  pendingCommentsChanged: function AddCommentUI_pendingCommentsChanged(changedBy, result) {
     this.numSendingComments += changedBy;
-    this.numSendingCommentChangedCallback();
+    this.numSendingCommentChangedCallback(result);
   },
 
   registerNumSendingCommentChangedCallback: function AddCommentUI_registerNumSendingCommentChangedCallback(callback) {
