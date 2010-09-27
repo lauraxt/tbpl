@@ -37,11 +37,12 @@ p {
   right: 0;
   text-align: right;
 }
-#legendContainer, #treeInfoContainer {
+.dropdown {
   display: inline-block;
   margin-right: 1em;
+  position: relative;
 }
-#mruList, #mruList li, #moreListContainer, #legend, #treeInfo, .dropdown h2 {
+#mruList, #mruList li, #moreListContainer, .dropdown h2 {
   margin: 0;
   padding: 0;
   display: inline;
@@ -60,10 +61,10 @@ p {
 .dropdown h2::after {
 	content: " ↓";
 }
-.dropdown {
-  position: relative;
-}
 .dropdown ul, .dropdown dl {
+  margin: 0;
+  padding: 0;
+  display: inline;
   position: absolute;
   z-index: 1; /* must be above rel-pos #moreListContainer, etc. */
   left: -5px;
@@ -85,12 +86,15 @@ p {
 #moreList a {
   padding: 5px 0;
 }
-#legend dt {
+.dropdown dt {
   position: absolute;
   font-weight: bold;
 }
 #legend dd {
   margin-left: 6em;
+}
+#infrastructure dd {
+  margin-left: 10em;
 }
 .loading {
   background: url(../images/loading_16.png) center left no-repeat transparent;

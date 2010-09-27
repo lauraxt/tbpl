@@ -95,6 +95,19 @@ var UserInterface = {
     pushesElem.removeClass("initialload");
     this._updateTreeStatus(machines);
 
+    if (infraStats) {
+      var html = '<dt>Branch</dt><dd><a href="http://build.mozilla.org/builds/pending.html">pending</a>' +
+        ' / <a href="http://build.mozilla.org/builds/running.html">running</a></dd>';
+      var total = {pending: 0, running: 0};
+      for (var branch in infraStats) {
+        html += "<dt>" + branch + "</dt><dd>" + infraStats[branch].pending + " / " + infraStats[branch].running + "</dd>";
+        total.pending += infraStats[branch].pending;
+        total.running += infraStats[branch].running;
+      }
+      html += "<dt>Total</dt><dd>" + total.pending + " / " + total.running + "</dd>";
+      $("#infrastructure").html(html);
+    }
+
     pushes.sort(function(a,b) { return a.date - b.date; });
     if (pushes.length) {
       $("#nopushes").remove();
