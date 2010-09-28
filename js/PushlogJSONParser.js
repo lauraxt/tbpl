@@ -12,7 +12,7 @@ var PushlogJSONParser = {
 
         // Filter by pusher if requested.
         if (pusher && push.user != pusher) {
-          return;
+          continue;
         }
 
         var patches = [];
@@ -43,7 +43,7 @@ var PushlogJSONParser = {
 
         // Ignore this push if the filtering rev isn't there.
         if (rev && !revFound) {
-          return;
+          continue;
         }
 
         var toprev = patches[0].rev;
