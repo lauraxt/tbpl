@@ -426,9 +426,7 @@ var UserInterface = {
 
   _buildHTMLForOS: function UserInterface__buildHTMLForOS(os, debug, results) {
     var self = this;
-    return '<li><span class="os ' + os + '">' + Config.OSNames[os] + debug +
-    '</span><span class="osresults">' +
-    Controller.keysFromObject(Config.testNames).map(function buildHTMLForPushResultsOnOSForMachineType(machineType) {
+    var osresults = Controller.keysFromObject(Config.testNames).map(function buildHTMLForPushResultsOnOSForMachineType(machineType) {
       if (!results[machineType])
         return '';
 
@@ -450,8 +448,13 @@ var UserInterface = {
         return a.startTime.getTime() - b.startTime.getTime();
       });
       return results[machineType].map(function linkMachineResults(a) { return self._machineResultLink(a); }).join(" ");
-    }).join("\n") +
-    '</span></li>';
+    }).join("\n");
+
+    if (!osresults)
+      return '';
+
+    return '<li><span class="os ' + os + '">' + Config.OSNames[os] + debug +
+    '</span><span class="osresults">' + soresults + '</span></li>';
   },
 
   _buildHTMLForPushResults: function UserInterface__buildHTMLForPushResults(push) {
