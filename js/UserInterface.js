@@ -454,7 +454,7 @@ var UserInterface = {
       return '';
 
     return '<li><span class="os ' + os + '">' + Config.OSNames[os] + debug +
-    '</span><span class="osresults">' + soresults + '</span></li>';
+    '</span><span class="osresults">' + osresults + '</span></li>';
   },
 
   _buildHTMLForPushResults: function UserInterface__buildHTMLForPushResults(push) {
