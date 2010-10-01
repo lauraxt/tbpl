@@ -38,6 +38,17 @@ var UserInterface = {
       self._clickNowhere(e);
     });
 
+    $(".dropdown").live("click", function dropdownClick(ev) {
+      $(this).addClass("open");
+    });
+
+    $("html").bind("mousedown", function clickAnywhere(e) {
+      // Close open dropdowns if the event's target is not inside
+      // an open dropdown.
+      if ($(e.target).parents(".dropdown.open").length == 0)
+        $(".dropdown").removeClass("open");
+    });
+
     SummaryLoader.init();
     AddCommentUI.init("http://tinderbox.mozilla.org/addnote.cgi", this._storage);
     AddCommentUI.registerNumSendingCommentChangedCallback(function commentSendUpdater(changedResult) {
@@ -162,14 +173,14 @@ var UserInterface = {
 
   _buildTreeSwitcher: function UserInterface__buildTreeSwitcher() {
     var mruList = $('<ul id="mruList"></ul>').appendTo("#treechooser");
-    var moreListContainer = $('<div id="moreListContainer"><h2>more...</h2></div></li>').appendTo("#treechooser");
+    var moreListContainer = $('<div id="moreListContainer" class="dropdown"><h2>more</h2></div></li>').appendTo("#treechooser");
     var moreList = $('<ul id="moreList"></ul>').appendTo(moreListContainer);
     var self = this;
     Controller.keysFromObject(Config.repoNames).forEach(function (tree, i) {
       var isMostRecentlyUsedTree = (self._storage.mostRecentlyUsedTrees.indexOf(tree) != -1);
       var treeLink = self._treeName == tree ?
         "<strong>" + tree + "</strong>" :
-        "<a href='" + (i == 0 ? "./" : "?tree=" + tree) + "'>" + tree + "</a>";
+        "<a href='?tree=" + tree + "'>" + tree + "</a>";
       $("<li>" + treeLink + "</li>").appendTo(isMostRecentlyUsedTree ? mruList : moreList);
     });
   },

@@ -41,8 +41,7 @@ p {
   display: inline-block;
   margin-right: 1em;
 }
-#mruList, #mruList li, #moreListContainer, #moreListContainer h2,
-#legend, #legendContainer h2, #treeInfo, #treeInfoContainer h2 {
+#mruList, #mruList li, #moreListContainer, #legend, #treeInfo, .dropdown h2 {
   margin: 0;
   padding: 0;
   display: inline;
@@ -53,30 +52,32 @@ p {
 #mruList a, #mruList strong {
   font-weight: bold;
 }
-#moreListContainer h2, #legendContainer h2, #treeInfoContainer h2 {
+.dropdown h2 {
   font-size: 1em;
   font-weight: normal;
   cursor: pointer;
 }
-#moreListContainer, #legendContainer, #treeInfoContainer {
+.dropdown h2::after {
+	content: " ↓";
+}
+.dropdown {
   position: relative;
 }
-#moreList, #legend, #treeInfo {
+.dropdown ul, .dropdown dl {
   position: absolute;
   z-index: 1; /* must be above rel-pos #moreListContainer, etc. */
   left: -5px;
-  top: 100%;
+  top: 99%;
   padding: 5px !important;
   white-space: nowrap;
   background-color: white;
   -moz-box-shadow: 1px 1px 5px #ccc;
   box-shadow: 1px 1px 5px #ccc;
 }
-#moreListContainer:not(:hover) #moreList, #legendContainer:not(:hover) #legend,
-#treeInfoContainer:not(:hover) #treeInfo {
-  display: none;
+.dropdown:not(.open) ul, .dropdown:not(.open) dl {
+  display: none !important;
 }
-#moreList, #moreList li {
+#moreList, #moreList li, #treeInfo li {
   display: block;
   margin: 0;
   padding: 0;
@@ -90,10 +91,6 @@ p {
 }
 #legend dd {
   margin-left: 6em;
-}
-#treeInfo li {
-  display: block;
-  margin: 0;
 }
 .loading {
   background: url(../images/loading_16.png) center left no-repeat transparent;
