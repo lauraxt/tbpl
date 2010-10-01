@@ -249,7 +249,7 @@ span.logtags span.inbranchtag {
 .machineResult:hover {
   text-decoration: none;
 }
-.machineResult:hover:not(.building):not(.pending), .machineResult[active=true],
+.machineResult:hover:not(.running):not(.pending), .machineResult[active=true],
 #logNoteSuggestions a:hover {
   color: white !important;
   text-decoration: none;
@@ -258,7 +258,8 @@ span.logtags span.inbranchtag {
 .testfailed { color: #F60 !important; }
 .busted     { color: #D00 !important; }
 .exception  { color: #708 !important; }
-.building   { color: #CCC !important; }
+.running    { color: #999 !important; }
+.pending    { color: #DDD !important; }
 .machineResult.success:hover    { background-color: #4A0; }
 .machineResult.testfailed:hover { background-color: #F70; }
 .machineResult.busted:hover     { background-color: #E00; }

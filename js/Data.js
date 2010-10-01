@@ -103,45 +103,14 @@ Data.prototype = {
     return this._finishedResults[id];
   },
 
-  _getRevForResult: function Data__getRevForResult(machineResult) {
-    if (machineResult.rev)
-      return machineResult.rev;
-  
-    var machineType = machineResult.machine.type;
-  
-    if (machineType != "Build" && machineType != "Nightly") {
-      // Talos and Unit Test boxes use the builds provided
-      // by build boxes and sync their start time with them.
-      // If there's a build machine with the same start time,
-      // use the same revision.
-      for (var j in this._finishedResults) {
-        var bMachine = this._finishedResults[j].machine;
-        if ((bMachine.type == "Build") &&
-          this._finishedResults[j].startTime.getTime() == machineResult.startTime.getTime()) {
-          return this._finishedResults[j].guessedRev;
-        }
-      }
-    }
-  
-    // Try to find out the rev by comparing times.
-    // this breaks when going back in time. Just return nothing when doing so.
-    // XXX fix this
-    //if (timeOffset)
-    // return '';
-
-    var latestPushRev = "", latestPushTime = -1;
-    var machineTime = machineResult.startTime.getTime();
-    for (var toprev in this._pushes) {
-      var push = this._pushes[toprev];
-      var pushTime = push.date.getTime();
-      if (pushTime < machineTime) {
-        if (latestPushTime < pushTime) {
-          latestPushRev = push.toprev;
-          latestPushTime = pushTime;
-        }
-      }
-    }
-    return latestPushRev;
+  _getPushForResult: function Data__getPushForResult(machineResult) {
+    var repo = Config.repoNames[this._treeName];
+    if (!(repo in machineResult.revs))
+      return;
+    var rev = machineResult.revs[repo];
+    if (rev in this._pushes)
+      return this._pushes[rev];
+    return;
   },
 
   getMachine: function Data__getMachine(name) {
@@ -195,7 +164,6 @@ Data.prototype = {
 
   _combineResults: function Data__combineResults(data, goingIntoPast) {
     var self = this;
-    var currentlyRunning = {};
     var updatedPushes = {};
     for (var toprev in data.pushes) {
       if (!(data.pushes[toprev].toprev in this._pushes)) {
@@ -208,34 +176,29 @@ Data.prototype = {
     // _finishedResults. Also takes care of keeping track of the machine and
     // makes sure new notes are correctly forwarded to already linked jobs.
     function categorizeResult(result) {
-      result.guessedRev = self._getRevForResult(result);
-      if (!(result.push = self._pushes[result.guessedRev])) {
+      if (!(result.push = self._getPushForResult(result))) {
         self._orphanResults[result.runID] = result;
         return;
       }
-      if (["building", "pending"].indexOf(result.state) != -1)
-        currentlyRunning[result.runID] = result;
-      else {
-        if (result.runID in self._finishedResults) {
-          var existing = self._finishedResults[result.runID];
-          if (result.note != existing.note) {
-            existing.note = result.note;
-            updatedPushes[existing.push.toprev] = existing.push;
-          }
-          return;
+      if (result.runID in self._finishedResults) {
+        var existing = self._finishedResults[result.runID];
+        if (result.note != existing.note) {
+          existing.note = result.note;
+          updatedPushes[existing.push.toprev] = existing.push;
         }
-        linkPush(result);
-        self._finishedResults[result.runID] = result;
-        var machine = result.machine;
-        if (!machine.latestFinishedRun || result.startTime > machine.latestFinishedRun.startTime) {
-          machine.latestFinishedRun = result;
-        }
-        if (result.state != "success")
-          return;
-        machine.runs++;
-        machine.runtime+= (result.endTime.getTime() - result.startTime.getTime())/1000;
-        machine.averageCycleTime = Math.ceil(machine.runtime/machine.runs);
+        return;
       }
+      linkPush(result);
+      self._finishedResults[result.runID] = result;
+      var machine = result.machine;
+      if (!machine.latestFinishedRun || result.startTime > machine.latestFinishedRun.startTime) {
+        machine.latestFinishedRun = result;
+      }
+      if (result.state != "success")
+        return;
+      machine.runs++;
+      machine.runtime+= (result.endTime.getTime() - result.startTime.getTime())/1000;
+      machine.averageCycleTime = Math.ceil(machine.runtime/machine.runs);
     }
 
     // Removes a run from a push. This is needed for running jobs that are
@@ -296,6 +259,58 @@ Data.prototype = {
     }
 
     if (!goingIntoPast) {
+      var currentlyRunning = {};
+      // key pending jobs on id + submitted_at and running jobs on
+      // id + start_time so we get different keys for the same job when it
+      // changes state. This is needed so we actually refresh the rendering via
+      // unlinkPush/linkPush.
+      // also keep in mind bug 590526, which says that tinderbox loses runs
+      // when they have the same buildername + starttime
+      var branchname = Config.repoNames[this._treeName].replace(/^[^\/]+\//, '');
+      if (branchname in data.pending) {
+        for (var rev in data.pending[branchname]) {
+          if (!(rev in this._pushes))
+            continue;
+          for (var i in data.pending[branchname][rev]) {
+            var job = data.pending[branchname][rev][i];
+            var machine = this.getMachine(job.buildername);
+            if (!machine)
+              continue;
+            var key = job.id + job.submitted_at;
+            var revs = {};
+            revs[Config.repoNames[this._treeName]] = rev;
+            currentlyRunning[key] = {
+              machine: machine,
+              startTime: new Date(job.submitted_at * 1000),
+              revs: revs,
+              push: this._pushes[rev],
+              state: "pending"
+            };
+          }
+        }
+      }
+      if (branchname in data.running) {
+        for (var rev in data.running[branchname]) {
+          if (!(rev in this._pushes))
+            continue;
+          for (var i in data.running[branchname][rev]) {
+            var job = data.running[branchname][rev][i];
+            var machine = this.getMachine(job.buildername);
+            if (!machine)
+              continue;
+            var key = job.id + job.start_time;
+            var revs = {};
+            revs[Config.repoNames[this._treeName]] = rev;
+            currentlyRunning[key] = {
+              machine: machine,
+              startTime: new Date(job.start_time * 1000),
+              revs: revs,
+              push: this._pushes[rev],
+              state: "running"
+            };
+          }
+        }
+      }
       var notRunningAnyMore = objdiff(this._runningAndPendingResults, currentlyRunning);
       for (var i in notRunningAnyMore)
         unlinkPush(notRunningAnyMore[i]);

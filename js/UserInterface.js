@@ -204,7 +204,8 @@ var UserInterface = {
       $('<dt>' + Config.testNames[name] + '</dt><dd>' + name + '</dd>').appendTo(legend);
     }
     $('<dt>…*</dt><dd>commented</dd>' +  
-      '<dt class="building">gray</dt><dd>building</dd>' +
+      '<dt class="pending">lightgray</dt><dd>pending</dd>' +
+      '<dt class="running">gray</dt><dd>running</dd>' +
       '<dt class="success">green</dt><dd>success</dd>' +
       '<dt class="testfailed">orange</dt><dd>tests failed</dd>' +
       '<dt class="exception">purple</dt><dd>infrastructure exception</dd>' +
@@ -369,16 +370,17 @@ var UserInterface = {
     var number = this._numberForMachine(result.machine);
     var type = result.machine.type + (number ? " " + number : "") + (result.machine.debug ? " debug" : " opt");
     return {
-      "building": type + ' is still running',
+      "pending": type + ' is pending',
+      "running": type + ' is still running',
       "success": type + ' was successful',
       "testfailed": 'Tests failed on ' + type + ' on ' + Config.OSNames[result.machine.os],
       "exception": 'Infrastructure exception on ' + type + ' on ' + Config.OSNames[result.machine.os],
       "busted": type + ' on ' + Config.OSNames[result.machine.os] + ' is burning'
-    }[result.state] + ', ' + this._timeString(result);
+    }[result.state] + (result.state == "pending" ? "" : ', ' + this._timeString(result));
   },
   
   _timeString: function UserInterface__timeString(result) {
-    if (result.state != 'building') {
+    if (["running", "pending"].indexOf(result.state) == -1) {
       return 'took ' + Math.ceil((result.endTime.getTime() - result.startTime.getTime()) / 1000 / 60)
         + 'mins';
     }
@@ -409,7 +411,7 @@ var UserInterface = {
      * the details panel because the runID will change once the run is finished
      * and because the details show no more info than the tooltip
      */
-    return '<a' + (['building', 'pending'].indexOf(machineResult.state) == -1 ? 
+    return '<a' + (['running', 'pending'].indexOf(machineResult.state) == -1 ? 
       ' href="http://tinderbox.mozilla.org/showlog.cgi?log=' + this._treeName + '/' + machineResult.runID +
       '" resultID="' + machineResult.runID +
       '" onclick="UserInterface.clickMachineResult(event, this)"' : "") + 
@@ -671,7 +673,7 @@ var UserInterface = {
 
   _durationDisplay: function UserInterface__durationDisplay(result) {
     return 'started ' + this._getDisplayTime(result.startTime) +
-      ', ' + (result.state == "building" ? 'still running... ' : 'finished ' +
+      ', ' + (result.state == "running" ? 'still running... ' : 'finished ' +
       this._getDisplayTime(result.endTime) + ', ') + this._timeString(result);
   },
   
@@ -693,9 +695,7 @@ var UserInterface = {
     if (result.note)
       box.addClass("hasStar");
     box.html((function htmlForResultInBottomBar() {
-      var revs = result.revs || {};
-      if(!result.revs)
-        revs[Config.repoNames[Controller.treeName]] = result.rev || result.guessedRev;
+      var revs = result.revs;
       return '<div><h3>' + result.machine.name +
       ' [<span class="state ' + result.state + '">' + result.state + '</span>]</h3>\n' +
       '<span>using revision' + (Controller.keysFromObject(revs).length != 1 ? 's' : '') + ': ' + (function(){

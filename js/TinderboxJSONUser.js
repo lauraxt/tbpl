@@ -67,6 +67,9 @@ var TinderboxJSONUser = {
     var machineResults = {};
     for (var rowIndex = 0; rowIndex < td.build_table.length; rowIndex++) {
     for (var machineIndex = 0; machineIndex < td.build_table[rowIndex].length; machineIndex++) {
+      var machine = machines[machineIndex];
+      if (!machine)
+        continue;
       var build = td.build_table[rowIndex][machineIndex];
       if (build === -1 || build.buildstatus == "null" || !machines[machineIndex])
         continue;
@@ -76,27 +79,25 @@ var TinderboxJSONUser = {
       var endTime = (state != "building") ? new Date(build.endtime * 1000) : 0;
       var machineRunID = build.logfile;
       var buildScrape = self.getBuildScrape(td, machineRunID);
-      var revs = (state != "building") && self.findRevInScrape(buildScrape);
-      var rev = revs && revs[Config.repoNames[tree]];
+      var revs = self.findRevInScrape(buildScrape);
+      // just ignore jobs that can’t be associated to a revision, this also
+      // takes care of running builds
+      if (!revs)
+        continue;
   
       if (machineResults[machineRunID])
         continue;
-  
-      if (state != "building" && !rev)
-        continue;
-  
+
       var note = build.hasnote ? notes[build.noteid * 1] : "";
 
       var result = machineResults[machineRunID] = new MachineResult ({
         "tree" : tree,
-        "machine": machines[machineIndex],
+        "machine": machine,
         "runID": machineRunID,
         "state": state,
         "startTime": startTime,
         "endTime": endTime,
         "revs": revs,
-        "rev": rev,
-        "guessedRev": rev,
         "note": note,
         "errorParser": build.errorparser,
         "_scrape": buildScrape,
