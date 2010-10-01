@@ -61,7 +61,8 @@ Data.prototype = {
         loadedData.machineResults = data;
         checkLoaded();
       },
-      failCallback
+      failCallback,
+      this
     );
     if (!timeOffset) {
       // we build the infraStats right here, no need to do that in _combineResults
@@ -142,7 +143,56 @@ Data.prototype = {
     }
     return latestPushRev;
   },
-  
+
+  getMachine: function Data__getMachine(name) {
+    if (!(name in this._machines)) {
+      // looking forward to bug 586664
+      var os =
+        /Linux x86-64/.test(name) ? "linux64" :
+        /Fedora.*x64/.test(name) ? "linux64" :
+        /Linux/.test(name) ? "linux" :
+        /Fedora/.test(name) ? "linux" :
+        /OS\s?X.*10\.6/.test(name) ? "osx64" :
+        /OS\s?X/.test(name) ? "osx" :
+        /WINNT 6\.1 x64/i.test(name) ? "windows7-64" :
+        /WINNT 6\.1/i.test(name) ? "windows" :
+        /WINNT 5\.2/i.test(name) ? "windows" :
+        /WINNT 5\.1/i.test(name) ? "windowsxp" :
+        /Android/.test(name) ? "android" :
+        /Maemo 5/.test(name) ? "maemo5" : 
+        /Maemo/.test(name) ? "maemo4" : 
+        /N810/.test(name) ? "maemo4" : 
+        /n900/.test(name) ? "maemo5" :
+        /static-analysis/.test(name) ? "linux" : "";
+
+      var debug = /debug/i.test(name) || /(leak|bloat)/i.test(name);
+
+      // see Config.testNames
+      var type =
+        /talos/i.test(name) ? "Talos Performance" :
+        /nightly/i.test(name) ? "Nightly" :
+        /shark/i.test(name) ? "Nightly" :
+        /mochitest/i.test(name) ? "Mochitest" :
+        /crashtest/i.test(name) ? "Crashtest" :
+        /jsreftest/i.test(name) ? "JSReftest" :
+        /reftest-d2d/i.test(name) ? "Reftest-Direct2D" :
+        /direct3d/i.test(name) ? "Reftest-Direct3D" :
+        /opengl/i.test(name) ? "Reftest-OpenGL" :
+        /reftest/i.test(name) ? "Reftest" :
+        /xpcshell/i.test(name) ? "XPCShellTest" :
+        /depend/i.test(name) ? "Build" :
+        /build/i.test(name) ? "Build" :
+        /(check|test)/.test(name) ? "Unit Test" : "";
+
+      if (!os || !type)
+        return;
+
+      this._machines[name] = {name: name, os: os, type: type, debug: debug,
+        latestFinishedRun: null, runs: 0, runtime: 0, averageCycleTime: 0};
+    }
+    return this._machines[name];
+  },
+
   _combineResults: function Data__combineResults(data, goingIntoPast) {
     var self = this;
     var currentlyRunning = {};
@@ -158,14 +208,6 @@ Data.prototype = {
     // _finishedResults. Also takes care of keeping track of the machine and
     // makes sure new notes are correctly forwarded to already linked jobs.
     function categorizeResult(result) {
-      if (!(result.machine.name in self._machines))
-        self._machines[result.machine.name] = {name: result.machine.name,
-          os: result.machine.os, type: result.machine.type,
-          debug: result.machine.debug, latestFinishedRun: null, runs: 0,
-          runtime: 0, averageCycleTime: 0};
-      var machine = self._machines[result.machine.name];
-      result.machine = machine;
-
       result.guessedRev = self._getRevForResult(result);
       if (!(result.push = self._pushes[result.guessedRev])) {
         self._orphanResults[result.runID] = result;
@@ -184,6 +226,7 @@ Data.prototype = {
         }
         linkPush(result);
         self._finishedResults[result.runID] = result;
+        var machine = result.machine;
         if (!machine.latestFinishedRun || result.startTime > machine.latestFinishedRun.startTime) {
           machine.latestFinishedRun = result;
         }

@@ -3,7 +3,7 @@
 
 var TinderboxJSONUser = {
 
-  load: function TinderboxJSONUser_load(tree, timeOffset, noIgnore, loadCallback, failCallback) {
+  load: function TinderboxJSONUser_load(tree, timeOffset, noIgnore, loadCallback, failCallback, data) {
     delete tinderbox_data;
     var self = this;
     var scriptURL = this._getScriptURL(tree, timeOffset, noIgnore);
@@ -11,49 +11,8 @@ var TinderboxJSONUser = {
       if (!tinderbox_data)
         failCallback("tinderbox_data is invalid");
       else
-        loadCallback(self.parseTinderbox(tree, tinderbox_data));
+        loadCallback(self.parseTinderbox(tree, tinderbox_data, data));
     });
-  },
-
-  getMachineType: function TinderboxJSONUser_getMachineType(name) {
-    return {
-      os:
-      /Linux x86-64/.test(name) ? "linux64" :
-      /Fedora.*x64/.test(name) ? "linux64" :
-      /Linux/.test(name) ? "linux" :
-      /Fedora/.test(name) ? "linux" :
-      /OS\s?X.*10\.6/.test(name) ? "osx64" :
-      /OS\s?X/.test(name) ? "osx" :
-      /WINNT 6\.1 x64/i.test(name) ? "windows7-64" :
-      /WINNT 6\.1/i.test(name) ? "windows" :
-      /WINNT 5\.2/i.test(name) ? "windows" :
-      /WINNT 5\.1/i.test(name) ? "windowsxp" :
-      /Android/.test(name) ? "android" :
-      /Maemo 5/.test(name) ? "maemo5" : 
-      /Maemo/.test(name) ? "maemo4" : 
-      /N810/.test(name) ? "maemo4" : 
-      /n900/.test(name) ? "maemo5" :
-      /static-analysis/.test(name) ? "linux" : "",
-
-      debug: /debug/i.test(name) || /(leak|bloat)/i.test(name),
-
-      // see Config.testNames
-      type:
-      /talos/i.test(name) ? "Talos Performance" :
-      /nightly/i.test(name) ? "Nightly" :
-      /shark/i.test(name) ? "Nightly" :
-      /mochitest/i.test(name) ? "Mochitest" :
-      /crashtest/i.test(name) ? "Crashtest" :
-      /jsreftest/i.test(name) ? "JSReftest" :
-      /reftest-d2d/i.test(name) ? "Reftest-Direct2D" :
-      /direct3d/i.test(name) ? "Reftest-Direct3D" :
-      /opengl/i.test(name) ? "Reftest-OpenGL" :
-      /reftest/i.test(name) ? "Reftest" :
-      /xpcshell/i.test(name) ? "XPCShellTest" :
-      /depend/i.test(name) ? "Build" :
-      /build/i.test(name) ? "Build" :
-      /(check|test)/.test(name) ? "Unit Test" : ""
-    };
   },
 
   _getScriptURL: function TinderboxJSONUser__getScriptURL(tree, timeOffset, noIgnore) {
@@ -93,20 +52,14 @@ var TinderboxJSONUser = {
     return td.scrape[machineRunID];
   },
   
-  parseTinderbox: function TinderboxJSONUser_parseTinderbox(tree, td) {
+  parseTinderbox: function TinderboxJSONUser_parseTinderbox(tree, td, data) {
     var self = this;
     var machines = [];
     $(td.build_names).each(function buildMachinesArray(i, name) {
-      var machinetype = self.getMachineType(name);
-      if (!machinetype.os || !machinetype.type) {
+      var machine = data.getMachine(name);
+      if (!machine)
         return;
-      }
-      machines[i] = {
-        "name": name,
-        "os": machinetype.os,
-        "type": machinetype.type,
-        "debug": machinetype.debug
-      };
+      machines[i] = machine;
     });
   
     var notes = td.note_array.map(self.processNote);
