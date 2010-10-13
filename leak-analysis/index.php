@@ -47,7 +47,13 @@ function analyze($tree, $id) {
     }
     $testName = getTestName($line);
     if ($testName) {
-      $lastTestName = $testName;
+      // "Shutdown" isn't a helpful testname, especially to carry over from
+      // mochitest-chrome to mochitest-browser-chrome's startup.
+      if ($testName != "Shutdown") {
+        $lastTestName = $testName;
+      } else {
+        $lastTestName = '(unknown)';
+      }
       continue;
     }
     if (preg_match("/\+\+DOMWINDOW.*\(([0-9a-fx]+)\)\s*\[serial = (\d+)\]/i", $line, $matches)) {
@@ -86,11 +92,17 @@ function analyze($tree, $id) {
 
 function getTestName($line) {
   $line = trim($line);
-  if (preg_match("/^REFTEST INFO | Loading ([^ ]+)$/", $line, $matches)) {
+  // reftest, crashtest, jsreftest
+  if (preg_match("/^REFTEST TEST-START \| ([^ ]+)$/", $line, $matches)) {
     return $matches[1];
-  } else if (preg_match("/^\d+ INFO Running ([^ ]+)...$/", $line, $matches)) {
+  // mochitest-plain, mochitest-chrome
+  } else if (preg_match("/^\d+ INFO TEST-START \| ([^ ]+)$/", $line, $matches)) {
     return $matches[1];
-  } else if (preg_match("/^Running ([^ ]+)...$/", $line, $matches)) {
+  // mochitest-browser-chrome
+  } else if (preg_match("/^TEST-START \| ([^ ]+)$/", $line, $matches)) {
+    return $matches[1];
+  // xpcshell
+  } else if (preg_match("/^TEST-INFO \| ([^ ]+) \| running test ...$/", $line, $matches)) {
     return $matches[1];
   } else {
     return null;
