@@ -86,10 +86,10 @@ var UserInterface = {
           return false;
         }).parent());
 
-    return {status: self.updateStatus, refresh: function (machines, pushes) { self.handleRefresh(machines, pushes); } };
+    return {status: self.updateStatus, refresh: function (machines, pushes, infraStats) { self.handleRefresh(machines, pushes, infraStats); } };
   },
 
-  handleRefresh: function UserInterface_loadedData(machines, pushes) {
+  handleRefresh: function UserInterface_loadedData(machines, pushes, infraStats) {
     this._machines = machines;
     var pushesElem = $("#pushes");
     pushesElem.removeClass("initialload");

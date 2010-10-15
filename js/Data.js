@@ -21,10 +21,11 @@ Data.prototype = {
   load: function Data_load(timeOffset, statusCallback, successCallback) {
     var self = this;
     // we can provide progress info, once we load more sources
-    var loadTotal = 2;
+    var loadTotal = timeOffset ? 2 : 4;
     var loaded = -1;
     var failed = [];
     var loadedData = {};
+    var infraStats = !timeOffset ? {} : null;
     var checkLoaded = function() {
       if (failed.length)
         return;
@@ -34,7 +35,7 @@ Data.prototype = {
         var updatedPushes = self._combineResults(loadedData, timeOffset);
         statusCallback({loadpercent: 1});
         successCallback(Controller.valuesFromObject(self._machines),
-          Controller.valuesFromObject(updatedPushes));
+          Controller.valuesFromObject(updatedPushes), infraStats);
       }
     };
     checkLoaded();
@@ -62,6 +63,29 @@ Data.prototype = {
       },
       failCallback
     );
+    if (!timeOffset) {
+      // we build the infraStats right here, no need to do that in _combineResults
+      $.getJSON("http://build.mozilla.org/builds/builds-pending.js", function(data) {
+        loadedData.pending = data.pending;
+        for (var tree in data.pending) {
+          if (!(tree in infraStats))
+            infraStats[tree] = {pending: 0, running: 0};
+          for (var rev in data.pending[tree])
+            infraStats[tree].pending += data.pending[tree][rev].length;
+        }
+        checkLoaded();
+      });
+      $.getJSON("http://build.mozilla.org/builds/builds-running.js", function(data) {
+        loadedData.running = data.running;
+        for (var tree in data.running) {
+          if (!(tree in infraStats))
+            infraStats[tree] = {pending: 0, running: 0};
+          for (var rev in data.running[tree])
+            infraStats[tree].running += data.running[tree][rev].length;
+        }
+        checkLoaded();
+      });
+    }
   },
 
   machineGroup: function Data_machineGroup(machineType) {
