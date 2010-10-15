@@ -415,6 +415,7 @@ var UserInterface = {
         var link =
         $("<a href=\"#\">Bug " + item.id + "</a>").click(function() {
           AddCommentUI.toggleSuggestion(this.getAttribute("data-id"), this);
+          return false;
         }).attr("title", "[" + item.status.trim() + "] " + item.summary)
         .attr("data-id", item.id)
         .appendTo(target);
