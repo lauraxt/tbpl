@@ -73,6 +73,7 @@ p {
   white-space: nowrap;
   background-color: white;
   -moz-box-shadow: 1px 1px 5px #ccc;
+  -webkit-box-shadow: 1px 1px 5px #ccc;
   box-shadow: 1px 1px 5px #ccc;
 }
 .dropdown:not(.open) ul, .dropdown:not(.open) dl {
