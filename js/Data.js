@@ -151,6 +151,7 @@ Data.prototype = {
         /xpcshell/i.test(name) ? "XPCShellTest" :
         /depend/i.test(name) ? "Build" :
         /build/i.test(name) ? "Build" :
+        /jetpack/i.test(name) ? "Jetpack SDK Test" :
         /(check|test)/.test(name) ? "Unit Test" : "";
 
       if (!os || !type)

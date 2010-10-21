@@ -68,6 +68,7 @@ var Config = {
     "JSReftest" : "J",
     "XPCShellTest" : "X",
     "Talos Performance" : "T",
+    "Jetpack SDK Test" : "JP",
     "Unit Test" : "U"
   },
   talosTestNames: [
