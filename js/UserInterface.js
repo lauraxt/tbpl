@@ -17,7 +17,7 @@ var UserInterface = {
     this._data = controller.getData();
     this._setupStorage();
 
-    document.title = controller.treeName + " - Tinderboxpushlog";
+    document.title = "[0] " + controller.treeName + " - Tinderboxpushlog";
 
     this._refreshMostRecentlyUsedTrees();
     this._buildTreeSwitcher();
@@ -294,6 +294,7 @@ var UserInterface = {
   _updateTreeStatus: function UserInterface__updateTreeStatus(machines) {
     var self = this;
     var failing = [];
+    var unstarred = 0;
     machines.forEach(function addMachineToTreeStatus1(machine) {
       var result = machine.latestFinishedRun;
       if (!result)
@@ -310,6 +311,9 @@ var UserInterface = {
           failing.push(result);
         break;
       }
+      if (!result.note &&
+          (result.state == 'busted' || result.state == 'testfailed' || result.state == 'exception'))
+        ++unstarred;
     });
     $('#status').html(
       '<strong>' + failing.length + '</strong> Job' + (failing.length != 1 ? 's are' : ' is') + ' failing:<br />' +
@@ -321,6 +325,7 @@ var UserInterface = {
                self._resultTitle(machineResult) + '</a>';
       }).join('\n')
     );
+    document.title = document.title.replace(/\[\d*\]/, "[" + unstarred + "]");
   },
 
   _useLocalTime: function UserInterface__useLocalTime() {
