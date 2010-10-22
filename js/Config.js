@@ -17,6 +17,7 @@ var Config = {
   wooBugURL: "http://brasstacks.mozilla.com/starcomment.php", // war-on-orange database
   repoNames: {
     "Firefox": "mozilla-central",
+    "Firefox4.0": "releases/mozilla-2.0",
     "Firefox3.6": "releases/mozilla-1.9.2",
     "Firefox3.5": "releases/mozilla-1.9.1",
     "TraceMonkey": "tracemonkey",
@@ -35,6 +36,7 @@ var Config = {
   // Trees that have split mochitests like M(12345).
   treesWithGroups: [
     "Firefox",
+    "Firefox4.0",
     "TraceMonkey",
     "Jaegermonkey",
     "Electrolysis",
