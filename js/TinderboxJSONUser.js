@@ -40,10 +40,14 @@ var TinderboxJSONUser = {
     var revs = {};
     if (!scrape)
       return revs;
-    for (var i = 1; i < scrape.length; i++) {
-      var match = scrape[i].match(/http:\/\/hg.mozilla.org\/([^"]*)\/rev\/([0-9a-f]{12})/);
-      if (match)
-        revs[match[1]] = match[2];
+    var matches;
+    var re = /http:\/\/hg.mozilla.org\/([^"]*)\/rev\/([0-9a-f]{12})/g;
+    for (var i = 0; i < scrape.length; i++) {
+      // There may be multiple revs in different repos in one line of the
+      // scrape, so keep exec()ing until we run out.
+      while ((matches = re.exec(scrape[i])) != null) {
+        revs[matches[1]] = matches[2];
+      }
     }
     return revs;
   },
