@@ -24,7 +24,7 @@ Data.prototype = {
     var loadTotal = timeOffset ? 2 : 4;
     var loaded = -1;
     var failed = [];
-    var loadedData = {};
+    var loadedData = {pending: {}, running: {}, pushes: {}, machineResults: {}};
     var infraStats = !timeOffset ? {} : null;
     var checkLoaded = function() {
       if (failed.length)
@@ -67,6 +67,8 @@ Data.prototype = {
     if (!timeOffset) {
       // we build the infraStats right here, no need to do that in _combineResults
       $.getJSON("http://build.mozilla.org/builds/builds-pending.js", function(data) {
+        if (!data.pending)
+          return;
         loadedData.pending = data.pending;
         for (var tree in data.pending) {
           if (!(tree in infraStats))
@@ -77,6 +79,8 @@ Data.prototype = {
         checkLoaded();
       });
       $.getJSON("http://build.mozilla.org/builds/builds-running.js", function(data) {
+        if (!data.running)
+          return;
         loadedData.running = data.running;
         for (var tree in data.running) {
           if (!(tree in infraStats))
