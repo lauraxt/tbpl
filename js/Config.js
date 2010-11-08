@@ -5,8 +5,8 @@ var Config = {
   tinderboxDataLoader: TinderboxJSONUser,
   pushlogDataLoader: PushlogJSONParser,
   defaultTreeName: "Firefox",
-  mvtTimezoneOffset: -7,
-  mvtTimezoneName: "PDT",
+  mvtTimezoneOffset: -8,
+  mvtTimezoneName: "PST",
   loadInterval: 120, // seconds
   goBackHours: 12,
   baseURL: "",
