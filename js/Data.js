@@ -152,6 +152,7 @@ Data.prototype = {
         /depend/i.test(name) ? "Build" :
         /build/i.test(name) ? "Build" :
         /jetpack/i.test(name) ? "Jetpack SDK Test" :
+        /mozmill-all/i.test(name) ? "Mozmill" :
         /(check|test)/.test(name) ? "Unit Test" : "";
 
       if (!os || !type)

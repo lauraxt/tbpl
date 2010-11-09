@@ -69,6 +69,7 @@ var Config = {
     "XPCShellTest" : "X",
     "Talos Performance" : "T",
     "Jetpack SDK Test" : "JP",
+    "Mozmill" : "Z",
     "Unit Test" : "U"
   },
   talosTestNames: [
