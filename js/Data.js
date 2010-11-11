@@ -103,6 +103,10 @@ Data.prototype = {
     return this._finishedResults[id];
   },
 
+  getPushForRev: function Data_getPushForRev(toprev) {
+    return this._pushes[toprev];
+  },
+
   _getPushForResult: function Data__getPushForResult(machineResult) {
     var repo = Config.repoNames[this._treeName];
     if (!(repo in machineResult.revs))

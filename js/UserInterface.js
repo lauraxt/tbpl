@@ -501,6 +501,10 @@ var UserInterface = {
     '</ul>';
   },
 
+  _changesetURL: function UserInterface__changesetUrl(rev) {
+      return 'http://hg.mozilla.org/' + Config.repoNames[this._treeName] + '/rev/' + rev;
+  },
+
   _generatePushNode: function UserInterface__generatePushNode(push) {
     var self = this;
     var nodeHtml = '<li id="push-' + push.patches[0].rev + '">\n' +
@@ -508,12 +512,13 @@ var UserInterface = {
       '<span class="date" data-timestamp="' + push.date.getTime() + '">' +
       self._getDisplayDate(push.date) + '</span>' +
       ' (<label>compare: <input class="revsToCompare" type="checkbox" value="' + push.patches[0].rev + '"></label>)' +
+      '<button class="csetList" onclick="UserInterface._listChangesetsForPush(\''+ push.patches[0].rev +'\')">List changeset URLs</button>' +
       '</h2>\n' +
       self._buildHTMLForPushResults(push) +
       '<ul class="patches">\n' +
       push.patches.map(function buildHTMLForPushPatches(patch, patchIndex) {
         return '<li>\n' +
-        '<a class="revlink" href="http://hg.mozilla.org/' + Config.repoNames[self._treeName] + '/rev/' + patch.rev + '">' + patch.rev +
+        '<a class="revlink" href="' + self._changesetURL(patch.rev) + '">' + patch.rev +
         '</a>\n<div class="popup"><span><span class="author">' + patch.author + '</span> &ndash; ' +
         '<span class="desc">' + self._linkBugs(patch.desc.split("\n")[0]) + '</span>' +
         (function buildHTMLForPatchTags() {
@@ -533,6 +538,16 @@ var UserInterface = {
     this._installComparisonClickHandler(node);
     this._installTooltips(node);
     return node;
+  },
+
+  _listChangesetsForPush: function(toprev) {
+    var self = this;
+    var push = this._data.getPushForRev(toprev);
+    var urls = push.patches.map(function (patch) { return self._changesetURL(patch.rev); });
+    // We want to show the csets' URLs first-to-last for pasting into bugs,
+    // instead of last-to-first as they're displayed in the UI
+    urls.reverse();
+    alert(urls.join('\n'));
   },
 
   clickMachineResult: function UserInterface_clickMachineResult(e, result) {

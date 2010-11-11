@@ -274,6 +274,10 @@ span.logtags span.inbranchtag {
 .machineResult.busted[active=true]     { background-color: #D00; }
 .machineResult.exception[active=true]  { background-color: #818; }
 
+button.csetList {
+  margin-left: 5px;
+}
+
 /* helps the color-blind */
 .busted, .testfailed, .exception { text-decoration: underline }
 
