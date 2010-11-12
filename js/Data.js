@@ -50,6 +50,7 @@ Data.prototype = {
         loadedData.pushes = data;
         checkLoaded();
       },
+      failCallback,
       this._pusher,
       this._rev
     );

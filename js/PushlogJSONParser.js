@@ -3,53 +3,60 @@
 
 var PushlogJSONParser = {
 
-  load: function PushlogJSONParser_load(repoName, timeOffset, loadCallback, pusher, rev) {
+  load: function PushlogJSONParser_load(repoName, timeOffset, loadCallback, failCallback, pusher, rev) {
     var self = this;
-    $.getJSON(this._getLogUrl(repoName, timeOffset), function(data) {
-      var pushes = {};
-      for (var pushID in data) {
-        var push = data[pushID];
+    $.ajax({
+      url: this._getLogUrl(repoName, timeOffset),
+      dataType: 'json',
+      success: function (data) {
+        var pushes = {};
+        for (var pushID in data) {
+          var push = data[pushID];
 
-        // Filter by pusher if requested.
-        if (pusher && push.user != pusher) {
-          continue;
-        }
-
-        var patches = [];
-        var revFound = false;
-        for (var i in push.changesets) {
-          var patch = push.changesets[i];
-          patch.rev = patch.node.substr(0, 12);
-
-          if (rev && patch.rev == rev) {
-            revFound = true;
+          // Filter by pusher if requested.
+          if (pusher && push.user != pusher) {
+            continue;
           }
 
-          // dont show the default branch and tag
-          var tags = $(patch.tags).map(function() {
-            return this != 'tip' ? {type: 'tagtag', name: this} : null;
-          });
-          if (patch.branch != 'default')
-            tags.push({type: 'inbranchtag', name: patch.branch});
-          
-          // The new json output includes the email adress in <brackets>
-          var author = $.trim(/([^<]+)/.exec(patch.author)[1]);
+          var patches = [];
+          var revFound = false;
+          for (var i in push.changesets) {
+            var patch = push.changesets[i];
+            patch.rev = patch.node.substr(0, 12);
 
-          // Revert the order because we want most recent pushes / patches to
-          // come first.
-          patches.unshift({rev: patch.rev, author: author,
-                  desc: Controller.stripTags(patch.desc), tags: tags});
+            if (rev && patch.rev == rev) {
+              revFound = true;
+            }
+
+            // dont show the default branch and tag
+            var tags = $(patch.tags).map(function() {
+              return this != 'tip' ? {type: 'tagtag', name: this} : null;
+            });
+            if (patch.branch != 'default')
+              tags.push({type: 'inbranchtag', name: patch.branch});
+
+            // The new json output includes the email adress in <brackets>
+            var author = $.trim(/([^<]+)/.exec(patch.author)[1]);
+
+            // Revert the order because we want most recent pushes / patches to
+            // come first.
+            patches.unshift({rev: patch.rev, author: author,
+                    desc: Controller.stripTags(patch.desc), tags: tags});
+          }
+
+          // Ignore this push if the filtering rev isn't there.
+          if (rev && !revFound) {
+            continue;
+          }
+
+          var toprev = patches[0].rev;
+          pushes[toprev] = {pusher: push.user, date: new Date(push.date * 1000), toprev: toprev, patches: patches};
         }
-
-        // Ignore this push if the filtering rev isn't there.
-        if (rev && !revFound) {
-          continue;
-        }
-
-        var toprev = patches[0].rev;
-        pushes[toprev] = {pusher: push.user, date: new Date(push.date * 1000), toprev: toprev, patches: patches};
+        loadCallback(pushes);
+      },
+      error: function (request, textStatus, error) {
+        failCallback(textStatus);
       }
-      loadCallback(pushes);
     });
   },
 
