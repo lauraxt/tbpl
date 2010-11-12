@@ -511,7 +511,7 @@ var UserInterface = {
       '<h2><span class="pusher">' + push.pusher + '</span> &ndash; ' +
       '<span class="date" data-timestamp="' + push.date.getTime() + '">' +
       self._getDisplayDate(push.date) + '</span>' +
-      ' (<label>compare: <input class="revsToCompare" type="checkbox" value="' + push.patches[0].rev + '"></label>)' +
+      ' <span class="talosCompare">(<label>compare: <input class="revsToCompare" type="checkbox" value="' + push.patches[0].rev + '"></label>)</span>' +
       '<button class="csetList" onclick="UserInterface._listChangesetsForPush(\''+ push.patches[0].rev +'\')">List changeset URLs</button>' +
       '</h2>\n' +
       self._buildHTMLForPushResults(push) +
