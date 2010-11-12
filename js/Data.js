@@ -65,28 +65,28 @@ Data.prototype = {
       this
     );
     if (!timeOffset) {
-      // we build the infraStats right here, no need to do that in _combineResults
-      $.getJSON("http://build.mozilla.org/builds/builds-pending.js", function(data) {
-        if (!data.pending)
-          return;
-        loadedData.pending = data.pending;
-        for (var tree in data.pending) {
+      // Here we'll fetch the pending / running JSON, and we'll
+      // count the builds. These numbers will be displayed in the
+      // infrastructure popup in the UI.
+      // Adding the actual running / pending entries to the right
+      // pushes will happen in _combineResults.
+      this._getPendingBuilds(function (pending) {
+        loadedData.pending = pending;
+        for (var tree in pending) {
           if (!(tree in infraStats))
             infraStats[tree] = {pending: 0, running: 0};
-          for (var rev in data.pending[tree])
-            infraStats[tree].pending += data.pending[tree][rev].length;
+          for (var rev in pending[tree])
+            infraStats[tree].pending += pending[tree][rev].length;
         }
         checkLoaded();
       });
-      $.getJSON("http://build.mozilla.org/builds/builds-running.js", function(data) {
-        if (!data.running)
-          return;
-        loadedData.running = data.running;
-        for (var tree in data.running) {
+      this._getRunningBuilds(function (running) {
+        loadedData.running = running;
+        for (var tree in running) {
           if (!(tree in infraStats))
             infraStats[tree] = {pending: 0, running: 0};
-          for (var rev in data.running[tree])
-            infraStats[tree].running += data.running[tree][rev].length;
+          for (var rev in running[tree])
+            infraStats[tree].running += running[tree][rev].length;
         }
         checkLoaded();
       });
@@ -331,5 +331,37 @@ Data.prototype = {
     }
 
     return updatedPushes;
-  }
+  },
+  
+  _getPendingBuilds: function Data__getPendingBuilds(success, error) {
+    var self = this;
+    $.getJSON("http://build.mozilla.org/builds/builds-pending.js", function(data) {
+      if (!data.pending)
+        return;
+      self._filterHiddenBuilds(data.pending);
+      success(data.pending);
+    });
+  },
+  
+  _getRunningBuilds: function Data__getRunningBuilds(success, error) {
+    var self = this;
+    $.getJSON("http://build.mozilla.org/builds/builds-running.js", function(data) {
+      if (!data.running)
+        return;
+      self._filterHiddenBuilds(data.running);
+      success(data.running);
+    });
+  },
+
+  _filterHiddenBuilds: function Data__filterHiddenBuilds(obj) {
+    if (this._noIgnore)
+      return;
+    for (var repo in obj) {
+      for (var toprev in obj[repo]) {
+        obj[repo][toprev] = obj[repo][toprev].filter(function (build) {
+          return Config.hiddenBuilds.indexOf(build.buildername) == -1;
+        });
+      }
+    }
+  },
 }
