@@ -417,7 +417,7 @@ var UserInterface = {
      * and because the details show no more info than the tooltip
      */
     return '<a' + (['running', 'pending'].indexOf(machineResult.state) == -1 ? 
-      ' href="http://tinderbox.mozilla.org/showlog.cgi?log=' + this._treeName + '/' + machineResult.runID +
+      ' href="' + machineResult.briefLogURL +
       '" resultID="' + machineResult.runID +
       '" onclick="UserInterface.clickMachineResult(event, this)"' : "") + 
     ' class="machineResult ' + machineResult.state +
@@ -725,8 +725,8 @@ var UserInterface = {
         }
         return ret;
       })().join(', ') + '</span>' +
-      '<a href="http://tinderbox.mozilla.org/showlog.cgi?log=' + self._treeName + '/' + result.runID + '">view brief log</a>' +
-      '<a href="http://tinderbox.mozilla.org/showlog.cgi?log=' + self._treeName + '/' + result.runID + '&fulltext=1">view full log</a>' +
+      '<a href="' + result.briefLogURL + '">view brief log</a>' +
+      '<a href="' + result.fullLogURL + '">view full log</a>' +
       '<div id="autoStar"></div>' +
       '<a class="addNote" href="http://tinderbox.mozilla.org/addnote.cgi?log=' + self._treeName + '/' + result.runID + '">add a comment</a>' +
       '<span class="duration">' + self._durationDisplay(result) + '</span></div>' +
