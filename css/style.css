@@ -275,7 +275,35 @@ span.logtags span.inbranchtag {
 .machineResult.exception[active=true]  { background-color: #818; }
 
 button.csetList {
-  margin-left: 5px;
+  float: right;
+  margin-top: 2px;
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1em;
+  color: #BBB;
+  -moz-transition: color 200ms ease-in-out;
+  -webkit-transition: color 200ms ease-in-out;
+  -o-transition: color 200ms ease-in-out;
+  transition: color 200ms ease-in-out;
+}
+button.csetList:hover {
+  text-decoration: underline;
+}
+button.csetList:active:hover {
+  color: #888;
+  -moz-transition: none;
+  -webkit-transition: none;
+  -o-transition: none;
+  transition: none;
+}
+button.csetList::-moz-focus-inner {
+  border: 0;
+}
+#pushes > li:not(:hover) button.csetList {
+  color: transparent;
 }
 
 /* helps the color-blind */

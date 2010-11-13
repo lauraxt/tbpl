@@ -547,7 +547,9 @@ var UserInterface = {
     // We want to show the csets' URLs first-to-last for pasting into bugs,
     // instead of last-to-first as they're displayed in the UI
     urls.reverse();
-    alert(urls.join('\n'));
+    var html = "<!DOCTYPE html><title>Changeset URLs for push " + toprev +
+               "</title><pre>" + urls.join('\n') + "</pre>";
+    window.open("data:text/html," + escape(html), "", "width=600,height=300,scrollbars=yes");
   },
 
   clickMachineResult: function UserInterface_clickMachineResult(e, result) {
