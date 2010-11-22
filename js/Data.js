@@ -329,6 +329,13 @@ Data.prototype = {
       for (var i in newRunning)
         linkPush(newRunning[i]);
       this._runningAndPendingResults = currentlyRunning;
+
+      // workaround to regenerate the DOM (and thus ETA string) for all running
+      // pushes
+      for (var k in currentlyRunning) {
+        var push = currentlyRunning[k].push;
+        updatedPushes[push.toprev] = push;
+      }
     }
 
     return updatedPushes;
