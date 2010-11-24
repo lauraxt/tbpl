@@ -213,6 +213,16 @@ var UserInterface = {
   },
 
   _buildTreeInfo: function UserInterface__buildTreeInfo() {
+    $.ajax({
+      url: "http://tinderbox-stage.mozilla.org/" + this._treeName + "/status.html",
+      dataType: "text",
+      success: function (data) {
+        var div = $("<div>").html(data);
+        $("#preamble", div).remove();
+        $("#status-container", div).contents().appendTo("#tree-status");
+      }
+    });
+
     google.setOnLoadCallback(function() {
       var service = new google.gdata.calendar.CalendarService("mozilla-tinderbox");
 

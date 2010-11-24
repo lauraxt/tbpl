@@ -98,6 +98,12 @@ p {
 #infrastructure dd {
   margin-left: 10em;
 }
+#tree-status {
+  margin-left: 120px;
+}
+#treestatus {
+  font-weight: bold;
+}
 .loading {
   background: url(../images/loading_16.png) center left no-repeat transparent;
   padding: 3px 0 3px 20px;
