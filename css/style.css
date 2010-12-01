@@ -8,7 +8,7 @@ p {
 
 /* Info bar on top */
 #topbar {
-  position: fixed;
+  position: absolute;
   z-index: 3;
   top: 0;
   left: 0;
@@ -16,9 +16,8 @@ p {
   text-align: left;
   padding: 4px;
   font-size: 0.8em;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(255, 255, 255, 0.8);
   height: 42px;
-  box-shadow: rgba(255, 255, 255, 0.9) 0px 0px 5px 10px;
 }
 #config {
   padding: 4px;
@@ -135,7 +134,19 @@ iframe {
   text-align: left;
   font-size: 0.76em;
   padding: 10px 20px;
-  margin: 42px 0px 121px 0px;
+  position: absolute;
+  margin: 0;
+  top: 50px;
+  bottom: 0px;
+  overflow: auto;
+  left: 0;
+  right: 0;
+}
+body.details > #pushes {
+  bottom: 121px;
+}
+body:not(.details) > #pushes > li:last-child {
+  margin-bottom: 121px;
 }
 #pushes, .patches, .results {
   list-style: none;
@@ -342,7 +353,7 @@ a:active {
 #details {
   display: none;
   border-top: 1px solid #DDD;
-  position: fixed;
+  position: absolute;
   padding: 0;
   z-index: 4;
   left: 0;
