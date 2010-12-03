@@ -124,19 +124,28 @@ Data.prototype = {
 
   getMachine: function Data__getMachine(name) {
     if (!(name in this._machines)) {
-      // looking forward to bug 586664
+      // XXX clean all this up after all builders have been
+      // transitioned to the new bug 586664 form
       var os =
-        /Linux x86-64/.test(name) ? "linux64" :
-        /Fedora.*x64/.test(name) ? "linux64" :
-        /Linux/.test(name) ? "linux" :
-        /Fedora/.test(name) ? "linux" :
+        /linux.*64/i.test(name) ? "linux64" :
+        /fedora.*64/i.test(name) ? "linux64" :
+        /linux/i.test(name) ? "linux" :
+        /fedora/i.test(name) ? "linux" :
+        /macosx64/.test(name) ? "osx64" :
+        /snowleopard/.test(name) ? "osx64" :
         /OS\s?X.*10\.6/.test(name) ? "osx64" :
+        /macosx/.test(name) ? "osx" :
+        /leopard/.test(name) ? "osx" :
         /OS\s?X/.test(name) ? "osx" :
+        /w764/.test(name) ? "windows7-64" :
         /WINNT 6\.1 x64/i.test(name) ? "windows7-64" :
+        /xp/i.test(name) ? "windowsxp" :
+        /WINNT 5\.1/i.test(name) ? "windowsxp" :
+        /win7/.test(name) ? "windows" :
+        /win32/.test(name) ? "windows" :
         /WINNT 6\.1/i.test(name) ? "windows" :
         /WINNT 5\.2/i.test(name) ? "windows" :
-        /WINNT 5\.1/i.test(name) ? "windowsxp" :
-        /Android/.test(name) ? "android" :
+        /android/i.test(name) ? "android" :
         /Maemo 5/.test(name) ? "maemo5" : 
         /Maemo/.test(name) ? "maemo4" : 
         /N810/.test(name) ? "maemo4" : 
@@ -162,6 +171,7 @@ Data.prototype = {
         /build/i.test(name) ? "Build" :
         /jetpack/i.test(name) ? "Jetpack SDK Test" :
         /mozmill-all/i.test(name) ? "Mozmill" :
+        /(a11y|chrome|cold|dirty|dromaeo|scroll|svg|tp4)/.test(name) ? "Talos Performance" :
         /(check|test)/.test(name) ? "Unit Test" : "";
 
       if (!os || !type)
