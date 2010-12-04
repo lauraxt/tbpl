@@ -139,7 +139,6 @@ Data.prototype = {
         /OS\s?X/.test(name) ? "osx" :
         /w764/.test(name) ? "windows7-64" :
         /WINNT 6\.1 x64/i.test(name) ? "windows7-64" :
-        /xp/i.test(name) ? "windowsxp" :
         /WINNT 5\.1/i.test(name) ? "windowsxp" :
         /win7/.test(name) ? "windows" :
         /win32/.test(name) ? "windows" :
@@ -150,6 +149,7 @@ Data.prototype = {
         /Maemo/.test(name) ? "maemo4" : 
         /N810/.test(name) ? "maemo4" : 
         /n900/.test(name) ? "maemo5" :
+        /xp/i.test(name) ? "windowsxp" :
         /static-analysis/.test(name) ? "linux" : "";
 
       var debug = /debug/i.test(name) || /(leak|bloat)/i.test(name);
