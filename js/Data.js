@@ -115,11 +115,16 @@ Data.prototype = {
   _getPushForResult: function Data__getPushForResult(machineResult) {
     var repo = Config.repoNames[this._treeName];
     if (!(repo in machineResult.revs))
-      return;
-    var rev = machineResult.revs[repo];
-    if (rev in this._pushes)
-      return this._pushes[rev];
-    return;
+      return null;
+
+    var resultRev = machineResult.revs[repo];
+    for (var rev in this._pushes) {
+      if (this._pushes[rev].defaultTip == resultRev) {
+        return this._pushes[rev];
+      }
+    }
+
+    return this._pushes[resultRev] || null;
   },
 
   getMachine: function Data__getMachine(name) {

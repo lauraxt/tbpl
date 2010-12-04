@@ -19,6 +19,7 @@ var PushlogJSONParser = {
           }
 
           var patches = [];
+          var defaultTip;
           var revFound = false;
           for (var i in push.changesets) {
             var patch = push.changesets[i];
@@ -34,6 +35,8 @@ var PushlogJSONParser = {
             });
             if (patch.branch != 'default')
               tags.push({type: 'inbranchtag', name: patch.branch});
+            else
+              defaultTip = patch.rev;
 
             // The new json output includes the email adress in <brackets>
             var author = $.trim(/([^<]+)/.exec(patch.author)[1]);
@@ -50,7 +53,7 @@ var PushlogJSONParser = {
           }
 
           var toprev = patches[0].rev;
-          pushes[toprev] = {pusher: push.user, date: new Date(push.date * 1000), toprev: toprev, patches: patches};
+          pushes[toprev] = {pusher: push.user, date: new Date(push.date * 1000), toprev: toprev, defaultTip: defaultTip, patches: patches};
         }
         loadCallback(pushes);
       },
