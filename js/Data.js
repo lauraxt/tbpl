@@ -217,7 +217,10 @@ Data.prototype = {
       linkPush(result);
       self._finishedResults[result.runID] = result;
       var machine = result.machine;
-      if (!machine.latestFinishedRun || result.startTime > machine.latestFinishedRun.startTime) {
+      if (!machine.latestFinishedRun ||
+          result.push.date.getTime() > machine.latestFinishedRun.push.date.getTime() ||
+          (result.push.date.getTime() == machine.latestFinishedRun.push.date.getTime() &&
+           result.startTime > machine.latestFinishedRun.startTime)) {
         machine.latestFinishedRun = result;
       }
       if (result.state != "success")
