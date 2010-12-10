@@ -65,7 +65,7 @@ var AddCommentUI = {
     var email = $("#logNoteEmail").get(0).value;
     var comment = $("#logNoteText").get(0).value;
     Controller.keysFromObject(this.addToBuilds).forEach(function(id) {
-      var result = data.getMachineResult(id)
+      var result = data.getMachineResult(id);
       self._postOneComment(email, comment, result, function oneLessCommentPending() {
         self.pendingCommentsChanged(-1, result);
       });
@@ -246,6 +246,36 @@ var AddCommentUI = {
   },
 
   _postOneComment: function AddCommentUI__postOneComment(email, comment, machineResult, callback) {
+    if (comment.toLowerCase().indexOf("bug") > -1) {
+      var machinename = "";
+      for (var i = 0; i < machineResult._scrape.length; i++) {
+        if (machineResult._scrape[i].indexOf("s: ") > -1) {
+          machinename = machineResult._scrape[i].substring(machineResult._scrape[i].indexOf("s: ") + 3);
+        }
+      }
+      var d = machineResult.startTime;
+      var c = comment.split(",");
+      for (var i = 0; i < c.length; i++) {
+        if (c[i].toLowerCase().indexOf("bug") > -1) {
+          NetUtils.crossDomainPost(Config.wooBugURL, {
+            buildname: machineResult.machine.name,
+            machinename: machinename,
+            os: machineResult.machine.os,
+            date: d.getFullYear() + "-" +
+                  (d.getMonth() < 9 ? "0" : "") + (d.getMonth() + 1) + "-" +
+                  (d.getDate() < 10 ? "0" : "") + d.getDate(),
+            type: machineResult.machine.type,
+            debug: machineResult.machine.debug,
+            starttime: machineResult.startTime.getTime() / 1000,
+            logfile: machineResult.runID,
+            tree: Config.repoNames[machineResult.tree],
+            rev: machineResult.revs[Config.repoNames[machineResult.tree]],
+            who: email,
+            bug: c[i].substring(c[i].toLowerCase().indexOf("bug") + 3).trim(),
+          }, function() { /* dummy callback*/ });
+        }
+      }
+    }
     NetUtils.crossDomainPost(this._submitURL, {
       buildname: machineResult.machine.name,
       buildtime: machineResult.startTime.getTime() / 1000,

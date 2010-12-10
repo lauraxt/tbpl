@@ -10,6 +10,7 @@ var Config = {
   loadInterval: 120, // seconds
   goBackHours: 12,
   baseURL: "",
+  wooBugURL: "http://brasstacks.mozilla.com/starfailure.php", // war-on-orange database
   repoNames: {
     "Firefox": "mozilla-central",
     "Firefox3.6": "releases/mozilla-1.9.2",
