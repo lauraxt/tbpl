@@ -323,7 +323,7 @@ var UserInterface = {
     $('#status').html(
       '<strong>' + failing.length + '</strong> Job' + (failing.length != 1 ? 's are' : ' is') + ' failing:<br />' +
       failing.map(function(machineResult) {
-        return '<a href="http://tinderbox.mozilla.org/showlog.cgi?log=' + self._treeName + '/' + machineResult.runID +
+        return '<a href="' + machineResult.briefLogURL +
                '" onclick="UserInterface.clickMachineResult(event, this)" class="machineResult ' + machineResult.state +
                (machineResult.note ? ' hasNote" title="(starred) ' : '" title="') +
                self._resultTitle(machineResult) + '" resultID="' + machineResult.runID + '">' +
