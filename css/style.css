@@ -261,18 +261,26 @@ span.logtags span.inbranchtag {
 .exception  { color: #708 !important; }
 .running    { color: #999 !important; }
 .pending    { color: #DDD !important; }
+.retry      { color: #00C !important; }
+.unknown    { color: #000 !important; }
 .machineResult.success:hover    { background-color: #4A0; }
 .machineResult.testfailed:hover { background-color: #F70; }
 .machineResult.busted:hover     { background-color: #E00; }
 .machineResult.exception:hover  { background-color: #818; }
+.machineResult.retry:hover      { background-color: #00D; }
+.machineResult.unknown:hover    { background-color: #111; }
 .machineResult.success:active    { background-color: #5B1; }
 .machineResult.testfailed:active { background-color: #F81; }
 .machineResult.busted:active     { background-color: #F00; }
 .machineResult.exception:active  { background-color: #928; }
+.machineResult.retry:active      { background-color: #00F; }
+.machineResult.unknown:active    { background-color: #222; }
 .machineResult.success[active=true]    { background-color: #4A0; }
 .machineResult.testfailed[active=true] { background-color: #F70; }
 .machineResult.busted[active=true]     { background-color: #D00; }
 .machineResult.exception[active=true]  { background-color: #818; }
+.machineResult.retry[active=true]      { background-color: #00C; }
+.machineResult.unknown[active=true]    { background-color: #111; }
 
 button.csetList {
   float: right;
@@ -307,7 +315,9 @@ button.csetList::-moz-focus-inner {
 }
 
 /* helps the color-blind */
-.busted, .testfailed, .exception { text-decoration: underline }
+.busted, .testfailed, .exception, .retry, .unknown {
+  text-decoration: underline;
+}
 
 #pushes .machineResultGroup .machineResult {
   padding: 0 2px 2px;
@@ -402,6 +412,12 @@ body.details > #details
 }
 #status a.exception {
   background-color: #708 !important;
+}
+#status a.retry {
+  background-color: #00C !important;
+}
+#status a.unknown {
+  background-color: #000 !important;
 }
 #status a {
   float: left;
@@ -515,10 +531,10 @@ em.testfail {
 .stars .summary span.highlight {
   font-weight: bold;
 }
-#details:not([state="testfailed"]):not([state="busted"]):not([state="exception"]) .stars .summary {
+#details[state="success"] .stars .summary {
   display: none;
 }
-#details:not([state="testfailed"]):not([state="busted"]):not([state="exception"]) .stars .note,
+#details[state="success"] .stars .note,
 #details:not(.hasStar) .stars .summary {
   max-height: 300px;
   border-top: none;

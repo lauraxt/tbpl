@@ -209,7 +209,10 @@ var UserInterface = {
       '<dt class="success">green</dt><dd>success</dd>' +
       '<dt class="testfailed">orange</dt><dd>tests failed</dd>' +
       '<dt class="exception">purple</dt><dd>infrastructure exception</dd>' +
-      '<dt class="busted">red</dt><dd>build error</dd>').appendTo(legend);
+      '<dt class="busted">red</dt><dd>build error</dd>' + 
+      '<dt class="retry">blue</dt><dd>build has been restarted</dd>' +
+      '<dt class="unknown">black</dt><dd>unknown error</dd>' +
+      '').appendTo(legend);
   },
 
   _buildTreeInfo: function UserInterface__buildTreeInfo() {
@@ -305,6 +308,7 @@ var UserInterface = {
       {
         case 'busted':
         case 'exception':
+        case 'unknown':
           failing.unshift(result);
         break;
         case 'testfailed':
@@ -312,7 +316,8 @@ var UserInterface = {
         break;
       }
       if (!result.note &&
-          (result.state == 'busted' || result.state == 'testfailed' || result.state == 'exception'))
+          (result.state == 'busted' || result.state == 'testfailed' || result.state == 'exception' ||
+           result.state == 'unknown'))
         ++unstarred;
     });
     $('#status').html(
@@ -380,7 +385,9 @@ var UserInterface = {
       "success": type + ' was successful',
       "testfailed": 'Tests failed on ' + type + ' on ' + Config.OSNames[result.machine.os],
       "exception": 'Infrastructure exception on ' + type + ' on ' + Config.OSNames[result.machine.os],
-      "busted": type + ' on ' + Config.OSNames[result.machine.os] + ' is burning'
+      "busted": type + ' on ' + Config.OSNames[result.machine.os] + ' is burning',
+      "retry": type + ' on ' + Config.OSNames[result.machine.os] + ' has been restarted',
+      "unknown": 'Unknown error on ' + type + ' on ' + Config.OSNames[result.machine.os],
     }[result.state] + (result.state == "pending" ? "" : ', ' + this._timeString(result));
   },
   
