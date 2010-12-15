@@ -8,11 +8,13 @@ var UserInterface = {
   _data: null,
   _activeResult: "",
   _storage: null,
+  _onlyUnstarred: false,
 
-  init: function UserInterface_init(controller) {
+  init: function UserInterface_init(controller, onlyUnstarred) {
     var self = this;
     this._controller = controller;
     this._treeName = controller.treeName;
+    this._onlyUnstarred = onlyUnstarred;
     this._data = controller.getData();
     this._setupStorage();
 
@@ -315,6 +317,21 @@ var UserInterface = {
            .replace(/(changeset\s*)?([0-9a-f]{12})\b/ig, '<a href="http://hg.mozilla.org/' + Config.repoNames[this._treeName] + '/rev/$2">$1$2</a>');
   },
 
+  _isFailureState: function UserInterface__isFailureState(state) {
+    switch (state) {
+      case 'busted':
+      case 'exception':
+      case 'unknown':
+      case 'testfailed':
+        return true;
+    }
+    return false;
+  },
+
+  _isUnstarredFailure: function UserInterface__isUnstarredFailure(result) {
+    return !result.note && this._isFailureState(result.state);
+  },
+
   _updateTreeStatus: function UserInterface__updateTreeStatus() {
     var machines = this._data.getMachines();
     var self = this;
@@ -337,9 +354,7 @@ var UserInterface = {
           failing.push(result);
         break;
       }
-      if (!result.note &&
-          (result.state == 'busted' || result.state == 'testfailed' || result.state == 'exception' ||
-           result.state == 'unknown'))
+      if (self._isUnstarredFailure(result))
         ++unstarred;
     });
     $('#status').html(
@@ -505,10 +520,24 @@ var UserInterface = {
     ' </span>';
   },
 
+  _filterDisplayedResults: function UserInterface__filterDisplayedResults(results) {
+    if (!this._onlyUnstarred)
+      return results;
+
+    var self = this;
+    return results.filter(function (result) {
+      return self._isUnstarredFailure(result);
+    });
+  },
+
   _buildHTMLForOS: function UserInterface__buildHTMLForOS(os, debug, results) {
     var self = this;
     var osresults = Controller.keysFromObject(Config.testNames).map(function buildHTMLForPushResultsOnOSForMachineType(machineType) {
-      if (!results[machineType] || results[machineType].length == 0)
+      if (!results[machineType])
+        return '';
+
+      var displayedResults = self._filterDisplayedResults(results[machineType]);
+      if (displayedResults.length == 0)
         return '';
 
       // Sort results.
@@ -528,7 +557,7 @@ var UserInterface = {
       }
       if (Config.treesWithGroups.indexOf(self._treeName) != -1 &&
           Controller.keysFromObject(Config.groupedMachineTypes).indexOf(machineType) != -1) {
-        results[machineType].sort(function machineResultSortOrderComparison(a, b) {
+        displayedResults.sort(function machineResultSortOrderComparison(a, b) {
           // machine.type does not mess up the numeric/alphabetic sort
           var numA = a.machine.type + self._numberForMachine(a.machine);
           var numB = b.machine.type + self._numberForMachine(b.machine);
@@ -537,10 +566,10 @@ var UserInterface = {
 
           return numA > numB ? 1 : -1;
         });
-        return self._machineGroupResultLink(machineType, results[machineType]);
+        return self._machineGroupResultLink(machineType, displayedResults);
       }
-      results[machineType].sort(resultOrder);
-      return results[machineType].map(function linkMachineResults(a) { return self._machineResultLink(a); }).join(" ");
+      displayedResults.sort(resultOrder);
+      return displayedResults.map(function linkMachineResults(a) { return self._machineResultLink(a); }).join(" ");
     }).join("");
 
     if (!osresults)
