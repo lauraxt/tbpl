@@ -18,31 +18,27 @@ function Data(treeName, noIgnore, config, pusher, rev) {
 };
 
 Data.prototype = {
-  load: function Data_load(timeOffset, statusCallback, successCallback) {
+  load: function Data_load(timeOffset, loadTracker, successCallback) {
     var self = this;
     // we can provide progress info, once we load more sources
     var loadTotal = timeOffset ? 2 : 4;
-    var loaded = -1;
-    var failed = [];
+    var loaded = 0;
     var loadedData = {pending: {}, running: {}, pushes: {}, machineResults: {}};
     var infraStats = !timeOffset ? {} : null;
     var checkLoaded = function() {
-      if (failed.length)
-        return;
-      else if (++loaded < loadTotal)
-        statusCallback({loadpercent: loaded/loadTotal});
-      else {
+      ++loaded;
+      loadTracker.loadCompleted();
+      if (loaded == loadTotal) {
         var updatedPushes = self._combineResults(loadedData, timeOffset);
-        statusCallback({loadpercent: 1});
         successCallback(Controller.valuesFromObject(self._machines),
           Controller.valuesFromObject(updatedPushes), infraStats);
       }
     };
-    checkLoaded();
     var failCallback = function(what) {
       failed.push(what);
-      statusCallback({failed: failed});
+      loadTracker.loadFailed(what);
     };
+    loadTracker.addTrackedLoad();
     Config.pushlogDataLoader.load(
       Config.repoNames[this._treeName],
       timeOffset,
@@ -54,6 +50,7 @@ Data.prototype = {
       this._pusher,
       this._rev
     );
+    loadTracker.addTrackedLoad();
     Config.tinderboxDataLoader.load(
       this._treeName,
       timeOffset,
@@ -71,6 +68,7 @@ Data.prototype = {
       // infrastructure popup in the UI.
       // Adding the actual running / pending entries to the right
       // pushes will happen in _combineResults.
+      loadTracker.addTrackedLoad();
       this._getPendingBuilds(function (pending) {
         loadedData.pending = pending;
         for (var tree in pending) {
@@ -81,6 +79,7 @@ Data.prototype = {
         }
         checkLoaded();
       });
+      loadTracker.addTrackedLoad();
       this._getRunningBuilds(function (running) {
         loadedData.running = running;
         for (var tree in running) {

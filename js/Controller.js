@@ -79,7 +79,8 @@ var Controller = {
 
   requestHistory: function Controller_requestHistory(callback) {
     this._timeOffset-= Config.goBackHours * 3600;
-    this._data.load(this._timeOffset, this._statusCallback, callback);
+    var loadTracker = new LoadTracker(this._statusCallback);
+    this._data.load(this._timeOffset, loadTracker, callback);
   },
 
   _getParams: function Controller__getParams() {
@@ -99,6 +100,7 @@ var Controller = {
   },
 
   _startStatusRequest: function Controller__startStatusRequest() {
-    this._data.load(0, this._statusCallback, this._refreshCallback);
+    var loadTracker = new LoadTracker(this._statusCallback);
+    this._data.load(0, loadTracker, this._refreshCallback);
   }
 };
