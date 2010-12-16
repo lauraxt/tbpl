@@ -62,35 +62,30 @@ Data.prototype = {
       failCallback,
       this
     );
-    if (!timeOffset) {
-      // Here we'll fetch the pending / running JSON, and we'll
-      // count the builds. These numbers will be displayed in the
-      // infrastructure popup in the UI.
-      // Adding the actual running / pending entries to the right
-      // pushes will happen in _combineResults.
+    if (!timeOffset)
+      this._loadPendingAndRunningBuilds(loadTracker, loadedData, infraStats, checkLoaded);
+  },
+
+  _loadPendingAndRunningBuilds: function Data__loadPendingAndRunningBuilds(loadTracker, loadedData, infraStats, checkLoaded) {
+    // Here we'll fetch the pending / running JSON, and we'll
+    // count the builds. These numbers will be displayed in the
+    // infrastructure popup in the UI.
+    // Adding the actual running / pending entries to the right
+    // pushes will happen in _combineResults.
+    var self = this;
+    ["pending", "running"].forEach(function (pendingOrRunning) {
       loadTracker.addTrackedLoad();
-      this._getPendingBuilds(function (pending) {
-        loadedData.pending = pending;
-        for (var tree in pending) {
+      self._getPendingOrRunningBuilds(pendingOrRunning, function (data) {
+        loadedData[pendingOrRunning] = data;
+        for (var tree in data) {
           if (!(tree in infraStats))
             infraStats[tree] = {pending: 0, running: 0};
-          for (var rev in pending[tree])
-            infraStats[tree].pending += pending[tree][rev].length;
+          for (var rev in data[tree])
+            infraStats[tree][pendingOrRunning] += data[tree][rev].length;
         }
         checkLoaded();
       });
-      loadTracker.addTrackedLoad();
-      this._getRunningBuilds(function (running) {
-        loadedData.running = running;
-        for (var tree in running) {
-          if (!(tree in infraStats))
-            infraStats[tree] = {pending: 0, running: 0};
-          for (var rev in running[tree])
-            infraStats[tree].running += running[tree][rev].length;
-        }
-        checkLoaded();
-      });
-    }
+    });
   },
 
   machineGroup: function Data_machineGroup(machineType) {
@@ -358,26 +353,24 @@ Data.prototype = {
     return updatedPushes;
   },
   
-  _getPendingBuilds: function Data__getPendingBuilds(success, error) {
+  _getPendingOrRunningBuilds: function Data__getPendingBuilds(pendingOrRunning, success, error) {
     var self = this;
-    $.getJSON("http://build.mozilla.org/builds/builds-pending.js", function(data) {
-      if (!data.pending)
-        return;
-      self._filterHiddenBuilds(data.pending);
-      success(data.pending);
+    $.ajax({
+      url: "http://build.mozilla.org/builds/builds-" + pendingOrRunning + ".js",
+      dataType: 'json',
+      success: function (json) {
+        if (!json[pendingOrRunning])
+          return;
+        var data = json[pendingOrRunning];
+        self._filterHiddenBuilds(data);
+        success(data);
+      },
+      error: function (request, textStatus, er) {
+        error(textStatus);
+      }
     });
   },
   
-  _getRunningBuilds: function Data__getRunningBuilds(success, error) {
-    var self = this;
-    $.getJSON("http://build.mozilla.org/builds/builds-running.js", function(data) {
-      if (!data.running)
-        return;
-      self._filterHiddenBuilds(data.running);
-      success(data.running);
-    });
-  },
-
   _filterHiddenBuilds: function Data__filterHiddenBuilds(obj) {
     if (this._noIgnore)
       return;
