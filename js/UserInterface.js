@@ -8,7 +8,6 @@ var UserInterface = {
   _data: null,
   _activeResult: "",
   _storage: null,
-  _machines: [],
 
   init: function UserInterface_init(controller) {
     var self = this;
@@ -54,7 +53,7 @@ var UserInterface = {
     AddCommentUI.registerNumSendingCommentChangedCallback(function commentSendUpdater(changedResult) {
       self.updateStatus();
       if (changedResult)
-        self.handleRefresh(self._machines, [changedResult.push]);
+        self.handleUpdatedPush(changedResult.push);
     });
     AddCommentUI.registerNumSendingBugChangedCallback(function bugSendUpdater() {
       self.updateStatus();
@@ -65,8 +64,8 @@ var UserInterface = {
     $("#pushes").append(
       $('<li><a id="goBack" href="#" title="add another ' + Config.goBackHours + ' hours of history"></a></li>')
         .children().first().bind('click', function goBack() {
-          self._controller.requestHistory(function UserInterface__requestHistory(machines, pushes) {
-            self._updateTreeStatus(machines);
+          self._controller.requestHistory(function UserInterface__requestHistory(pushes) {
+            self._updateTreeStatus();
 
             pushes.forEach(function (push) {
               self.handleUpdatedPush(push);
@@ -75,14 +74,13 @@ var UserInterface = {
           return false;
         }).parent());
 
-    return {status: self.updateStatus, refresh: function (machines, pushes, infraStats) { self.handleRefresh(machines, pushes, infraStats); } };
+    return {status: self.updateStatus, refresh: function (pushes, infraStats) { self.handleRefresh(pushes, infraStats); } };
   },
 
-  handleRefresh: function UserInterface_loadedData(machines, pushes, infraStats) {
-    this._machines = machines;
+  handleRefresh: function UserInterface_loadedData(pushes, infraStats) {
     var pushesElem = $("#pushes");
     pushesElem.removeClass("initialload");
-    this._updateTreeStatus(machines);
+    this._updateTreeStatus();
 
     if (infraStats)
       this.handleInfraStatsUpdate(infraStats);
@@ -302,7 +300,8 @@ var UserInterface = {
            .replace(/(changeset\s*)?([0-9a-f]{12})\b/ig, '<a href="http://hg.mozilla.org/' + Config.repoNames[this._treeName] + '/rev/$2">$1$2</a>');
   },
 
-  _updateTreeStatus: function UserInterface__updateTreeStatus(machines) {
+  _updateTreeStatus: function UserInterface__updateTreeStatus() {
+    var machines = this._data.getMachines();
     var self = this;
     var failing = [];
     var unstarred = 0;

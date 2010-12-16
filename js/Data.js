@@ -30,8 +30,7 @@ Data.prototype = {
       loadTracker.loadCompleted();
       if (loaded == loadTotal) {
         var updatedPushes = self._combineResults(loadedData, timeOffset);
-        successCallback(Controller.valuesFromObject(self._machines),
-          Controller.valuesFromObject(updatedPushes), infraStats);
+        successCallback(Controller.valuesFromObject(updatedPushes), infraStats);
       }
     };
     var failCallback = function(what) {
@@ -180,6 +179,10 @@ Data.prototype = {
         latestFinishedRun: null, runs: 0, runtime: 0, averageCycleTime: 0};
     }
     return this._machines[name];
+  },
+
+  getMachines: function Data_getMachines() {
+    return Controller.valuesFromObject(this._machines);
   },
 
   _combineResults: function Data__combineResults(data, goingIntoPast) {
