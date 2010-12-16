@@ -477,6 +477,20 @@ var UserInterface = {
         return '';
 
       // Sort results.
+      function resultOrder(a, b) {
+        // Sort finished before running before pending results,
+        // and then via start time.
+        if (a.state != b.state &&
+            (a.state == "pending" || b.state == "pending" ||
+             a.state == "running" || b.state == "running")) {
+          // When does b go after a? Return -1 in those cases.
+          if ((b.state == "pending") ||
+              (b.state == "running" && a.state != "pending"))
+            return -1;
+          return 1;
+        }
+        return a.startTime.getTime() - b.startTime.getTime();
+      }
       if (Config.treesWithGroups.indexOf(self._treeName) != -1 &&
           Controller.keysFromObject(Config.groupedMachineTypes).indexOf(machineType) != -1) {
         results[machineType].sort(function machineResultSortOrderComparison(a, b) {
@@ -484,17 +498,15 @@ var UserInterface = {
           var numA = a.machine.type + self._numberForMachine(a.machine);
           var numB = b.machine.type + self._numberForMachine(b.machine);
           if (numA == numB)
-            return a.startTime.getTime() - b.startTime.getTime();
+            return resultOrder(a, b);
 
           return numA > numB ? 1 : -1;
         });
         return self._machineGroupResultLink(machineType, results[machineType]);
       }
-      results[machineType].sort(function machineResultSortTimeComparison(a, b) {
-        return a.startTime.getTime() - b.startTime.getTime();
-      });
+      results[machineType].sort(resultOrder);
       return results[machineType].map(function linkMachineResults(a) { return self._machineResultLink(a); }).join(" ");
-    }).join("\n");
+    }).join("");
 
     if (!osresults)
       return '';
