@@ -53,7 +53,14 @@ var PushlogJSONParser = {
           }
 
           var toprev = patches[0].rev;
-          pushes[toprev] = {pusher: push.user, date: new Date(push.date * 1000), toprev: toprev, defaultTip: defaultTip, patches: patches};
+          pushes[toprev] = {
+            id: +pushID,
+            pusher: push.user,
+            date: new Date(push.date * 1000),
+            toprev: toprev,
+            defaultTip: defaultTip,
+            patches: patches,
+          };
         }
         loadCallback(pushes);
       },

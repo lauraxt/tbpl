@@ -520,14 +520,32 @@ var UserInterface = {
 
   _buildHTMLForPushResults: function UserInterface__buildHTMLForPushResults(push) {
     var self = this;
-    return '<ul class="results">\n' +
-    Controller.keysFromObject(Config.OSNames).map(function buildHTMLForPushResultsOnOS(os) {
+    return Controller.keysFromObject(Config.OSNames).map(function buildHTMLForPushResultsOnOS(os) {
       if (!push.results || !push.results[os])
         return '';
       return (push.results[os].opt   ? self._buildHTMLForOS(os, " opt"  , push.results[os].opt  ) : '') + 
              (push.results[os].debug ? self._buildHTMLForOS(os, " debug", push.results[os].debug) : '');
-    }).join("\n") +
-    '</ul>';
+    }).join("\n");
+  },
+  
+  _buildHTMLForPushPatches: function UserInterface__buildHTMLForPushPatches(push) {
+    var self = this;
+    return push.patches.map(function buildHTMLForPushPatch(patch, patchIndex) {
+      return '<li>\n' +
+      '<a class="revlink" href="' + self._changesetURL(patch.rev) + '">' + patch.rev +
+      '</a>\n<div class="popup"><span><span class="author">' + patch.author + '</span> &ndash; ' +
+      '<span class="desc">' + self._linkBugs(patch.desc.split("\n")[0]) + '</span>' +
+      (function buildHTMLForPatchTags() {
+        if (!patch.tags.length)
+          return '';
+
+        return ' <span class="logtags">' + $(patch.tags).map(function () {
+          return ' <span class="' + this.type + '">' + this.name + '</span>';
+        }).get().join('') + '</span>';
+      })() +
+      '</span></div>\n' +
+      '</li>';
+    }).join("\n");
   },
 
   _changesetURL: function UserInterface__changesetUrl(rev) {
@@ -536,37 +554,26 @@ var UserInterface = {
 
   _generatePushNode: function UserInterface__generatePushNode(push) {
     var self = this;
-    var nodeHtml = '<li id="push-' + push.patches[0].rev + '">\n' +
+    var nodeHtml = '<li class="push" id="push-' + push.id + '" data-id="' + push.id + '">\n' +
       '<h2><span class="pusher">' + push.pusher + '</span> &ndash; ' +
       '<span class="date" data-timestamp="' + push.date.getTime() + '">' +
       self._getDisplayDate(push.date) + '</span>' +
-      ' <span class="talosCompare">(<label>compare: <input class="revsToCompare" type="checkbox" value="' + push.patches[0].rev + '"></label>)</span>' +
-      '<button class="csetList" onclick="UserInterface._listChangesetsForPush(\''+ push.patches[0].rev +'\')">List changeset URLs</button>' +
+      ' <span class="talosCompare">(<label>compare: <input class="revsToCompare" type="checkbox" value="' + push.toprev + '"></label>)</span>' +
+      '<button class="csetList" onclick="UserInterface._listChangesetsForPush(\''+ push.toprev +'\')">List changeset URLs</button>' +
       '</h2>\n' +
-      self._buildHTMLForPushResults(push) +
-      '<ul class="patches">\n' +
-      push.patches.map(function buildHTMLForPushPatches(patch, patchIndex) {
-        return '<li>\n' +
-        '<a class="revlink" href="' + self._changesetURL(patch.rev) + '">' + patch.rev +
-        '</a>\n<div class="popup"><span><span class="author">' + patch.author + '</span> &ndash; ' +
-        '<span class="desc">' + self._linkBugs(patch.desc.split("\n")[0]) + '</span>' +
-        (function buildHTMLForPatchTags() {
-          if (!patch.tags.length)
-            return '';
-
-          return ' <span class="logtags">' + $(patch.tags).map(function () {
-            return ' <span class="' + this.type + '">' + this.name + '</span>';
-          }).get().join('') + '</span>';
-        })() +
-        '</span></div>\n' +
-        '</li>';
-      }).join("\n") +
-      '</ul>\n' +
+      '<ul class="results"></ul>\n' +
+      '<ul class="patches"></ul>\n' +
       '</li>';
     var node = $(nodeHtml);
+    $(".patches", node).html(this._buildHTMLForPushPatches(push));
+    this._refreshPushResultsInPushNode(push, node);
     this._installComparisonClickHandler(node);
     this._installTooltips(node);
     return node;
+  },
+  
+  _refreshPushResultsInPushNode: function UserInterface__refreshPushResultsInPushNode(push, node) {
+    $(".results", node).html(this._buildHTMLForPushResults(push));
   },
 
   _listChangesetsForPush: function(toprev) {
