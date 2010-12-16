@@ -473,7 +473,7 @@ var UserInterface = {
   _buildHTMLForOS: function UserInterface__buildHTMLForOS(os, debug, results) {
     var self = this;
     var osresults = Controller.keysFromObject(Config.testNames).map(function buildHTMLForPushResultsOnOSForMachineType(machineType) {
-      if (!results[machineType])
+      if (!results[machineType] || results[machineType].length == 0)
         return '';
 
       // Sort results.
