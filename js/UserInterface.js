@@ -80,7 +80,6 @@ var UserInterface = {
                 else
                   goback.before(self._generatePushNode(push));
               });
-              self._setActiveResult(this._activeResult, false);
             }
           });
           return false;
@@ -119,7 +118,6 @@ var UserInterface = {
         else
           pushesElem.prepend(self._generatePushNode(push));
       });
-      this._setActiveResult(this._activeResult, false);
     }
   },
 
@@ -323,11 +321,19 @@ var UserInterface = {
     $('#status').html(
       '<strong>' + failing.length + '</strong> Job' + (failing.length != 1 ? 's are' : ' is') + ' failing:<br />' +
       failing.map(function(machineResult) {
-        return '<a href="' + machineResult.briefLogURL +
-               '" onclick="UserInterface.clickMachineResult(event, this)" class="machineResult ' + machineResult.state +
-               (machineResult.note ? ' hasNote" title="(starred) ' : '" title="') +
-               self._resultTitle(machineResult) + '" resultID="' + machineResult.runID + '">' +
-               self._resultTitle(machineResult) + '</a>';
+        var className = "machineResult " + machineResult.state;
+        var title = self._resultTitle(machineResult);
+        if (machineResult.note) {
+          className += " hasNote";
+          title = "(starred) " + title;
+        }
+        return '<a href="' + machineResult.briefLogURL + '"' +
+               ' onclick="UserInterface.clickMachineResult(event, this)"' +
+               ' class="' + className + '"' +
+               ' title="' + title + '"' +
+               (machineResult.runID == self._activeResult ? ' active="true"' : '') +
+               ' resultID="' + machineResult.runID + '"' +
+               '>' + title + '</a>';
       }).join('\n')
     );
     document.title = document.title.replace(/\[\d*\]/, "[" + unstarred + "]");
@@ -424,9 +430,10 @@ var UserInterface = {
      * and because the details show no more info than the tooltip
      */
     return '<a' + (['running', 'pending'].indexOf(machineResult.state) == -1 ? 
-      ' href="' + machineResult.briefLogURL +
-      '" resultID="' + machineResult.runID +
-      '" onclick="UserInterface.clickMachineResult(event, this)"' : "") + 
+      ' href="' + machineResult.briefLogURL + '"' +
+      ' resultID="' + machineResult.runID + '"' +
+      (machineResult.runID == this._activeResult ? ' active="true"' : '') +
+      ' onclick="UserInterface.clickMachineResult(event, this)"' : "") +
     ' class="machineResult ' + machineResult.state +
     '" title="' + this._resultTitle(machineResult) +
     '">' + (machine.type == "Mochitest" && onlyNumber ? this._numberForMachine(machine) :
