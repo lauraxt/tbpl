@@ -68,19 +68,9 @@ var UserInterface = {
           self._controller.requestHistory(function UserInterface__requestHistory(machines, pushes) {
             self._updateTreeStatus(machines);
 
-            pushes.sort(function(a,b) { return b.date - a.date; });
-            var goback = $("#goBack").parent();
-            if (pushes.length) {
-              $("#nopushes").remove();
-              var pushesElem = $("#pushes");
-              pushes.forEach(function(push) {
-                var exists = document.getElementById("push-" + push.toprev);
-                if (exists)
-                  $(exists).replaceWith(self._generatePushNode(push));
-                else
-                  goback.before(self._generatePushNode(push));
-              });
-            }
+            pushes.forEach(function (push) {
+              self.handleUpdatedPush(push);
+            });
           });
           return false;
         }).parent());
@@ -97,18 +87,35 @@ var UserInterface = {
     if (infraStats)
       this.handleInfraStatsUpdate(infraStats);
 
-    pushes.sort(function(a,b) { return a.date - b.date; });
-    if (pushes.length) {
-      $("#nopushes").remove();
-      var self = this;
-      pushes.forEach(function(push) {
-        var exists = document.getElementById("push-" + push.toprev);
-        if (exists)
-          $(exists).replaceWith(self._generatePushNode(push));
-        else
-          pushesElem.prepend(self._generatePushNode(push));
-      });
+    var self = this;
+    pushes.forEach(function (push) {
+      self.handleUpdatedPush(push);
+    });
+  },
+
+  handleUpdatedPush: function UserInterface_handleUpdatedPush(push) {
+    $("#nopushes").remove();
+    var existingPushNode = $("#push-" + push.id);
+    if (existingPushNode.length) {
+      this._refreshPushResultsInPushNode(push, existingPushNode);
+    } else {
+      this._generatePushNode(push).insertBefore(this._getInsertBeforeAnchor(push));
     }
+  },
+
+  _getInsertBeforeAnchor: function UserInterface__getInsertBeforeAnchor(push) {
+    var allPushNodes = $("#pushes").children(".push");
+    // allPushNodes are sorted in decreasing pushID order.
+    // The first pushNode with pushID < push.id will be our
+    // insertBefore anchor. If all existing pushes have
+    // pushID > push.id, the goBack arrow container li is the
+    // anchor.
+    for (var i = 0; i < allPushNodes.length; i++) {
+      var currentPushNode = allPushNodes.eq(i);
+      if (+currentPushNode.attr("data-id") < push.id)
+        return currentPushNode;
+    }
+    return $("#goBack").parent();
   },
 
   handleInfraStatsUpdate: function UserInterface_handleInfraStatsUpdate(infraStats) {
