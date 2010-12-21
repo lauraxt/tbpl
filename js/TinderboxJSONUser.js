@@ -3,34 +3,53 @@
 
 var TinderboxJSONUser = {
 
-  load: function TinderboxJSONUser_load(tree, timeOffset, noIgnore, loadTracker, loadCallback, data) {
+  load: function TinderboxJSONUser_load(tree, pushes, noIgnore, loadTracker, loadCallback, data) {
     delete tinderbox_data;
     var self = this;
-    var scriptURL = this._getScriptURL(tree, timeOffset, noIgnore);
-    loadTracker.addTrackedLoad();
-    $.getScript(scriptURL, function tinderboxJSONGetScriptCallback() {
-      if (!tinderbox_data) {
-        loadTracker.loadFailed("tinderbox_data is invalid");
-      } else {
-        loadCallback(self.parseTinderbox(tree, tinderbox_data, data));
-        loadTracker.loadCompleted();
-      }
+    if (!pushes.length)
+      return;
+    var now = new Date();
+    this._getTimeRangesForPushes(pushes, now).forEach(function (timeRange) {
+      var scriptURL = self._getScriptURL(tree, timeRange, noIgnore, now);
+      loadTracker.addTrackedLoad();
+      $.getScript(scriptURL, function tinderboxJSONGetScriptCallback() {
+        if (!tinderbox_data) {
+          loadTracker.loadFailed("tinderbox_data is invalid");
+        } else {
+          loadCallback(self.parseTinderbox(tree, tinderbox_data, data));
+          loadTracker.loadCompleted();
+        }
+      });
     });
   },
 
-  _getScriptURL: function TinderboxJSONUser__getScriptURL(tree, timeOffset, noIgnore) {
-    var scriptURL;
-    if (timeOffset || noIgnore) {
-      scriptURL = 'http://tinderbox.mozilla.org/showbuilds.cgi?tree=' + tree +
-                  '&json=1';
-      if (timeOffset) {
-        scriptURL += '&maxdate=' + timeOffset + '&hours=' + Config.goBackHours;
-      }
-      if (noIgnore) {
-        scriptURL += '&noignore=1';
-      }
-    } else {
-      scriptURL = "http://tinderbox.mozilla.org/" + tree + "/json.js";
+  _getTimeRangesForPushes: function TinderboxJSONUser__getTimeRangesForPushes(pushes, now) {
+    var rangeDuration = 12 * 60 * 60 * 1000; // 12 hours
+    var maxResultDelayAfterPush = 12 * 60 * 60 * 1000; // 12 hours
+    var latestPushDate = pushes[pushes.length - 1].date;
+    var requestEnd = new Date(Math.min(latestPushDate.getTime() + maxResultDelayAfterPush, now));
+    var requestStart = pushes[0].date;
+    var timeRanges = [];
+    while (requestEnd > requestStart) {
+      timeRanges.push({
+        endTime: requestEnd,
+        duration: rangeDuration,
+      });
+      requestEnd = new Date(requestEnd - rangeDuration);
+    }
+    return timeRanges;
+  },
+
+  _getScriptURL: function TinderboxJSONUser__getScriptURL(tree, timeRange, noIgnore, now) {
+    if (timeRange.endTime >= now && !noIgnore)
+      return "http://tinderbox.mozilla.org/" + tree + "/json.js";
+
+    var scriptURL = 'http://tinderbox.mozilla.org/showbuilds.cgi?tree=' + tree +
+                    '&json=1' +
+                    '&maxdate=' + Math.ceil(timeRange.endTime / 1000) +
+                    '&hours=' + Math.ceil(timeRange.duration / 60 / 60 / 1000);
+    if (noIgnore) {
+      scriptURL += '&noignore=1';
     }
     return scriptURL;
   },

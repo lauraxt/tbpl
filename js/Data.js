@@ -18,6 +18,7 @@ function Data(treeName, noIgnore, config, pusher, rev) {
 Data.prototype = {
   load: function Data_load(timeOffset, loadTracker, updatedPushCallback, infraStatsCallback, initialPushlogLoadCallback) {
     var self = this;
+    var tinderboxLoadEstimation = loadTracker.addMorePotentialLoads(2);
     Config.pushlogDataLoader.load(
       Config.repoNames[this._treeName],
       timeOffset,
@@ -30,11 +31,19 @@ Data.prototype = {
         self._addFinishedResultsToPushes(self._finishedResultsWithoutPush, updatedPushes, updatedPushes);
         self._notifyUpdatedPushes(updatedPushes, updatedPushCallback);
         initialPushlogLoadCallback();
+        self._loadTinderboxDataForPushes(updatedPushes, loadTracker, updatedPushCallback);
+        tinderboxLoadEstimation.cancel();
       }
     );
+    if (!timeOffset)
+      this._loadPendingAndRunningBuilds(loadTracker, updatedPushCallback, infraStatsCallback);
+  },
+
+  _loadTinderboxDataForPushes: function Data__loadTinderboxDataForPushes(unfilteredPushes, loadTracker, updatedPushCallback) {
+    var self = this;
     Config.tinderboxDataLoader.load(
       this._treeName,
-      timeOffset,
+      this._getFilteredPushes(unfilteredPushes),
       this._noIgnore,
       loadTracker,
       function tinderboxDataLoadCallback(data) {
@@ -44,8 +53,6 @@ Data.prototype = {
       },
       this
     );
-    if (!timeOffset)
-      this._loadPendingAndRunningBuilds(loadTracker, updatedPushCallback, infraStatsCallback);
   },
 
   _loadPendingAndRunningBuilds: function Data__loadPendingAndRunningBuilds(loadTracker, updatedPushCallback, infraStatsCallback) {
