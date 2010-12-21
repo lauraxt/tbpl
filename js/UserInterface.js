@@ -62,7 +62,7 @@ var UserInterface = {
     this._updateTimezoneDisplay();
 
     $("#pushes").append(
-      $('<li><a id="goBack" href="#" title="add another ' + Config.goBackHours + ' hours of history"></a></li>')
+      $('<li id="goBackLi"><a id="goBack" href="#" title="add another ' + Config.goBackHours + ' hours of history"></a></li>')
         .children().first().bind('click', function goBack() {
           self._controller.requestHistory();
           return false;
@@ -106,7 +106,7 @@ var UserInterface = {
       if (+currentPushNode.attr("data-id") < push.id)
         return currentPushNode;
     }
-    return $("#goBack").parent();
+    return $("#goBackLi");
   },
 
   handleInfraStatsUpdate: function UserInterface_handleInfraStatsUpdate(infraStats) {

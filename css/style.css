@@ -128,7 +128,8 @@ p {
 #nopushes {
   text-align: center;
 }
-.initialload #nopushes {
+.initialload #nopushes,
+.initialload #goBackLi {
   display: none;
 }
 
