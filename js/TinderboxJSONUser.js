@@ -3,15 +3,18 @@
 
 var TinderboxJSONUser = {
 
-  load: function TinderboxJSONUser_load(tree, timeOffset, noIgnore, loadCallback, failCallback, data) {
+  load: function TinderboxJSONUser_load(tree, timeOffset, noIgnore, loadTracker, loadCallback, data) {
     delete tinderbox_data;
     var self = this;
     var scriptURL = this._getScriptURL(tree, timeOffset, noIgnore);
+    loadTracker.addTrackedLoad();
     $.getScript(scriptURL, function tinderboxJSONGetScriptCallback() {
-      if (!tinderbox_data)
-        failCallback("tinderbox_data is invalid");
-      else
+      if (!tinderbox_data) {
+        loadTracker.loadFailed("tinderbox_data is invalid");
+      } else {
         loadCallback(self.parseTinderbox(tree, tinderbox_data, data));
+        loadTracker.loadCompleted();
+      }
     });
   },
 

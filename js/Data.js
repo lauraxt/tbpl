@@ -18,10 +18,10 @@ function Data(treeName, noIgnore, config, pusher, rev) {
 Data.prototype = {
   load: function Data_load(timeOffset, loadTracker, updatedPushCallback, infraStatsCallback, initialPushlogLoadCallback) {
     var self = this;
-    loadTracker.addTrackedLoad();
     Config.pushlogDataLoader.load(
       Config.repoNames[this._treeName],
       timeOffset,
+      loadTracker,
       function hgDataLoadCallback(loadedPushes) {
         var updatedPushes = {};
         self._addPushes(loadedPushes, updatedPushes);
@@ -30,24 +30,20 @@ Data.prototype = {
         self._addFinishedResultsToPushes(self._finishedResultsWithoutPush, updatedPushes, updatedPushes);
         self._notifyUpdatedPushes(updatedPushes, updatedPushCallback);
         initialPushlogLoadCallback();
-        loadTracker.loadCompleted();
       },
-      function () { loadTracker.loadFailed() },
       this._pusher,
       this._rev
     );
-    loadTracker.addTrackedLoad();
     Config.tinderboxDataLoader.load(
       this._treeName,
       timeOffset,
       this._noIgnore,
+      loadTracker,
       function tinderboxDataLoadCallback(data) {
         var updatedPushes = {};
         self._addFinishedResultsToPushes(data, self._pushes, updatedPushes);
         self._notifyUpdatedPushes(updatedPushes, updatedPushCallback);
-        loadTracker.loadCompleted();
       },
-      function () { loadTracker.loadFailed() },
       this
     );
     if (!timeOffset)

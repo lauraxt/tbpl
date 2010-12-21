@@ -3,8 +3,9 @@
 
 var PushlogJSONParser = {
 
-  load: function PushlogJSONParser_load(repoName, timeOffset, loadCallback, failCallback, pusher, rev) {
+  load: function PushlogJSONParser_load(repoName, timeOffset, loadTracker, loadCallback, pusher, rev) {
     var self = this;
+    loadTracker.addTrackedLoad();
     $.ajax({
       url: this._getLogUrl(repoName, timeOffset),
       dataType: 'json',
@@ -63,9 +64,10 @@ var PushlogJSONParser = {
           };
         }
         loadCallback(pushes);
+        loadTracker.loadCompleted();
       },
       error: function (request, textStatus, error) {
-        failCallback(textStatus);
+        loadTracker.loadFailed(textStatus);
       }
     });
   },
