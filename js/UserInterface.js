@@ -62,9 +62,9 @@ var UserInterface = {
     this._updateTimezoneDisplay();
 
     $("#pushes").append(
-      $('<li id="goBackLi"><a id="goBack" href="#" title="add another ' + Config.goBackHours + ' hours of history"></a></li>')
+      $('<li id="goBackLi"><a id="goBack" href="#" title="add another ' + Config.goBackPushes + ' pushes"></a></li>')
         .children().first().bind('click', function goBack() {
-          self._controller.requestHistory();
+          self._controller.extendPushRange(-Config.goBackPushes);
           return false;
         }).parent());
 

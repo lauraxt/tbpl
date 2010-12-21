@@ -24,47 +24,32 @@ var Controller = {
 
   treeName: Config.defaultTreeName,
 
-  /**
-   * Used to browse the history. This is a timestamp from which we go 12 hours
-   * into the past. Or zero if we want to show the most recent changes.
-   */
-  _timeOffset: 0,
   _uiCallbacks: null,
 
   _loadInterval: null,
   _data: null,
+  _requestedRange: null,
+  _trackingTip: false,
 
   init: function Controller_init() {
     var params = this._getParams();
-
-    // Allow specifying a tree name in the URL (http://foo/?tree=Firefox3.5)
-    if ("tree" in params) {
-      if (!Config.repoNames[params.tree])
-        throw "wrongtree"; // er, hm.
-      this.treeName = params.tree;
-    }
-
-    var pusher = null;
-    if ("pusher" in params) {
-      pusher = params.pusher;
-    }
-
-    var rev = null;
-    if ("rev" in params) {
-      rev = params.rev;
-    }
-
-    // Allow specifying &noignore=1 in the URL (to pass through to tinderbox)
+    this.treeName = (("tree" in params) && params.tree) || "Firefox";
+    var pusher = ("pusher" in params) && params.pusher;
     var noIgnore = ("noignore" in params) && (params.noignore == "1");
 
-    this._data = new Data(this.treeName, noIgnore, Config, pusher, rev);
-    this._uiCallbacks = UserInterface.init(this);
-    this._timeOffset = (new Date()).getTime() / 1000;
+    if (!(this.treeName in Config.repoNames))
+      throw "wrongtree"; // er, hm.
 
+    this._data = new Data(this.treeName, noIgnore, Config, pusher);
+    this._uiCallbacks = UserInterface.init(this);
+
+    var initialPushRangeParams = this._getInitialPushRangeParams(params);
+    var initialPushRange = initialPushRangeParams.range;
+    this._trackingTip = initialPushRangeParams.trackTip;
+    this._initialDataLoad(initialPushRange);
     var self = this;
-    this._startStatusRequest();
     this._loadInterval = setInterval(function startStatusRequestIntervalCallback() {
-      self._startStatusRequest();
+      self.refreshData();
     }, Config.loadInterval * 1000);
   },
 
@@ -72,10 +57,32 @@ var Controller = {
     return this._data;
   },
 
-  requestHistory: function Controller_requestHistory() {
-    this._timeOffset-= Config.goBackHours * 3600;
+  /**
+   * Extend the displayed push range by num pushes.
+   * Positive num extends into the future, negative into the past.
+   **/
+  extendPushRange: function Controller_extendPushRange(num) {
+    var currentRange = this._requestedRange || this._data.getLoadedPushRange();
+    if (!currentRange)
+      return;
+
+    var requestedRange;
+    if (num >= 0) {
+      // Extend into the future, i.e. increase endID.
+      requestedRange = {
+        startID: currentRange.startID,
+        endID: currentRange.endID + num,
+      };
+    } else {
+      // Extend into the past, i.e. decrease startID.
+      requestedRange = {
+        startID: currentRange.startID - Math.abs(num),
+        endID: currentRange.endID,
+      };
+    }
     var loadTracker = new LoadTracker(this._uiCallbacks.status);
-    this._data.load(this._timeOffset, loadTracker, this._uiCallbacks.handleUpdatedPush, this._uiCallbacks.handleInfraStatsUpdate, this._uiCallbacks.handleInitialPushlogLoad);
+    this._data.loadPushRange(requestedRange, false, loadTracker, this._uiCallbacks.handleUpdatedPush, this._uiCallbacks.handleInfraStatsUpdate, this._uiCallbacks.handleInitialPushlogLoad);
+    this._requestedRange = requestedRange;
   },
 
   _getParams: function Controller__getParams() {
@@ -93,9 +100,39 @@ var Controller = {
     }
     return params;
   },
+  
+  _getInitialPushRangeParams: function Controller__getInitialPushRangeParams(params) {
+    if ("rev" in params)
+      return {
+        range: { rev: params.rev },
+        trackTip: false,
+      };
 
-  _startStatusRequest: function Controller__startStatusRequest() {
+    if ("fromchange" in params && "tochange" in params)
+      return {
+        range: { fromchange: params.fromchange, tochange: params.tochange },
+        trackTip: false,
+      };
+
+    if ("startdate" in params && "enddate" in params)
+      return {
+        range: { startdate: params.startdate, enddate: params.enddate },
+        trackTip: false,
+      };
+
+    return {
+      range: {}, // default
+      trackTip: true,
+    };
+  },
+
+  _initialDataLoad: function Controller__initialDataLoad(initialPushRange) {
     var loadTracker = new LoadTracker(this._uiCallbacks.status);
-    this._data.load(0, loadTracker, this._uiCallbacks.handleUpdatedPush, this._uiCallbacks.handleInfraStatsUpdate, this._uiCallbacks.handleInitialPushlogLoad);
-  }
+    this._data.loadPushRange(initialPushRange, true, loadTracker, this._uiCallbacks.handleUpdatedPush, this._uiCallbacks.handleInfraStatsUpdate, this._uiCallbacks.handleInitialPushlogLoad);
+  },
+
+  refreshData: function Controller_refreshData() {
+    var loadTracker = new LoadTracker(this._uiCallbacks.status);
+    this._data.refresh(loadTracker, this._trackingTip, this._uiCallbacks.handleUpdatedPush, this._uiCallbacks.handleInfraStatsUpdate);
+  },
 };

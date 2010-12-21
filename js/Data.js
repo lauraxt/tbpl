@@ -1,12 +1,12 @@
 /* -*- Mode: JS; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 /* vim: set sw=2 ts=2 et tw=80 : */
 
-function Data(treeName, noIgnore, config, pusher, rev) {
+function Data(treeName, noIgnore, config, pusher) {
   this._treeName = treeName;
   this._noIgnore = noIgnore;
   this._config = config;
   this._pusher = pusher;
-  this._rev = rev;
+  this._mostRecentPush = null;
   this._pushes = {};
   this._machines = {};
   this._finishedResultsWithPush = {};
@@ -16,27 +16,102 @@ function Data(treeName, noIgnore, config, pusher, rev) {
 };
 
 Data.prototype = {
-  load: function Data_load(timeOffset, loadTracker, updatedPushCallback, infraStatsCallback, initialPushlogLoadCallback) {
+  getLoadedPushRange: function Data_getLoadedPushRange() {
+    if (!this._mostRecentPush)
+      return null;
+    return {
+      startID: this._mostRecentPush.id - Controller.valuesFromObject(this._pushes).length,
+      endID: this._mostRecentPush.id,
+    };
+  },
+
+  loadPushRange: function Data_loadPushRange(pushRange, loadPendingRunning, loadTracker, updatedPushCallback, infraStatsCallback, initialPushlogLoadCallback) {
     var self = this;
-    var tinderboxLoadEstimation = loadTracker.addMorePotentialLoads(2);
+    var pushlogRequestParams = this._getPushlogParamsForRange(pushRange);
+    pushlogRequestParams.forEach(function (params) {
+      self._loadPushlogData(params, loadTracker, updatedPushCallback, initialPushlogLoadCallback);
+    });
+    if (loadPendingRunning)
+      this._loadPendingAndRunningBuilds(loadTracker, updatedPushCallback, infraStatsCallback);
+  },
+  
+  refresh: function Data_refresh(loadTracker, trackTip, updatedPushCallback, infraStatsCallback) {
+    if (trackTip) {
+      // Passing only startID means "Load all pushes with push.id > startID".
+      this._loadPushlogData({ startID: this._mostRecentPush.id }, loadTracker, updatedPushCallback);
+    }
+    this._loadTinderboxDataForPushes(this._pushes, loadTracker, updatedPushCallback);
+    this._loadPendingAndRunningBuilds(loadTracker, updatedPushCallback, infraStatsCallback);
+  },
+  
+  _getPushlogParamsForRange: function Data__getPushlogParamsForRange(pushRange) {
+    // This function determines what to load from pushlog so that our total
+    // loaded range matches the requested pushRange.
+    // pushRange is guaranteed to be a superset of this.getLoadedPushRange().
+    // We never make our window smaller.
+
+    if ("startID" in pushRange && "endID" in pushRange) {
+      // The startID/endID mode is our default mode of operation. We start
+      // using it as soon as we've got our first result from pushlog, since
+      // only then do we know about push IDs.
+      // A pushRange with startID and endID describes the range of all pushes
+      // with startID < push.id <= endID. Note: startID is NOT included.
+      // So the number of pushes in the range is endID - startID.
+      // endID is always > startID, push ranges in the form startID/endID
+      // are never empty.
+
+      var params = [];
+      var currentRange = this.getLoadedPushRange();
+
+      // Above loaded range:
+      if (pushRange.endID > currentRange.endID) {
+        params.push({
+          startID: currentRange.endID,
+          endID: pushRange.endID,
+        });
+      }
+
+      // Below loaded range:
+      if (pushRange.startID < currentRange.startID) {
+        params.push({
+          startID: pushRange.startID,
+          endID: currentRange.startID,
+        });
+      }
+
+      return params;
+    }
+
+    // We're not in startID/endID mode yet. This is the initial request.
+    if ("rev" in pushRange)
+      return [{ changeset: pushRange.rev }];
+    if ("fromchange" in pushRange && "tochange" in pushRange)
+      return [{ fromchange: pushRange.fromchange, tochange: pushRange.tochange }];
+    if ("startdate" in pushRange && "enddate" in pushRange)
+      return [{ startdate: pushRange.startdate, enddate: pushRange.enddate }];
+    return [{}];
+  },
+
+  _loadPushlogData: function Data__loadPushlogData(params, loadTracker, updatedPushCallback, initialPushlogLoadCallback) {
+    var self = this;
+    var tinderboxLoadEstimation = loadTracker.addMorePotentialLoads(30);
     Config.pushlogDataLoader.load(
       Config.repoNames[this._treeName],
-      timeOffset,
+      params,
       loadTracker,
-      function hgDataLoadCallback(loadedPushes) {
+      function pushlogLoadCallback(loadedPushes) {
         var updatedPushes = {};
         self._addPushes(loadedPushes, updatedPushes);
         self._addPendingOrRunningResultsToPushes("pending", updatedPushes);
         self._addPendingOrRunningResultsToPushes("running", updatedPushes);
         self._addFinishedResultsToPushes(self._finishedResultsWithoutPush, updatedPushes, updatedPushes);
         self._notifyUpdatedPushes(updatedPushes, updatedPushCallback);
-        initialPushlogLoadCallback();
+        if (initialPushlogLoadCallback)
+          initialPushlogLoadCallback();
         self._loadTinderboxDataForPushes(updatedPushes, loadTracker, updatedPushCallback);
         tinderboxLoadEstimation.cancel();
       }
     );
-    if (!timeOffset)
-      this._loadPendingAndRunningBuilds(loadTracker, updatedPushCallback, infraStatsCallback);
   },
 
   _loadTinderboxDataForPushes: function Data__loadTinderboxDataForPushes(unfilteredPushes, loadTracker, updatedPushCallback) {
@@ -76,6 +151,8 @@ Data.prototype = {
       if (!(toprev in this._pushes)) {
         this._pushes[toprev] = push;
         updatedPushes[toprev] = push;
+        if (!this._mostRecentPush || push.id > this._mostRecentPush.id)
+          this._mostRecentPush = push;
       }
     }
   },
@@ -110,8 +187,6 @@ Data.prototype = {
 
   _mayDisplayPush: function Data__mayDisplayPush(push) {
     if (this._pusher && push.pusher != this._pusher)
-      return false;
-    if (this._rev && push.toprev != this._rev)
       return false;
     return true;
   },

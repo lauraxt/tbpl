@@ -8,7 +8,7 @@ var Config = {
   mvtTimezoneOffset: -8,
   mvtTimezoneName: "PST",
   loadInterval: 120, // seconds
-  goBackHours: 12,
+  goBackPushes: 10,
   baseURL: "",
   wooBugURL: "http://brasstacks.mozilla.com/starfailure.php", // war-on-orange database
   repoNames: {
