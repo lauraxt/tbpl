@@ -450,6 +450,7 @@ Data.prototype = {
         /nightly/i.test(name) ? "Nightly" :
         /shark/i.test(name) ? "Nightly" :
         /mochitest/i.test(name) ? "Mochitest" :
+        /unit (browser-)?chrome/i.test(name) ? "Mochitest" :
         /crashtest/i.test(name) ? "Crashtest" :
         /jsreftest/i.test(name) ? "JSReftest" :
         /reftest-d2d/i.test(name) ? "Reftest-Direct2D" :

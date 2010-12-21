@@ -36,6 +36,7 @@ var Config = {
     "Birch",
     "Cedar",
     "Maple",
+    "Mobile",
   ],
   groupedMachineTypes: {
     "Mochitest" : ["Mochitest"],
