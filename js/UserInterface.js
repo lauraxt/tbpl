@@ -567,9 +567,11 @@ var UserInterface = {
   _generatePushNode: function UserInterface__generatePushNode(push) {
     var self = this;
     var nodeHtml = '<li class="push" id="push-' + push.id + '" data-id="' + push.id + '">\n' +
-      '<h2><span class="pusher">' + push.pusher + '</span> &ndash; ' +
-      '<span class="date" data-timestamp="' + push.date.getTime() + '">' +
-      self._getDisplayDate(push.date) + '</span>' +
+      '<h2><a href="' + this._controller.getURLForPusherFilteringView(push.pusher) +
+      '" class="pusher">' + push.pusher + '</a> &ndash; ' +
+      '<a class="date" data-timestamp="' + push.date.getTime() +
+      '" href="' + this._controller.getURLForSinglePushView(push.toprev) + '">' +
+      self._getDisplayDate(push.date) + '</a>' +
       ' <span class="talosCompare">(<label>compare: <input class="revsToCompare" type="checkbox" value="' + push.toprev + '"></label>)</span>' +
       '<button class="csetList" onclick="UserInterface._listChangesetsForPush(\''+ push.toprev +'\')">List changeset URLs</button>' +
       '</h2>\n' +

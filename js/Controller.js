@@ -30,9 +30,11 @@ var Controller = {
   _data: null,
   _requestedRange: null,
   _trackingTip: false,
+  _params: {},
 
   init: function Controller_init() {
     var params = this._getParams();
+    this._params = params;
     this.treeName = (("tree" in params) && params.tree) || "Firefox";
     var pusher = ("pusher" in params) && params.pusher;
     var noIgnore = ("noignore" in params) && (params.noignore == "1");
@@ -85,6 +87,26 @@ var Controller = {
     this._requestedRange = requestedRange;
   },
 
+  getURLForPusherFilteringView: function Controller_getURLForPusherFilteringView(pusher) {
+    var params = $.extend({}, this._params); // fancy way of cloning an object
+    params.pusher = pusher;
+    return this._createURLForParams(params);
+  },
+
+  getURLForSinglePushView: function Controller_getURLForSinglePushView(rev) {
+    var params = $.extend({}, this._params);
+    params.rev = rev;
+    return this._createURLForParams(params);
+  },
+
+  _createURLForParams: function Controller__createURLForParams(params) {
+    var items = [];
+    for (var key in params) {
+      items.push(escape(key) + "=" + escape(params[key]));
+    }
+    return "?" + items.join("&");
+  },
+
   _getParams: function Controller__getParams() {
     // Get the parameters specified in the query string of the URL.
     var params = {};
@@ -94,7 +116,7 @@ var Controller = {
       for (var index in items) {
         var eqitems = items[index].split("=");
         if (eqitems.length >= 2) {
-          params[eqitems[0]] = eqitems.slice(1).join("=");
+          params[unescape(eqitems[0])] = unescape(eqitems.slice(1).join("="));
         }
       }
     }
