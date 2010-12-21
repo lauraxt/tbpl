@@ -64,31 +64,24 @@ var UserInterface = {
     $("#pushes").append(
       $('<li><a id="goBack" href="#" title="add another ' + Config.goBackHours + ' hours of history"></a></li>')
         .children().first().bind('click', function goBack() {
-          self._controller.requestHistory(function UserInterface__requestHistory(pushes) {
-            self._updateTreeStatus();
-
-            pushes.forEach(function (push) {
-              self.handleUpdatedPush(push);
-            });
-          });
+          self._controller.requestHistory();
           return false;
         }).parent());
 
-    return {status: self.updateStatus, refresh: function (pushes, infraStats) { self.handleRefresh(pushes, infraStats); } };
-  },
-
-  handleRefresh: function UserInterface_loadedData(pushes, infraStats) {
-    var pushesElem = $("#pushes");
-    pushesElem.removeClass("initialload");
-    this._updateTreeStatus();
-
-    if (infraStats)
-      this.handleInfraStatsUpdate(infraStats);
-
-    var self = this;
-    pushes.forEach(function (push) {
-      self.handleUpdatedPush(push);
-    });
+    return {
+      status: function (status) {
+        self.updateStatus(status);
+      },
+      handleUpdatedPush: function (push) {
+        self.handleUpdatedPush(push);
+      },
+      handleInfraStatsUpdate: function (infraStats) {
+        self.handleInfraStatsUpdate(infraStats);
+      },
+      handleInitialPushlogLoad: function () {
+        $("#pushes").removeClass("initialload");
+      },
+    };
   },
 
   handleUpdatedPush: function UserInterface_handleUpdatedPush(push) {
@@ -130,6 +123,9 @@ var UserInterface = {
   },
 
   updateStatus: function UserInterface_updateStatus(status) {
+    if (status && status.loadpercent == 1) {
+      this._updateTreeStatus();
+    }
     var statusSpan = $("#loading");
     statusSpan.removeClass("loading");
     statusSpan.removeClass("fail");

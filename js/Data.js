@@ -18,19 +18,20 @@ function Data(treeName, noIgnore, config, pusher, rev) {
 };
 
 Data.prototype = {
-  load: function Data_load(timeOffset, loadTracker, successCallback) {
+  load: function Data_load(timeOffset, loadTracker, updatedPushCallback, infraStatsCallback, initialPushlogLoadCallback) {
     var self = this;
     // we can provide progress info, once we load more sources
     var loadTotal = timeOffset ? 2 : 4;
     var loaded = 0;
-    var loadedData = {pending: {}, running: {}, pushes: {}, machineResults: {}};
+    var loadedData = {pending: null, running: null, pushes: {}, machineResults: {}};
     var infraStats = !timeOffset ? {} : null;
     var checkLoaded = function() {
       ++loaded;
       loadTracker.loadCompleted();
       if (loaded == loadTotal) {
         var updatedPushes = self._combineResults(loadedData, timeOffset);
-        successCallback(Controller.valuesFromObject(updatedPushes), infraStats);
+        Controller.valuesFromObject(updatedPushes).forEach(updatedPushCallback);
+        initialPushlogLoadCallback();
       }
     };
     var failCallback = function(what) {
@@ -62,10 +63,10 @@ Data.prototype = {
       this
     );
     if (!timeOffset)
-      this._loadPendingAndRunningBuilds(loadTracker, loadedData, infraStats, checkLoaded);
+      this._loadPendingAndRunningBuilds(loadTracker, loadedData, infraStats, infraStatsCallback, checkLoaded);
   },
 
-  _loadPendingAndRunningBuilds: function Data__loadPendingAndRunningBuilds(loadTracker, loadedData, infraStats, checkLoaded) {
+  _loadPendingAndRunningBuilds: function Data__loadPendingAndRunningBuilds(loadTracker, loadedData, infraStats, infraStatsCallback, checkLoaded) {
     // Here we'll fetch the pending / running JSON, and we'll
     // count the builds. These numbers will be displayed in the
     // infrastructure popup in the UI.
@@ -82,6 +83,8 @@ Data.prototype = {
           for (var rev in data[tree])
             infraStats[tree][pendingOrRunning] += data[tree][rev].length;
         }
+        if (loadedData.pending && loadedData.running)
+          infraStatsCallback(infraStats);
         checkLoaded();
       });
     });

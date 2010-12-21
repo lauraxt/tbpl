@@ -29,8 +29,7 @@ var Controller = {
    * into the past. Or zero if we want to show the most recent changes.
    */
   _timeOffset: 0,
-  _statusCallback: null,
-  _refreshCallback: null,
+  _uiCallbacks: null,
 
   _loadInterval: null,
   _data: null,
@@ -59,11 +58,7 @@ var Controller = {
     var noIgnore = ("noignore" in params) && (params.noignore == "1");
 
     this._data = new Data(this.treeName, noIgnore, Config, pusher, rev);
-
-    var uiConf = UserInterface.init(this);
-    this._statusCallback = uiConf.status;
-    this._refreshCallback = uiConf.refresh;
-
+    this._uiCallbacks = UserInterface.init(this);
     this._timeOffset = (new Date()).getTime() / 1000;
 
     var self = this;
@@ -77,10 +72,10 @@ var Controller = {
     return this._data;
   },
 
-  requestHistory: function Controller_requestHistory(callback) {
+  requestHistory: function Controller_requestHistory() {
     this._timeOffset-= Config.goBackHours * 3600;
-    var loadTracker = new LoadTracker(this._statusCallback);
-    this._data.load(this._timeOffset, loadTracker, callback);
+    var loadTracker = new LoadTracker(this._uiCallbacks.status);
+    this._data.load(this._timeOffset, loadTracker, this._uiCallbacks.handleUpdatedPush, this._uiCallbacks.handleInfraStatsUpdate, this._uiCallbacks.handleInitialPushlogLoad);
   },
 
   _getParams: function Controller__getParams() {
@@ -100,7 +95,7 @@ var Controller = {
   },
 
   _startStatusRequest: function Controller__startStatusRequest() {
-    var loadTracker = new LoadTracker(this._statusCallback);
-    this._data.load(0, loadTracker, this._refreshCallback);
+    var loadTracker = new LoadTracker(this._uiCallbacks.status);
+    this._data.load(0, loadTracker, this._uiCallbacks.handleUpdatedPush, this._uiCallbacks.handleInfraStatsUpdate, this._uiCallbacks.handleInitialPushlogLoad);
   }
 };
