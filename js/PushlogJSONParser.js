@@ -3,7 +3,7 @@
 
 var PushlogJSONParser = {
 
-  load: function PushlogJSONParser_load(repoName, timeOffset, loadTracker, loadCallback, pusher, rev) {
+  load: function PushlogJSONParser_load(repoName, timeOffset, loadTracker, loadCallback) {
     var self = this;
     loadTracker.addTrackedLoad();
     $.ajax({
@@ -14,21 +14,11 @@ var PushlogJSONParser = {
         for (var pushID in data) {
           var push = data[pushID];
 
-          // Filter by pusher if requested.
-          if (pusher && push.user != pusher) {
-            continue;
-          }
-
           var patches = [];
           var defaultTip;
-          var revFound = false;
           for (var i in push.changesets) {
             var patch = push.changesets[i];
             patch.rev = patch.node.substr(0, 12);
-
-            if (rev && patch.rev == rev) {
-              revFound = true;
-            }
 
             // dont show the default branch and tag
             var tags = $(patch.tags).map(function() {
@@ -46,11 +36,6 @@ var PushlogJSONParser = {
             // come first.
             patches.unshift({rev: patch.rev, author: author,
                     desc: Controller.stripTags(patch.desc), tags: tags});
-          }
-
-          // Ignore this push if the filtering rev isn't there.
-          if (rev && !revFound) {
-            continue;
           }
 
           var toprev = patches[0].rev;

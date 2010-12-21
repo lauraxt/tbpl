@@ -30,9 +30,7 @@ Data.prototype = {
         self._addFinishedResultsToPushes(self._finishedResultsWithoutPush, updatedPushes, updatedPushes);
         self._notifyUpdatedPushes(updatedPushes, updatedPushCallback);
         initialPushlogLoadCallback();
-      },
-      this._pusher,
-      this._rev
+      }
     );
     Config.tinderboxDataLoader.load(
       this._treeName,
@@ -97,8 +95,22 @@ Data.prototype = {
     return pushes;
   },
 
+  _getFilteredPushes: function Data__getFilteredPushes(unfilteredPushesObject) {
+    var pushes = this._getSortedPushesArray(unfilteredPushesObject);
+    var self = this;
+    return pushes.filter(function (push) { return self._mayDisplayPush(push); });
+  },
+
+  _mayDisplayPush: function Data__mayDisplayPush(push) {
+    if (this._pusher && push.pusher != this._pusher)
+      return false;
+    if (this._rev && push.toprev != this._rev)
+      return false;
+    return true;
+  },
+
   _notifyUpdatedPushes: function Data__notifyUpdatedPushes(updatedPushes, callback) {
-    this._getSortedPushesArray(updatedPushes).forEach(callback);
+    this._getFilteredPushes(updatedPushes).forEach(callback);
   },
 
   _reportInfrastructureStatistics: function Data__reportInfrastructureStatistics(infraStatsCallback) {
