@@ -52,8 +52,17 @@ var UserInterface = {
     AddCommentUI.init("http://tinderbox.mozilla.org/addnote.cgi", this._storage);
     AddCommentUI.registerNumSendingCommentChangedCallback(function commentSendUpdater(changedResult) {
       self.updateStatus();
-      if (changedResult)
+      if (changedResult) {
+        // Starredness is reflected in several places:
+        //  - a star after the letter in the results column next to the push
+        //  - the list of failed jobs in the top right corner
+        //  - the number of unstarred failures in the title
+        //  - the panel showing the star if the starred result is selected
+        // We need to refresh all these places.
         self.handleUpdatedPush(changedResult.push);
+        self._updateTreeStatus();
+        self._setActiveResult(self._activeResult, false);
+      }
     });
     AddCommentUI.registerNumSendingBugChangedCallback(function bugSendUpdater() {
       self.updateStatus();
