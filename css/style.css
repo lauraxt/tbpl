@@ -189,16 +189,13 @@ body:not(.details) > #pushes > li:last-child {
   white-space: nowrap;
   margin-left: 95px;
 }
-.patches > li > .popup.hovering {
+.patches > li > .popup > span {
+  opacity: 0;
   white-space: normal;
   position: absolute;
-  margin-right: 60px;
-  display: none;
-}
-.patches > li > .popup.hovering > span {
   display: block;
   padding: 2px 5px;
-  margin: -2px -5px;
+  margin: -2px 55px -2px -9000px;
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
   border-radius: 3px;
@@ -206,6 +203,22 @@ body:not(.details) > #pushes > li:last-child {
   -moz-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
   -webkit-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
   box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+  -moz-transition-property: opacity, margin-left;
+  -moz-transition-duration: 200ms, 0ms;
+  -moz-transition-delay: 300ms, 500ms;
+  -webkit-transition-property: opacity, margin-left;
+  -webkit-transition-duration: 200ms, 0ms;
+  -webkit-transition-delay: 300ms, 500ms;
+  transition-property: opacity, margin-left;
+  transition-duration: 200ms, 0ms;
+  transition-delay: 300ms, 500ms;
+}
+.patches > li:hover > .popup > span {
+  opacity: 1;
+  margin-left: -5px;
+  -moz-transition-delay: 500ms;
+  -webkit-transition-delay: 500ms;
+  transition-delay: 500ms;
 }
 span.logtags span {
   padding: 0px 4px;

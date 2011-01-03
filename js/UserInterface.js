@@ -29,6 +29,12 @@ var UserInterface = {
     this._initFilters();
     this._initWindowEvents();
 
+    $(window).resize(function refreshTooltips() {
+      $("#pushes > li").each(function () {
+        $(".patches .popup", this).remove();
+        self._installTooltips($(this));
+      });
+    });
     $("#localTime").bind("click", function localTimeClick() {
       self._switchTimezone(true);
       return false;
@@ -794,7 +800,7 @@ var UserInterface = {
     return push.patches.map(function buildHTMLForPushPatch(patch, patchIndex) {
       return '<li>\n' +
       '<a class="revlink" href="' + self._changesetURL(patch.rev) + '">' + patch.rev +
-      '</a>\n<div class="popup"><span><span class="author">' + patch.author + '</span> &ndash; ' +
+      '</a>\n<div><span><span class="author">' + patch.author + '</span> &ndash; ' +
       '<span class="desc">' + self._linkBugs(patch.desc.split("\n")[0], false) + '</span>' +
       (function buildHTMLForPatchTags() {
         if (!patch.tags.length)
@@ -898,45 +904,18 @@ var UserInterface = {
   },
 
   _installTooltips: function UserInterface__installTooltips(context) {
-    $(".patches > li", context).bind("mouseenter", function startFadeInTimeout() {
-      var div = $(".popup:not(.hovering)", this);
-      if (div.width() - div.children().width() > 10)
-        return; // There's enough space; no need to show the popup.
-  
-      var self = $(this);
-      var popup = null;
-      var fadeInTimer = 0, fadeOutTimer = 0;
-      self.unbind("mouseenter", startFadeInTimeout);
-      self.bind("mouseleave", clearFadeInTimeout);
-      function clearFadeInTimeout() {
-        self.unbind("mouseleave", clearFadeInTimeout);
-        self.bind("mouseenter", startFadeInTimeout);
-        clearTimeout(fadeInTimer);
-      }
-      fadeInTimer = setTimeout(function afterFadeIn() {
-        self.unbind("mouseleave", clearFadeInTimeout);
-        self.bind("mouseleave", startFadeOutTimeout);
-        popup = div.clone().addClass("hovering").insertBefore(div).fadeIn(200);
-      }, 500);
-      function startFadeOutTimeout() {
-        self.unbind("mouseleave", startFadeOutTimeout);
-        self.bind("mouseenter", clearFadeOutTimeout);
-        fadeOutTimer = setTimeout(function afterMouseLeft() {
-          popup.fadeOut(200);
-          fadeOutTimer = setTimeout(function afterFadeOut() {
-            self.unbind("mouseenter", clearFadeOutTimeout);
-            self.bind("mouseenter", startFadeInTimeout);
-            popup.remove();
-            popup = null;
-          }, 200);
-        }, 300);
-      }
-      function clearFadeOutTimeout() {
-        self.unbind("mouseenter", clearFadeOutTimeout);
-        self.bind("mouseleave", startFadeOutTimeout);
-        clearTimeout(fadeOutTimer);
-        popup.fadeIn(200);
-      }
+    // We only know the width of the element and children if we already had a
+    // reflow, so we still do the element creation in the mouseenter handler.
+    // We also still need the child span to have meaningful children.width numbers.
+    context.unbind("mouseenter");
+    context.bind("mouseenter", function createPopup() {
+      $(this).unbind();
+      $(".patches > li > div", this).each(function createPopupPatch(i) {
+        var div = $(this);
+        if (div.width() - div.children().width() > 0)
+          return; // There's enough space; no need to show the popup.
+        div.clone().addClass("popup").insertBefore(div);
+      });
     });
   },
 
