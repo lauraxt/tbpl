@@ -305,7 +305,7 @@ var UserInterface = {
       self._onlyUnstarred = onlyUnstarredCheckbox.checked;
 
       var pushes = self._controller.valuesFromObject(self._data.getPushes());
-      for (var i=0; i<pushes.length; ++i) {
+      for (var i = 0; i < pushes.length; ++i) {
         self.handleUpdatedPush(pushes[i]);
       }
     }
