@@ -24,6 +24,7 @@ var UserInterface = {
     this._buildTreeSwitcher();
     this._buildLegend();
     this._buildTreeInfo();
+    this._initFilters();
 
     $("#localTime").bind("click", function localTimeClick() {
       self._switchTimezone(true);
@@ -291,6 +292,23 @@ var UserInterface = {
       }
     });
     google.load("gdata", "1.s");
+  },
+
+  _initFilters: function UserInterface__initFilters() {
+    var onlyUnstarredCheckbox = document.getElementById('onlyUnstarred');
+
+    // Use the value passed in parameter as the default value.
+    onlyUnstarredCheckbox.checked = this._onlyUnstarred;
+
+    var self = this;
+    onlyUnstarredCheckbox.onchange = function() {
+      self._onlyUnstarred = onlyUnstarredCheckbox.checked;
+
+      var pushes = self._controller.valuesFromObject(self._data.getPushes());
+      for (var i=0; i<pushes.length; ++i) {
+        self.handleUpdatedPush(pushes[i]);
+      }
+    }
   },
 
   _updateTimezoneDisplay: function UserInterface__updateTimezoneDisplay() {

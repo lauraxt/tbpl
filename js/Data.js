@@ -509,4 +509,8 @@ Data.prototype = {
       }
     }
   },
+
+  getPushes: function Data_getPushes() {
+    return this._pushes;
+  },
 }

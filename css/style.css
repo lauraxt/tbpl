@@ -79,7 +79,7 @@ p {
 .dropdown:not(.open) ul, .dropdown:not(.open) dl {
   display: none !important;
 }
-#moreList, #moreList li, #treeInfo li {
+#moreList, #moreList li, #treeInfo li, #filters li {
   display: block;
   margin: 0;
   padding: 0;
