@@ -227,6 +227,13 @@ span.logtags span.inbranchtag {
   background-color: #d5dde6;
   border-color: #e3ecf4 #9398f4 #9398f4 #e3ecf4;
 }
+span.pusher {
+  cursor: pointer;
+  color: #555;
+}
+span.pusher:hover {
+  text-decoration: underline;
+}
 .revlink {
   float: left;
   width: 95px;

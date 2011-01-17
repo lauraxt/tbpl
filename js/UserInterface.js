@@ -302,6 +302,18 @@ var UserInterface = {
     google.load("gdata", "1.s");
   },
 
+  _updatePusherFilter: function UserInterface__updatePusherFilter() {
+    var self = this;
+
+    $(".push").each(function(index) {
+      if (self._pusher && self._pusher != $(this).attr('data-pusher')) {
+        $(this).hide();
+      } else {
+        $(this).show();
+      }
+    });
+  },
+
   _initFilters: function UserInterface__initFilters() {
     var onlyUnstarredCheckbox = document.getElementById('onlyUnstarred');
     var pusherField = document.getElementById('pusher');
@@ -330,13 +342,7 @@ var UserInterface = {
 
       self._pusher = pusherField.value;
 
-      $(".push").each(function(index) {
-        if (self._pusher && self._pusher != $(this).attr('data-pusher')) {
-          $(this).hide();
-        } else {
-          $(this).show();
-        }
-      });
+      self._updatePusherFilter();
     }
   },
 
@@ -660,11 +666,24 @@ var UserInterface = {
       return 'http://hg.mozilla.org/' + Config.repoNames[this._treeName] + '/rev/' + rev;
   },
 
+  _setPusherFromClick: function UserInterface__setPusherFromClick(pusher) {
+    var pusherField = document.getElementById('pusher');
+
+    if (pusherField.value == pusher) {
+      pusher = "";
+    }
+
+    pusherField.value = pusher;
+    this._pusher = pusher;
+
+    this._updatePusherFilter();
+  },
+
   _generatePushNode: function UserInterface__generatePushNode(push) {
     var self = this;
     var nodeHtml = '<li class="push" id="push-' + push.id + '" data-id="' + push.id + '" data-pusher="' + push.pusher + '">\n' +
-      '<h2><a href="' + this._controller.getURLForPusherFilteringView(push.pusher) +
-      '" class="pusher">' + push.pusher + '</a> &ndash; ' +
+      '<h2><span onclick="UserInterface._setPusherFromClick(\'' + push.pusher + '\');"' +
+      'class="pusher">' + push.pusher + '</span> &ndash; ' +
       '<a class="date" data-timestamp="' + push.date.getTime() +
       '" href="' + this._controller.getURLForSinglePushView(push.toprev) + '">' +
       self._getDisplayDate(push.date) + '</a>' +
