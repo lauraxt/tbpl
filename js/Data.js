@@ -1,11 +1,10 @@
 /* -*- Mode: JS; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 /* vim: set sw=2 ts=2 et tw=80 : */
 
-function Data(treeName, noIgnore, config, pusher) {
+function Data(treeName, noIgnore, config) {
   this._treeName = treeName;
   this._noIgnore = noIgnore;
   this._config = config;
-  this._pusher = pusher;
   this._mostRecentPush = null;
   this._pushes = {};
   this._machines = {};
@@ -118,7 +117,7 @@ Data.prototype = {
     var self = this;
     Config.tinderboxDataLoader.load(
       this._treeName,
-      this._getFilteredPushes(unfilteredPushes),
+      this._getSortedPushesArray(unfilteredPushes),
       this._noIgnore,
       loadTracker,
       function tinderboxDataLoadCallback(data) {
@@ -179,20 +178,8 @@ Data.prototype = {
     return pushes;
   },
 
-  _getFilteredPushes: function Data__getFilteredPushes(unfilteredPushesObject) {
-    var pushes = this._getSortedPushesArray(unfilteredPushesObject);
-    var self = this;
-    return pushes.filter(function (push) { return self._mayDisplayPush(push); });
-  },
-
-  _mayDisplayPush: function Data__mayDisplayPush(push) {
-    if (this._pusher && push.pusher != this._pusher)
-      return false;
-    return true;
-  },
-
   _notifyUpdatedPushes: function Data__notifyUpdatedPushes(updatedPushes, callback) {
-    this._getFilteredPushes(updatedPushes).forEach(callback);
+    this._getSortedPushesArray(updatedPushes).forEach(callback);
   },
 
   _reportInfrastructureStatistics: function Data__reportInfrastructureStatistics(infraStatsCallback) {

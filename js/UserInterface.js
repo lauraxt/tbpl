@@ -9,12 +9,14 @@ var UserInterface = {
   _activeResult: "",
   _storage: null,
   _onlyUnstarred: false,
+  _pusher: "",
 
-  init: function UserInterface_init(controller, onlyUnstarred) {
+  init: function UserInterface_init(controller, onlyUnstarred, pusher) {
     var self = this;
     this._controller = controller;
     this._treeName = controller.treeName;
     this._onlyUnstarred = onlyUnstarred;
+    this._pusher = pusher || "";
     this._data = controller.getData();
     this._setupStorage();
 
@@ -102,7 +104,13 @@ var UserInterface = {
     if (existingPushNode.length) {
       this._refreshPushResultsInPushNode(push, existingPushNode);
     } else {
-      this._generatePushNode(push).insertBefore(this._getInsertBeforeAnchor(push));
+      var pushNode = this._generatePushNode(push);
+      pushNode.insertBefore(this._getInsertBeforeAnchor(push));
+
+      // It's a new push node which might need to be filtered.
+      if (this._pusher && this._pusher != push.pusher) {
+        pushNode.hide();
+      }
     }
   },
 
@@ -296,11 +304,14 @@ var UserInterface = {
 
   _initFilters: function UserInterface__initFilters() {
     var onlyUnstarredCheckbox = document.getElementById('onlyUnstarred');
+    var pusherField = document.getElementById('pusher');
 
-    // Use the value passed in parameter as the default value.
+    // Use the values passed in parameter as the default values.
     onlyUnstarredCheckbox.checked = this._onlyUnstarred;
+    pusherField.value = this._pusher;
 
     var self = this;
+
     onlyUnstarredCheckbox.onchange = function() {
       self._onlyUnstarred = onlyUnstarredCheckbox.checked;
 
@@ -308,6 +319,24 @@ var UserInterface = {
       for (var i = 0; i < pushes.length; ++i) {
         self.handleUpdatedPush(pushes[i]);
       }
+    }
+
+    pusherField.onchange = function() {
+      // If the UA knows HTML5 Forms validation, don't update the UI when the
+      // value isn't a valid email address.
+      if (("validity" in pusherField) && !pusherField.validity.valid) {
+        return;
+      }
+
+      self._pusher = pusherField.value;
+
+      $(".push").each(function(index) {
+        if (self._pusher && self._pusher != $(this).attr('data-pusher')) {
+          $(this).hide();
+        } else {
+          $(this).show();
+        }
+      });
     }
   },
 
@@ -633,7 +662,7 @@ var UserInterface = {
 
   _generatePushNode: function UserInterface__generatePushNode(push) {
     var self = this;
-    var nodeHtml = '<li class="push" id="push-' + push.id + '" data-id="' + push.id + '">\n' +
+    var nodeHtml = '<li class="push" id="push-' + push.id + '" data-id="' + push.id + '" data-pusher="' + push.pusher + '">\n' +
       '<h2><a href="' + this._controller.getURLForPusherFilteringView(push.pusher) +
       '" class="pusher">' + push.pusher + '</a> &ndash; ' +
       '<a class="date" data-timestamp="' + push.date.getTime() +

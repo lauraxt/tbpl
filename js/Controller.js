@@ -43,8 +43,8 @@ var Controller = {
     if (!(this.treeName in Config.repoNames))
       throw "wrongtree"; // er, hm.
 
-    this._data = new Data(this.treeName, noIgnore, Config, pusher);
-    this._uiCallbacks = UserInterface.init(this, onlyUnstarred);
+    this._data = new Data(this.treeName, noIgnore, Config);
+    this._uiCallbacks = UserInterface.init(this, onlyUnstarred, pusher);
 
     var initialPushRangeParams = this._getInitialPushRangeParams(params);
     var initialPushRange = initialPushRangeParams.range;
