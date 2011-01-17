@@ -385,12 +385,26 @@ var UserInterface = {
 
   _initWindowEvents: function UserInterface__initWindowEvents() {
     var self = this;
+
     window.onpopstate = function(event) {
       var state = event.state;
 
       self._updatePusherFilter(state && state['pusher'] ? state['pusher'] : "");
       self._updateUnstarredFilter(state && state['onlyUnstarred']);
     }
+
+    jQuery(document).keypress(function(event) {
+      // This could be improved by checking :editable maybe...
+      if (event.target.nodeName == 'INPUT' ||
+          event.target.nodeName == 'TEXTAREA') {
+        return;
+      }
+
+      // Toggle "Only unstarred" filter on 'U' key.
+      if (event.which == 117) {
+        self._updateUnstarredFilter(!self._onlyUnstarred);
+      }
+    });
   },
 
   _updateTimezoneDisplay: function UserInterface__updateTimezoneDisplay() {
