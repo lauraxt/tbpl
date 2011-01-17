@@ -33,7 +33,7 @@ var Controller = {
   _params: {},
 
   init: function Controller_init() {
-    var params = this._getParams();
+    var params = this._parseParams();
     this._params = params;
     this.treeName = (("tree" in params) && params.tree) || "Firefox";
     var pusher = ("pusher" in params) && params.pusher;
@@ -108,7 +108,7 @@ var Controller = {
     return "?" + items.join("&");
   },
 
-  _getParams: function Controller__getParams() {
+  _parseParams: function Controller__parseParams() {
     // Get the parameters specified in the query string of the URL.
     var params = {};
     var search = document.location.search;
@@ -123,7 +123,12 @@ var Controller = {
     }
     return params;
   },
-  
+
+  getParams: function Controller_getParams() {
+    // Return a copy of _params.
+    return $.extend({}, this._params);
+  },
+
   _getInitialPushRangeParams: function Controller__getInitialPushRangeParams(params) {
     if ("rev" in params)
       return {

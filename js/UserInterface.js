@@ -27,6 +27,7 @@ var UserInterface = {
     this._buildLegend();
     this._buildTreeInfo();
     this._initFilters();
+    this._initWindowEvents();
 
     $("#localTime").bind("click", function localTimeClick() {
       self._switchTimezone(true);
@@ -302,9 +303,50 @@ var UserInterface = {
     google.load("gdata", "1.s");
   },
 
-  _updatePusherFilter: function UserInterface__updatePusherFilter() {
-    var self = this;
+  _getParamsString: function UserInterface__getParamsString() {
+    var params = this._controller.getParams();
+    var items = [];
 
+    params.pusher = this._pusher;
+    params.onlyunstarred = this._onlyUnstarred ? "1" : "";
+
+    for (var key in params) {
+      if ((key == "pusher" && !this._pusher)
+          || (key == "onlyunstarred") && !this._onlyUnstarred) {
+        continue;
+      }
+
+      items.push(escape(key) + "=" + escape(params[key]));
+    }
+
+    return "?" + items.join("&");
+  },
+
+  _updateLocation: function UserInterface__updateLocation() {
+    if (history && "pushState" in history) {
+      var state = {
+        pusher: this._pusher,
+        onlyUnstarred: this._onlyUnstarred,
+      };
+      history.pushState(state, "", this._getParamsString());
+    }
+  },
+
+  _updateUnstarredFilter: function UserInterface__updateOnlyStarredFilter(state) {
+    document.getElementById('onlyUnstarred').checked = state;
+    this._onlyUnstarred = state;
+
+    var pushes = this._controller.valuesFromObject(this._data.getPushes());
+    for (var i = 0; i < pushes.length; ++i) {
+      this.handleUpdatedPush(pushes[i]);
+    }
+  },
+
+  _updatePusherFilter: function UserInterface__updatePusherFilter(pusher) {
+    document.getElementById('pusher').value = pusher;
+    this._pusher = pusher;
+
+    var self = this;
     $(".push").each(function(index) {
       if (self._pusher && self._pusher != $(this).attr('data-pusher')) {
         $(this).hide();
@@ -325,12 +367,8 @@ var UserInterface = {
     var self = this;
 
     onlyUnstarredCheckbox.onchange = function() {
-      self._onlyUnstarred = onlyUnstarredCheckbox.checked;
-
-      var pushes = self._controller.valuesFromObject(self._data.getPushes());
-      for (var i = 0; i < pushes.length; ++i) {
-        self.handleUpdatedPush(pushes[i]);
-      }
+      self._updateUnstarredFilter(onlyUnstarredCheckbox.checked);
+      self._updateLocation();
     }
 
     pusherField.onchange = function() {
@@ -340,9 +378,18 @@ var UserInterface = {
         return;
       }
 
-      self._pusher = pusherField.value;
+      self._updatePusherFilter(pusherField.value);
+      self._updateLocation();
+    }
+  },
 
-      self._updatePusherFilter();
+  _initWindowEvents: function UserInterface__initWindowEvents() {
+    var self = this;
+    window.onpopstate = function(event) {
+      var state = event.state;
+
+      self._updatePusherFilter(state && state['pusher'] ? state['pusher'] : "");
+      self._updateUnstarredFilter(state && state['onlyUnstarred']);
     }
   },
 
@@ -673,10 +720,8 @@ var UserInterface = {
       pusher = "";
     }
 
-    pusherField.value = pusher;
-    this._pusher = pusher;
-
-    this._updatePusherFilter();
+    this._updatePusherFilter(pusher);
+    this._updateLocation();
   },
 
   _generatePushNode: function UserInterface__generatePushNode(push) {
