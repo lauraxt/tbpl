@@ -143,7 +143,7 @@ var UserInterface = {
   },
 
   updateStatus: function UserInterface_updateStatus(status) {
-    if (status && status.loadpercent == 1) {
+    if (status) {
       this._updateTreeStatus();
     }
     var statusSpan = $("#loading");
