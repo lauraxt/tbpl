@@ -404,6 +404,65 @@ var UserInterface = {
       if (event.which == 117) {
         self._updateUnstarredFilter(!self._onlyUnstarred);
       }
+
+      // Move between unstarred failing jobs with 'N' and 'P' keys.
+      if (event.which == 110 || event.which == 112) {
+        var machines = self._data.getMachines();
+        var unstarred = [];
+        // We want to have the same order as _updateTreeStatus with only
+        // unstarred jobs.
+        machines.forEach(function addMachineToTreeStatus1(machine) {
+          var result = machine.latestFinishedRun;
+          if (!result)
+            // Ignore machines without run information.
+            return;
+          // errors in front, failures in back
+          switch(result.state)
+          {
+            case 'busted':
+            case 'exception':
+            case 'unknown':
+              if (self._isUnstarredFailure(result)) {
+                unstarred.unshift(result);
+              }
+            break;
+            case 'testfailed':
+              if (self._isUnstarredFailure(result)) {
+                unstarred.push(result);
+              }
+            break;
+          }
+        });
+
+        if (unstarred.length == 0) {
+          return;
+        }
+
+        // Set the default value (if nothing is currently selected).
+        var result = (event.which == '110') ? 0 : unstarred.length - 1;
+
+        if (self._activeResult) {
+          for (var i = 0; i < unstarred.length; ++i) {
+            if (unstarred[i].runID == self._activeResult) {
+              if (event.which == '110') {
+                result = ++i;
+              } else {
+                result = --i;
+              }
+
+              if (result >= unstarred.length) {
+                result = 0;
+              } else if (result < 0) {
+                result = unstarred.length - 1;
+              }
+              break;
+            }
+          }
+        }
+
+        self._setActiveResult(unstarred[result].runID, true);
+        AddCommentUI.clearAutoStarBugs();
+      }
     });
   },
 
