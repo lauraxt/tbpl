@@ -16,6 +16,11 @@ var TinderboxJSONUser = {
         if (!tinderbox_data) {
           loadTracker.loadFailed("tinderbox_data is invalid");
         } else {
+          pushes.forEach(function (push) {
+            // push.latestTinderboxData is the date until which we already have
+            // up-to-date Tinderbox data for this push.
+            push.latestTinderboxData = Math.max(push.latestTinderboxData || push.date, timeRange.endTime);
+          });
           loadCallback(self.parseTinderbox(tree, tinderbox_data, data));
           loadTracker.loadCompleted();
         }
@@ -23,12 +28,20 @@ var TinderboxJSONUser = {
     });
   },
 
+  _getRequestStartForPushes: function TinderboxJSONUser__getRequestStartForPushes(pushes, now) {
+    // Return the earliest time for which there's no existing Tinderbox data
+    // for any push in pushes.
+    return pushes.reduce(function (startTime, push) {
+      return Math.min(startTime, push.latestTinderboxData || push.date);
+    }, now.getTime());
+  },
+
   _getTimeRangesForPushes: function TinderboxJSONUser__getTimeRangesForPushes(pushes, now) {
     var rangeDuration = 12 * 60 * 60 * 1000; // 12 hours
     var maxResultDelayAfterPush = 12 * 60 * 60 * 1000; // 12 hours
     var latestPushDate = pushes[pushes.length - 1].date;
     var requestEnd = new Date(Math.min(latestPushDate.getTime() + maxResultDelayAfterPush, now));
-    var requestStart = pushes[0].date;
+    var requestStart = this._getRequestStartForPushes(pushes, now);
     var timeRanges = [];
     while (requestEnd > requestStart) {
       timeRanges.push({
