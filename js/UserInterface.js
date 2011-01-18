@@ -432,6 +432,7 @@ var UserInterface = {
       // Toggle "Only unstarred" filter on 'U' key.
       if (event.which == 117) {
         self._updateUnstarredFilter(!self._onlyUnstarred);
+        self._updateLocation();
       }
 
       // Move between unstarred failing jobs with 'N' and 'P' keys.
