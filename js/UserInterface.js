@@ -383,6 +383,35 @@ var UserInterface = {
     }
   },
 
+  _getFailingJobs: function UserInterface__getFailingJobs() {
+    var machines = this._data.getMachines();
+    var failing = [];
+    var self = this;
+
+    machines.forEach(function addMachineToTreeStatus1(machine) {
+      var result = machine.latestFinishedRun;
+
+      // Ignore machines without run information.
+      if (!result) {
+        return;
+      }
+
+      switch (result.state)
+      {
+        case 'busted':
+        case 'exception':
+        case 'unknown':
+          failing.unshift(result);
+        break;
+        case 'testfailed':
+          failing.push(result);
+        break;
+      }
+    });
+
+    return failing;
+  },
+
   _initWindowEvents: function UserInterface__initWindowEvents() {
     var self = this;
 
@@ -407,32 +436,14 @@ var UserInterface = {
 
       // Move between unstarred failing jobs with 'N' and 'P' keys.
       if (event.which == 110 || event.which == 112) {
-        var machines = self._data.getMachines();
-        var unstarred = [];
-        // We want to have the same order as _updateTreeStatus with only
-        // unstarred jobs.
-        machines.forEach(function addMachineToTreeStatus1(machine) {
-          var result = machine.latestFinishedRun;
-          if (!result)
-            // Ignore machines without run information.
-            return;
-          // errors in front, failures in back
-          switch(result.state)
-          {
-            case 'busted':
-            case 'exception':
-            case 'unknown':
-              if (self._isUnstarredFailure(result)) {
-                unstarred.unshift(result);
-              }
-            break;
-            case 'testfailed':
-              if (self._isUnstarredFailure(result)) {
-                unstarred.push(result);
-              }
-            break;
+        var unstarred = self._getFailingJobs();
+
+        // We actually got the failing jobs, we want the unstarred ones.
+        for (var i = unstarred.length-1; i >= 0; --i) {
+          if (!self._isUnstarredFailure(unstarred[i])) {
+            unstarred.splice(i, 1);
           }
-        });
+        }
 
         if (unstarred.length == 0) {
           return;
@@ -506,30 +517,15 @@ var UserInterface = {
   },
 
   _updateTreeStatus: function UserInterface__updateTreeStatus() {
-    var machines = this._data.getMachines();
-    var self = this;
-    var failing = [];
+    var failing = this._getFailingJobs();
     var unstarred = 0;
-    machines.forEach(function addMachineToTreeStatus1(machine) {
-      var result = machine.latestFinishedRun;
-      if (!result)
-        // Ignore machines without run information.
-        return;
-      // errors in front, failures in back
-      switch(result.state)
-      {
-        case 'busted':
-        case 'exception':
-        case 'unknown':
-          failing.unshift(result);
-        break;
-        case 'testfailed':
-          failing.push(result);
-        break;
+    for (var i = 0; i < failing.length; ++i) {
+      if (this._isUnstarredFailure(failing[i])) {
+        unstarred++;
       }
-      if (self._isUnstarredFailure(result))
-        ++unstarred;
-    });
+    }
+
+    var self = this;
     $('#status').html(
       '<strong>' + failing.length + '</strong> Job' + (failing.length != 1 ? 's are' : ' is') + ' failing:<br />' +
       failing.map(function(machineResult) {
