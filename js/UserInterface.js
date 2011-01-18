@@ -418,8 +418,17 @@ var UserInterface = {
     window.onpopstate = function(event) {
       var state = event.state;
 
-      self._updatePusherFilter(state && state['pusher'] ? state['pusher'] : "");
-      self._updateUnstarredFilter(state && state['onlyUnstarred']);
+      // When the page is loaded, we don't have a state object but the
+      // parameters can be trusted.
+      if (!state) {
+        var params = self._controller.getParams();
+        self._updatePusherFilter(params.pusher ? params.pusher : "");
+        self._updateUnstarredFilter(params.onlyunstarred == '1');
+        return;
+      }
+
+      self._updatePusherFilter(state['pusher'] ? state['pusher'] : "");
+      self._updateUnstarredFilter(state['onlyUnstarred']);
     }
 
     jQuery(document).keypress(function(event) {
