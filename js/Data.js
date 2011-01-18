@@ -88,7 +88,33 @@ Data.prototype = {
       return [{ fromchange: pushRange.fromchange, tochange: pushRange.tochange }];
     if ("startdate" in pushRange && "enddate" in pushRange)
       return [{ startdate: pushRange.startdate, enddate: pushRange.enddate }];
+    // "maxhours" does not directly map to pushlog parameters and is only
+    // used internally in _restrictPushesToRequestedRange.
+    if ("maxhours" in pushRange)
+      return [{ maxhours: pushRange.maxhours }];
     return [{}];
+  },
+
+  _restrictPushesToRequestedRange: function Data__restrictPushesToRequestedRange(pushes, requestParams) {
+    if (!("maxhours" in requestParams))
+      return;
+
+    var maxHours = requestParams.maxhours;
+
+    // First pass: Find the date of the most recent push.
+    var mostRecentPushDate = null;
+    for (var toprev in pushes) {
+      var push = pushes[toprev];
+      if (!mostRecentPushDate || mostRecentPushDate < push.date)
+        mostRecentPushDate = push.date;
+    }
+
+    // Second pass: Drop all pushes older than mostRecentPushDate - maxHours hours.
+    for (var toprev in pushes) {
+      var push = pushes[toprev];
+      if (push.date < mostRecentPushDate - maxHours * 60 * 60 * 1000)
+        delete pushes[toprev];
+    }
   },
 
   _loadPushlogData: function Data__loadPushlogData(params, loadTracker, updatedPushCallback, initialPushlogLoadCallback) {
@@ -99,6 +125,7 @@ Data.prototype = {
       params,
       loadTracker,
       function pushlogLoadCallback(loadedPushes) {
+        self._restrictPushesToRequestedRange(loadedPushes, params);
         var updatedPushes = {};
         self._addPushes(loadedPushes, updatedPushes);
         self._addPendingOrRunningResultsToPushes("pending", updatedPushes);

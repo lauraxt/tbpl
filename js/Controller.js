@@ -149,7 +149,7 @@ var Controller = {
       };
 
     return {
-      range: {}, // default
+      range: { maxhours: 24 }, // Don't include pushes that are older than the latest push minus 24 hours.
       trackTip: true,
     };
   },
