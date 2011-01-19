@@ -442,6 +442,7 @@ var UserInterface = {
       if (event.which == 117) {
         self._updateUnstarredFilter(!self._onlyUnstarred);
         self._updateLocation();
+        event.preventDefault();
       }
 
       // Move between unstarred failing jobs with 'N' and 'P' keys.
@@ -483,6 +484,7 @@ var UserInterface = {
 
         self._setActiveResult(unstarred[result].runID, true);
         AddCommentUI.clearAutoStarBugs();
+        event.preventDefault();
       }
     });
   },
