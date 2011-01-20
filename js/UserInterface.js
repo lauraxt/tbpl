@@ -432,6 +432,11 @@ var UserInterface = {
     }
 
     jQuery(document).keypress(function(event) {
+      // We don't have keybindings with modifiers.
+      if (event.metaKey || event.altKey || event.ctrlKey) {
+        return;
+      }
+
       // This could be improved by checking :editable maybe...
       if (event.target.nodeName == 'INPUT' ||
           event.target.nodeName == 'TEXTAREA') {
