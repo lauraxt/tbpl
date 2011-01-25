@@ -127,11 +127,20 @@ var AddCommentUI = {
     }
   },
 
-  toggleAutoStarBug: function AddCommentUI_toggleAutoStarBug(bugid) {
+  addAutoStarBug: function AddCommentUI_addAutoStarBug(bugid) {
     if (bugid in this._autoStarBugs) {
-      delete this._autoStarBugs[bugid];
+      this._autoStarBugs[bugid]++;
     } else {
-      this._autoStarBugs[bugid] = true;
+      this._autoStarBugs[bugid] = 1;
+    }
+  },
+
+  removeAutoStarBug: function AddCommentUI_removeAutoStarBug(bugid) {
+    if (bugid in this._autoStarBugs) {
+      this._autoStarBugs[bugid]--;
+      if (this._autoStarBugs[bugid] == 0) {
+        delete this._autoStarBugs[bugid];
+      }
     }
   },
 
@@ -140,6 +149,7 @@ var AddCommentUI = {
   },
 
   shouldAutoStarBug: function AddCommentUI_shouldAutoStarBug(bugid) {
+    // this._autoStarBugs[bugid] == 0 should not happen.
     return bugid in this._autoStarBugs;
   },
 
