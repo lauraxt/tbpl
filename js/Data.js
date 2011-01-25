@@ -499,7 +499,7 @@ Data.prototype = {
       url: "http://build.mozilla.org/builds/builds-" + pendingOrRunning + ".js",
       dataType: 'json',
       success: function (json) {
-        if (!json[pendingOrRunning])
+        if (!json || !json[pendingOrRunning])
           return;
         var data = json[pendingOrRunning];
         self._filterHiddenBuilds(data);
