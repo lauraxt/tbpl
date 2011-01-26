@@ -476,6 +476,7 @@ Data.prototype = {
         /build/i.test(name) ? "Build" :
         /jetpack/i.test(name) ? "Jetpack SDK Test" :
         /mozmill-all/i.test(name) ? "Mozmill" :
+        /valgrind/i.test(name) ? "Valgrind" :
         /(a11y|chrome|cold|dirty|dromaeo|scroll|svg|tp4)/.test(name) ? "Talos Performance" :
         /(check|test)/.test(name) ? "Unit Test" : "";
 

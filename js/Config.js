@@ -69,6 +69,7 @@ var Config = {
     "Talos Performance" : "T",
     "Jetpack SDK Test" : "JP",
     "Mozmill" : "Z",
+    "Valgrind": "V",
     "Unit Test" : "U"
   },
   hiddenBuilds: [
