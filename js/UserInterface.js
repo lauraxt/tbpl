@@ -513,8 +513,15 @@ var UserInterface = {
     });
   },
 
-  _linkBugs: function UserInterface__linkBugs(text) {
-    return text.replace(/(bug\s*|b=)([1-9][0-9]*)\b/ig, '<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=$2">$1$2</a>')
+  _linkBugs: function UserInterface__linkBugs(text, addOrangefactorLink) {
+    var buglink = '<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=$2">$1$2</a>';
+    if (addOrangefactorLink) {
+      var today = new Date();
+      var sixtyDaysAgo = new Date(today.getTime() - (1000 * 60 * 60 * 24 * 60));
+      buglink += ' [<a href="http://brasstacks.mozilla.com/orangefactor/?display=Bug&endday=' +
+                  this._ISODateString(today) + '&startday=' + this._ISODateString(sixtyDaysAgo) + '&bugid=$2">orangefactor</a>]'
+    }
+    return text.replace(/(bug\s*|b=)([1-9][0-9]*)\b/ig, buglink)
            .replace(/(changeset\s*)?([0-9a-f]{12})\b/ig, '<a href="http://hg.mozilla.org/' + Config.repoNames[this._treeName] + '/rev/$2">$1$2</a>');
   },
 
@@ -605,6 +612,12 @@ var UserInterface = {
     var d = this._getTimezoneAdaptedDate(date);
     var pad = this._pad;
     return pad(d.getHours()) + ":" + pad(d.getMinutes());
+  },
+
+  _ISODateString: function(date) {
+    return date.getUTCFullYear() + '-' +
+           this._pad(date.getUTCMonth() + 1) + '-' +
+           this._pad(date.getUTCDate());
   },
 
   _resultTitle: function UserInterface__resultTitle(result) {
@@ -781,7 +794,7 @@ var UserInterface = {
       return '<li>\n' +
       '<a class="revlink" href="' + self._changesetURL(patch.rev) + '">' + patch.rev +
       '</a>\n<div class="popup"><span><span class="author">' + patch.author + '</span> &ndash; ' +
-      '<span class="desc">' + self._linkBugs(patch.desc.split("\n")[0]) + '</span>' +
+      '<span class="desc">' + self._linkBugs(patch.desc.split("\n")[0], false) + '</span>' +
       (function buildHTMLForPatchTags() {
         if (!patch.tags.length)
           return '';
@@ -1052,7 +1065,7 @@ var UserInterface = {
           if (!result.note)
             return '';
           return '<div class="note">' +
-          self._linkBugs(result.note) + '</div>';
+          self._linkBugs(result.note, true) + '</div>';
         })() + '<div class="summary"><span id="summaryLoader"></span></div></div>';
       })();
     })());
