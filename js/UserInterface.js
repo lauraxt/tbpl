@@ -515,7 +515,7 @@ var UserInterface = {
 
   _linkBugs: function UserInterface__linkBugs(text, addOrangefactorLink) {
     var buglink = '<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=$2">$1$2</a>';
-    if (addOrangefactorLink) {
+    if (addOrangefactorLink && Config.treesWithOrangeFactor.indexOf(this._treeName) != -1) {
       var today = new Date();
       var sixtyDaysAgo = new Date(today.getTime() - (1000 * 60 * 60 * 24 * 60));
       buglink += ' [<a href="http://brasstacks.mozilla.com/orangefactor/?display=Bug&endday=' +

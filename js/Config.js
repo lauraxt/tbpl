@@ -38,6 +38,10 @@ var Config = {
     "Maple",
     "Mobile",
   ],
+  // Trees that have orange factor views
+  treesWithOrangeFactor: [
+    "Firefox",
+  ],
   groupedMachineTypes: {
     "Mochitest" : ["Mochitest"],
     "Reftest" : ["Crashtest", "Reftest-Direct2D", "Reftest-Direct3D",
