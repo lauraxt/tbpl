@@ -267,9 +267,9 @@ var AddCommentUI = {
       buildname: machineResult.machine.name,
       machinename: machinename,
       os: machineResult.machine.os,
-      date: d.getFullYear() + "-" +
-            (d.getMonth() < 9 ? "0" : "") + (d.getMonth() + 1) + "-" +
-            (d.getDate() < 10 ? "0" : "") + d.getDate(),
+      date: d.getUTCFullYear() + "-" +
+            (d.getUTCMonth() < 9 ? "0" : "") + (d.getUTCMonth() + 1) + "-" +
+            (d.getUTCDate() < 10 ? "0" : "") + d.getUTCDate(),
       type: machineResult.machine.type,
       debug: machineResult.machine.debug,
       starttime: machineResult.startTime.getTime() / 1000,
@@ -278,6 +278,7 @@ var AddCommentUI = {
       rev: machineResult.revs[Config.repoNames[machineResult.tree]],
       who: email,
       comment: comment,
+      timestamp: Math.ceil((new Date()).getTime()/1000),
     }, function() { /* dummy callback */ });
 
     NetUtils.crossDomainPost(this._submitURL, {
