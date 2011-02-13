@@ -51,7 +51,9 @@ var Config = {
   groupedMachineTypes: {
     "Mochitest" : ["Mochitest"],
     "Reftest" : ["Crashtest", "Reftest-Direct2D", "Reftest-Direct3D",
-      "Reftest-OpenGL", "Reftest", "JSReftest"]
+      "Reftest-OpenGL", "Reftest", "JSReftest"],
+    "SpiderMonkey" : ["SpiderMonkey DTrace", "SpiderMonkey --disable-methodjit",
+      "SpiderMonkey --disable-tracejit", "SpiderMonkey Shark"],
   },
   OSNames: {
     "linux": "Linux",
@@ -67,6 +69,11 @@ var Config = {
   },
   testNames: {
     "Build" : "B",
+    "SpiderMonkey" : "SM",
+    "SpiderMonkey DTrace" : "d",
+    "SpiderMonkey --disable-methodjit" : "¬m",
+    "SpiderMonkey --disable-tracejit" : "¬t",
+    "SpiderMonkey Shark" : "s",
     "Nightly" : "N",
     "Mochitest" : "M",
     "Crashtest" : "C",

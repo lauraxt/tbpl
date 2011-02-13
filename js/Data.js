@@ -462,6 +462,10 @@ Data.prototype = {
       var type =
         /talos/i.test(name) ? "Talos Performance" :
         /nightly/i.test(name) ? "Nightly" :
+        /spidermonkey-dtrace/i.test(name) ? "SpiderMonkey DTrace" :
+        /spidermonkey-nomethodjit/i.test(name) ? "SpiderMonkey --disable-methodjit" :
+        /spidermonkey-notracejit/i.test(name) ? "SpiderMonkey --disable-tracejit" :
+        /spidermonkey-shark/i.test(name) ? "SpiderMonkey Shark" :
         /shark/i.test(name) ? "Nightly" :
         /mochitest/i.test(name) ? "Mochitest" :
         /unit (browser-)?chrome/i.test(name) ? "Mochitest" :
