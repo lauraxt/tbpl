@@ -1037,6 +1037,19 @@ var UserInterface = {
         }
         return ret;
       })().join(', ') + '</span>' +
+      (function htmlForTryBuilds() {
+        if (result.machine.type != 'Build') {
+          return '';
+        }
+        for (var repo in result.revs) {
+          if (repo == 'try' || repo == 'try-comm-central') {
+            var dir = (repo == 'try') ? "firefox" : "thunderbird";
+            return '<a href="https://ftp.mozilla.org/pub/mozilla.org/' +
+                   dir + '/tryserver-builds/' + result.push.pusher + '-' +
+                   result.revs[repo] + '/">go to build directory</a>';
+          }
+        }
+      })() +
       '<a href="' + result.briefLogURL + '">view brief log</a>' +
       '<a href="' + result.fullLogURL + '">view full log</a>' +
       '<div id="autoStar"></div>' +
