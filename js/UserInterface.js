@@ -188,7 +188,8 @@ var UserInterface = {
   },
 
   _mostRecentlyUsedTrees: function() {
-    if (!("mostRecentlyUsedTrees" in this._storage))
+    if (!("mostRecentlyUsedTrees" in this._storage) ||
+        !this._storage.mostRecentlyUsedTrees)
       this._setMostRecentlyUsedTrees([]);
     if (JSON.parse(this._storage.mostRecentlyUsedTrees).length != 3)
       this._setMostRecentlyUsedTrees(Controller.keysFromObject(Config.repoNames).slice(0, 3));
