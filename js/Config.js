@@ -10,6 +10,10 @@ var Config = {
   loadInterval: 120, // seconds
   goBackPushes: 10,
   baseURL: "",
+  jsonPendingOrRunningBaseURL: "http://build.mozilla.org/builds/",
+  htmlPendingOrRunningBaseURL: "http://build.mozilla.org/builds/",
+  alternateTinderboxPushlogURL: "http://build.mozillamessaging.com/tinderboxpushlog/?tree=",
+  alternateTinderboxPushlogName: "Mozilla Messaging",
   wooBugURL: "http://brasstacks.mozilla.com/starcomment.php", // war-on-orange database
   repoNames: {
     "Firefox": "mozilla-central",

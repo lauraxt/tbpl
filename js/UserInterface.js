@@ -137,8 +137,10 @@ var UserInterface = {
   },
 
   handleInfraStatsUpdate: function UserInterface_handleInfraStatsUpdate(infraStats) {
-    var html = '<dt>Branch</dt><dd><a href="http://build.mozilla.org/builds/pending.html">pending</a>' +
-      ' / <a href="http://build.mozilla.org/builds/running.html">running</a></dd>';
+    var html = '<dt>Branch</dt><dd><a href="' +
+      Config.htmlPendingOrRunningBaseURL + 'pending.html">pending</a>' +
+      ' / <a href="' + Config.htmlPendingOrRunningBaseURL +
+      'running.html">running</a></dd>';
     var total = {pending: 0, running: 0};
     for (var branch in infraStats) {
       html += "<dt>" + branch + "</dt><dd>" + infraStats[branch].pending + " / " + infraStats[branch].running + "</dd>";
@@ -179,7 +181,7 @@ var UserInterface = {
     statusSpan.css("visibility", text ? "visible" : "hidden");
     statusSpan.html(text);
   },
-  
+
   _setupStorage: function UserInterface__setupStorage() {
     try {
       this._storage = window.localStorage;
@@ -233,13 +235,13 @@ var UserInterface = {
     for (var name in Config.testNames) {
       $('<dt>' + Config.testNames[name] + '</dt><dd>' + name + '</dd>').appendTo(legend);
     }
-    $('<dt>…*</dt><dd>commented</dd>' +  
+    $('<dt>…*</dt><dd>commented</dd>' +
       '<dt class="pending">lightgray</dt><dd>pending</dd>' +
       '<dt class="running">gray</dt><dd>running</dd>' +
       '<dt class="success">green</dt><dd>success</dd>' +
       '<dt class="testfailed">orange</dt><dd>tests failed</dd>' +
       '<dt class="exception">purple</dt><dd>infrastructure exception</dd>' +
-      '<dt class="busted">red</dt><dd>build error</dd>' + 
+      '<dt class="busted">red</dt><dd>build error</dd>' +
       '<dt class="retry">blue</dt><dd>build has been restarted</dd>' +
       '<dt class="unknown">black</dt><dd>unknown error</dd>' +
       '').appendTo(legend);
@@ -611,7 +613,7 @@ var UserInterface = {
     d.getDate() + " " + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds()) + " " +
     d.getFullYear() + timezoneName;
   },
-  
+
   _getDisplayTime: function UserInterface__getDisplayTime(date) {
     if (!date.getTime)
       return '';
@@ -641,7 +643,7 @@ var UserInterface = {
       "unknown": 'Unknown error on ' + type + ' on ' + Config.OSNames[result.machine.os],
     }[result.state] + (result.state == "pending" ? "" : ', ' + this._timeString(result));
   },
-  
+
   _timeString: function UserInterface__timeString(result) {
     if (["running", "pending"].indexOf(result.state) == -1) {
       return 'took ' + Math.ceil((result.endTime.getTime() - result.startTime.getTime()) / 1000 / 60)
@@ -660,7 +662,7 @@ var UserInterface = {
     var match = /([0-9]+)\/[0-9]/.exec(machine.name);
     if (match)
       return match[1];
-    
+
     if (machine.name.match(/mochitest\-other/))
       return "oth";
 
@@ -685,7 +687,7 @@ var UserInterface = {
      * the details panel because the runID will change once the run is finished
      * and because the details show no more info than the tooltip
      */
-    return '<a' + (['running', 'pending'].indexOf(machineResult.state) == -1 ? 
+    return '<a' + (['running', 'pending'].indexOf(machineResult.state) == -1 ?
       ' href="' + machineResult.briefLogURL + '"' +
       ' resultID="' + machineResult.runID + '"' +
       (machineResult.runID == this._activeResult ? ' active="true"' : '') +
@@ -790,11 +792,11 @@ var UserInterface = {
     return Controller.keysFromObject(Config.OSNames).map(function buildHTMLForPushResultsOnOS(os) {
       if (!push.results || !push.results[os])
         return '';
-      return (push.results[os].opt   ? self._buildHTMLForOS(os, " opt"  , push.results[os].opt  ) : '') + 
+      return (push.results[os].opt   ? self._buildHTMLForOS(os, " opt"  , push.results[os].opt  ) : '') +
              (push.results[os].debug ? self._buildHTMLForOS(os, " debug", push.results[os].debug) : '');
     }).join("\n");
   },
-  
+
   _buildHTMLForPushPatches: function UserInterface__buildHTMLForPushPatches(push) {
     var self = this;
     return push.patches.map(function buildHTMLForPushPatch(patch, patchIndex) {
@@ -851,7 +853,7 @@ var UserInterface = {
     this._installTooltips(node);
     return node;
   },
-  
+
   _refreshPushResultsInPushNode: function UserInterface__refreshPushResultsInPushNode(push, node) {
     $(".results", node).html(this._buildHTMLForPushResults(push));
   },
@@ -923,18 +925,18 @@ var UserInterface = {
     if (!$(e.target).is("a, #pushes"))
       this._setActiveResult("");
   },
-  
+
   _resultLinkClick: function UserInterface__resultLinkClick(link) {
     var resultID = link.getAttribute("resultID");
     this._setActiveResult(resultID, true);
     AddCommentUI.clearAutoStarBugs();
   },
-  
+
   _markActiveResultLinks: function UserInterface__markActiveResultLinks() {
     if (this._activeResult)
       $('.machineResult[resultID="' + this._activeResult + '"]').attr("active", "true");
   },
-  
+
   _setActiveResult: function UserInterface__setActiveResult(resultID, scroll) {
     SummaryLoader._abortOutstandingSummaryLoadings();
     SummaryLoader._abortOutstandingSummaryLoadings = function deactivateActiveResult() {};
@@ -951,7 +953,7 @@ var UserInterface = {
       }
     }
   },
-  
+
   _scrollElemIntoView: function UserInterface__scrollElemIntoView(elem, box, margin) {
     var boxBox = box.getBoundingClientRect();
     var elemBox = elem.getBoundingClientRect();
@@ -987,7 +989,7 @@ var UserInterface = {
       ', ' + (result.state == "running" ? 'still running... ' : 'finished ' +
       this._getDisplayTime(result.endTime) + ', ') + this._timeString(result);
   },
-  
+
   _displayResult: function UserInterface__displayResult() {
     var self = this;
     var result = this._data.getMachineResult(this._activeResult);

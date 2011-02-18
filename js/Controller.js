@@ -35,7 +35,7 @@ var Controller = {
   init: function Controller_init() {
     var params = this._parseParams();
     this._params = params;
-    this.treeName = (("tree" in params) && params.tree) || "Firefox";
+    this.treeName = (("tree" in params) && params.tree) || Config.defaultTreeName;
     var pusher = ("pusher" in params) && params.pusher;
     var noIgnore = ("noignore" in params) && (params.noignore == "1");
     var onlyUnstarred = ("onlyunstarred" in params) && (params.onlyunstarred == "1");

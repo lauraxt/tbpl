@@ -33,7 +33,7 @@ Data.prototype = {
     if (loadPendingRunning)
       this._loadPendingAndRunningBuilds(loadTracker, updatedPushCallback, infraStatsCallback);
   },
-  
+
   refresh: function Data_refresh(loadTracker, trackTip, updatedPushCallback, infraStatsCallback) {
     if (trackTip) {
       // Passing only startID means "Load all pushes with push.id > startID".
@@ -42,7 +42,7 @@ Data.prototype = {
     this._loadTinderboxDataForPushes(this._pushes, loadTracker, updatedPushCallback);
     this._loadPendingAndRunningBuilds(loadTracker, updatedPushCallback, infraStatsCallback);
   },
-  
+
   _getPushlogParamsForRange: function Data__getPushlogParamsForRange(pushRange) {
     // This function determines what to load from pushlog so that our total
     // loaded range matches the requested pushRange.
@@ -449,9 +449,9 @@ Data.prototype = {
         /WINNT 6\.1/i.test(name) ? "windows" :
         /WINNT 5\.2/i.test(name) ? "windows" :
         /android/i.test(name) ? "android" :
-        /Maemo 5/.test(name) ? "maemo5" : 
-        /Maemo/.test(name) ? "maemo4" : 
-        /N810/.test(name) ? "maemo4" : 
+        /Maemo 5/.test(name) ? "maemo5" :
+        /Maemo/.test(name) ? "maemo4" :
+        /N810/.test(name) ? "maemo4" :
         /n900/.test(name) ? "maemo5" :
         /xp/i.test(name) ? "windowsxp" :
         /static-analysis/.test(name) ? "linux" : "";
@@ -497,7 +497,7 @@ Data.prototype = {
     var self = this;
     loadTracker.addTrackedLoad();
     $.ajax({
-      url: "http://build.mozilla.org/builds/builds-" + pendingOrRunning + ".js",
+      url: Config.jsonPendingOrRunningBaseURL + "builds-" + pendingOrRunning + ".js",
       dataType: 'json',
       success: function (json) {
         if (!json || !json[pendingOrRunning])
@@ -512,7 +512,7 @@ Data.prototype = {
       }
     });
   },
-  
+
   _filterHiddenBuilds: function Data__filterHiddenBuilds(obj) {
     if (this._noIgnore)
       return;
