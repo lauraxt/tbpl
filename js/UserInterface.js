@@ -912,7 +912,7 @@ var UserInterface = {
       $(this).unbind();
       $(".patches > li > div", this).each(function createPopupPatch(i) {
         var div = $(this);
-        if (div.width() - div.children().width() > 0)
+        if (div.width() - div.children().width() > 10)
           return; // There's enough space; no need to show the popup.
         div.clone().addClass("popup").insertBefore(div);
       });
