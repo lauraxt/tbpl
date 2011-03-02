@@ -469,8 +469,10 @@ Data.prototype = {
         /shark/i.test(name) ? "Nightly" :
         /mochitest/i.test(name) ? "Mochitest" :
         /unit (browser-)?chrome/i.test(name) ? "Mochitest" :
+        /crashtest-ipc/.test(name) ? "Crashtest-IPC" :
         /crashtest/i.test(name) ? "Crashtest" :
         /jsreftest/i.test(name) ? "JSReftest" :
+        /reftest-ipc/i.test(name) ? "Reftest-IPC" :
         /reftest-d2d/i.test(name) ? "Reftest-Direct2D" :
         /direct3d/i.test(name) ? "Reftest-Direct3D" :
         /opengl/i.test(name) ? "Reftest-OpenGL" :
