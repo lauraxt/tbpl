@@ -473,9 +473,6 @@ Data.prototype = {
         /crashtest/i.test(name) ? "Crashtest" :
         /jsreftest/i.test(name) ? "JSReftest" :
         /reftest-ipc/i.test(name) ? "Reftest-IPC" :
-        /reftest-d2d/i.test(name) ? "Reftest-Direct2D" :
-        /direct3d/i.test(name) ? "Reftest-Direct3D" :
-        /opengl/i.test(name) ? "Reftest-OpenGL" :
         /reftest/i.test(name) ? "Reftest" :
         /xpcshell/i.test(name) ? "XPCShellTest" :
         /depend/i.test(name) ? "Build" :
