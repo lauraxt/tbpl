@@ -461,12 +461,13 @@ Data.prototype = {
       // see Config.testNames
       var type =
         /talos/i.test(name) ? "Talos Performance" :
+        /mobile desktop .* nightly/i.test(name) ? "Mobile Desktop Nightly" :
         /nightly/i.test(name) ? "Nightly" :
         /spidermonkey-dtrace/i.test(name) ? "SpiderMonkey DTrace" :
         /spidermonkey-nomethodjit/i.test(name) ? "SpiderMonkey --disable-methodjit" :
         /spidermonkey-notracejit/i.test(name) ? "SpiderMonkey --disable-tracejit" :
         /spidermonkey-shark/i.test(name) ? "SpiderMonkey Shark" :
-        /shark/i.test(name) ? "Nightly" :
+        /shark/i.test(name) ? "Shark Nightly" :
         /mochitest/i.test(name) ? "Mochitest" :
         /unit (browser-)?chrome/i.test(name) ? "Mochitest" :
         /crashtest-ipc/.test(name) ? "Crashtest-IPC" :
@@ -476,6 +477,8 @@ Data.prototype = {
         /reftest/i.test(name) ? "Reftest" :
         /xpcshell/i.test(name) ? "XPCShellTest" :
         /depend/i.test(name) ? "Build" :
+        /(linux|maemo .*) qt/i.test(name) ? "Qt Build" :
+        /mobile desktop/i.test(name) ? "Mobile Desktop Build" :
         /build/i.test(name) ? "Build" :
         /jetpack/i.test(name) ? "Jetpack SDK Test" :
         /mozmill-all/i.test(name) ? "Mozmill" :
