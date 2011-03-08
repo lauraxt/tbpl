@@ -1058,6 +1058,7 @@ var UserInterface = {
                    result.revs[repo] + '/">go to build directory</a>';
           }
         }
+        return '';
       })() +
       '<a href="' + result.briefLogURL + '">view brief log</a>' +
       '<a href="' + result.fullLogURL + '">view full log</a>' +
