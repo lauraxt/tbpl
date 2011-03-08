@@ -79,7 +79,7 @@ p {
 .dropdown:not(.open) ul, .dropdown:not(.open) dl {
   display: none !important;
 }
-#moreList, #moreList li, #treeInfo li, #filters li {
+#moreList, #moreList li, #filters li {
   display: block;
   margin: 0;
   padding: 0;
@@ -92,6 +92,9 @@ p {
   font-weight: bold;
 }
 #legend dd {
+  margin-left: 6em;
+}
+#treeInfo dd {
   margin-left: 6em;
 }
 #infrastructure dd {

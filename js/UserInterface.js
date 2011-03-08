@@ -255,9 +255,37 @@ var UserInterface = {
         var div = $("<div>").html(data);
         $("#preamble", div).remove();
         $("#status-container", div).contents().appendTo("#tree-status");
+        if (!Config.useGoogleCalendar) {
+          ["#sheriff", "#releng"].forEach(function (role) {
+            var info = $(role, div).contents();
+            if (!info.text())
+              $("<div>Unknown</div>").replaceAll(role);
+            else
+              info.replaceAll(role);
+          });
+        }
       }
     });
 
+    var treeInfo = $('#treeInfo');
+    var primaryRepo = Config.treeInfo[this._treeName].primaryRepo;
+    $('<dt>Pushlog:</dt><dd><a href="http://hg.mozilla.org/' + primaryRepo + '/pushloghtml">' +
+      Config.treeInfo[this._treeName].primaryRepo +
+      '</a></dd>').appendTo(treeInfo);
+
+    if ('otherRepo' in Config.treeInfo[this._treeName]) {
+      var otherRepo = Config.treeInfo[this._treeName].otherRepo;
+
+      $('<dt></dt><dd><a href="http://hg.mozilla.org/' + otherRepo + '/pushloghtml">' +
+      Config.treeInfo[this._treeName].otherRepo +
+      '</a></dd>').appendTo(treeInfo);
+    }
+
+    // This returns early if we're not using the google calendar.
+    if (!Config.useGoogleCalendar)
+      return;
+
+    // Only google calendar set-up below.
     google.setOnLoadCallback(function() {
       var service = new google.gdata.calendar.CalendarService("mozilla-tinderbox");
 

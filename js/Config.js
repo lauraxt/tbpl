@@ -10,6 +10,7 @@ var Config = {
   loadInterval: 120, // seconds
   goBackPushes: 10,
   baseURL: "",
+  useGoogleCalendar: true,
   jsonPendingOrRunningBaseURL: "http://build.mozilla.org/builds/",
   htmlPendingOrRunningBaseURL: "http://build.mozilla.org/builds/",
   alternateTinderboxPushlogURL: "http://build.mozillamessaging.com/tinderboxpushlog/?tree=",
@@ -59,6 +60,7 @@ var Config = {
     },
     "Mobile": {
       primaryRepo: "mozilla-central",
+      otherRepo: "mobile-browser",
       hasGroups: true,
     },
     "MozillaTry": {
