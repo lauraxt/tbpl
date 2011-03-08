@@ -121,7 +121,7 @@ Data.prototype = {
     var self = this;
     var tinderboxLoadEstimation = loadTracker.addMorePotentialLoads(30);
     Config.pushlogDataLoader.load(
-      Config.repoNames[this._treeName],
+      Config.treeInfo[this._treeName].primaryRepo,
       params,
       loadTracker,
       function pushlogLoadCallback(loadedPushes) {
@@ -230,7 +230,8 @@ Data.prototype = {
 
   _addPendingOrRunningResultsToPushes: function Data__addPendingOrRunningResultsToPushes(pendingOrRunning, toWhichPushes, updatedPushes) {
     var data = this["_" + pendingOrRunning + "Jobs"];
-    var prBranchName = Config.repoNames[this._treeName].replace(/^[^\/]+\//, '');
+    var prBranchName =
+      Config.treeInfo[this._treeName].primaryRepo.replace(/^[^\/]+\//, '');
     if (prBranchName in data) {
       for (var rev in data[prBranchName]) {
         if (!(rev in toWhichPushes))
@@ -298,7 +299,8 @@ Data.prototype = {
 
   _clearOldPendingOrRunningResultsFromTheirPushes: function Data__clearOldPendingOrRunningResultsFromTheirPushes(pendingOrRunning, updatedPushes) {
     var data = this["_" + pendingOrRunning + "Jobs"];
-    var prBranchName = Config.repoNames[this._treeName].replace(/^[^\/]+\//, '');
+    var prBranchName =
+      Config.treeInfo[this._treeName].primaryRepo.replace(/^[^\/]+\//, '');
     if (prBranchName in data) {
       for (var rev in data[prBranchName]) {
         if (!(rev in this._pushes))
@@ -319,7 +321,7 @@ Data.prototype = {
       return null;
     var key = pendingOrRunning + "-" + run.id;
     var revs = {};
-    revs[Config.repoNames[this._treeName]] = rev;
+    revs[Config.treeInfo[this._treeName].primaryRepo] = rev;
     return {
       runID: key,
       machine: machine,
@@ -394,7 +396,7 @@ Data.prototype = {
   },
 
   machineGroup: function Data_machineGroup(machineType) {
-    if (this._config.treesWithGroups.indexOf(this._treeName) == -1)
+    if ("hasGroups" in this._config.treeInfo[this._treeName])
       return machineType;
     for (var groupname in this._config.groupedMachineTypes) {
       if (this._config.groupedMachineTypes[groupname].indexOf(machineType) != -1)
@@ -412,7 +414,7 @@ Data.prototype = {
   },
 
   _getPushForResult: function Data__getPushForResult(machineResult) {
-    var repo = Config.repoNames[this._treeName];
+    var repo = Config.treeInfo[this._treeName].primaryRepo;
     if (!(repo in machineResult.revs))
       return null;
 

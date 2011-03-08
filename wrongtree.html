@@ -20,7 +20,7 @@ window.onload = function() {
   "the list below:" +
   '<ul style="font-size: 0.8em">' + (function() {
     var rc = "";
-    for (var name in Config.repoNames) {
+    for (var name in Config.treeInfo) {
       rc += '<li><a href="./?tree=' + name + '">' + name + '<' + '/a><' + '/li>';
     }
     return rc;

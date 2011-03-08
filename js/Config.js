@@ -15,45 +15,81 @@ var Config = {
   alternateTinderboxPushlogURL: "http://build.mozillamessaging.com/tinderboxpushlog/?tree=",
   alternateTinderboxPushlogName: "Mozilla Messaging",
   wooBugURL: "http://brasstacks.mozilla.com/starcomment.php", // war-on-orange database
-  repoNames: {
-    "Firefox": "mozilla-central",
-    "Firefox4.0": "releases/mozilla-2.0",
-    "Firefox3.6": "releases/mozilla-1.9.2",
-    "Firefox3.5": "releases/mozilla-1.9.1",
-    "TraceMonkey": "tracemonkey",
-    "Jaegermonkey": "projects/jaegermonkey",
-    "Electrolysis": "projects/electrolysis",
-    "Places": "projects/places",
-    "Mobile": "mozilla-central",
-    "MozillaTry": "try",
-    "Build-System": "projects/build-system",
-    "Graphics": "projects/graphics",
-    "Services-Central": "services/services-central",
-    "Birch": "projects/birch",
-    "Cedar": "projects/cedar",
-    "Maple": "projects/maple",
+  // treeInfo gives details about the trees and repositories. There are various
+  // items that can be specified:
+  //
+  // - primaryRepo:    [required] The primary hg repository for the tree.
+  // - otherRepo:      [optional] An additional hg repository that the tree
+  //                              works with.
+  // - hasGroups:      [optional] If the builders should be grouped, specify
+  //                              this option. If not, leave it out.
+  // - orangeFactor:   [optional] If the tree is linked to the orange factor
+  //                              specify this option. If not, leave it out.
+  treeInfo: {
+    "Firefox": {
+      primaryRepo: "mozilla-central",
+      hasGroups: true,
+      orangeFactor: true,
+    },
+    "Firefox4.0": {
+      primaryRepo: "releases/mozilla-2.0",
+      hasGroups: true,
+    },
+    "Firefox3.6": {
+      primaryRepo: "releases/mozilla-1.9.2",
+    },
+    "Firefox3.5": {
+      primaryRepo: "releases/mozilla-1.9.1",
+    },
+    "TraceMonkey": {
+      primaryRepo: "tracemonkey",
+      hasGroups: true,
+    },
+    "Jaegermonkey": {
+      primaryRepo: "projects/jaegermonkey",
+      hasGroups: true,
+    },
+    "Electrolysis": {
+      primaryRepo: "projects/electrolysis",
+      hasGroups: true,
+    },
+    "Places": {
+      primaryRepo: "projects/places",
+      hasGroups: true,
+    },
+    "Mobile": {
+      primaryRepo: "mozilla-central",
+      hasGroups: true,
+    },
+    "MozillaTry": {
+      primaryRepo: "try",
+      hasGroups: true,
+    },
+    "Build-System": {
+      primaryRepo: "projects/build-system",
+      hasGroups: true,
+    },
+    "Graphics": {
+      primaryRepo: "projects/graphics",
+      hasGroups: true,
+    },
+    "Services-Central": {
+      primaryRepo: "services/services-central",
+      hasGroups: true,
+    },
+    "Birch": {
+      primaryRepo: "projects/birch",
+      hasGroups: true,
+    },
+    "Cedar": {
+      primaryRepo: "projects/cedar",
+      hasGroups: true,
+    },
+    "Maple": {
+      primaryRepo: "projects/maple",
+      hasGroups: true,
+    },
   },
-  // Trees that have split mochitests like M(12345).
-  treesWithGroups: [
-    "Firefox",
-    "Firefox4.0",
-    "TraceMonkey",
-    "Jaegermonkey",
-    "Electrolysis",
-    "Places",
-    "MozillaTry",
-    "Build-System",
-    "Graphics",
-    "Services-Central",
-    "Birch",
-    "Cedar",
-    "Maple",
-    "Mobile",
-  ],
-  // Trees that have orange factor views
-  treesWithOrangeFactor: [
-    "Firefox",
-  ],
   groupedMachineTypes: {
     "Mochitest" : ["Mochitest"],
     "Reftest" : ["Crashtest", "Crashtest-IPC",

@@ -200,7 +200,7 @@ var UserInterface = {
         !this._storage.mostRecentlyUsedTrees)
       this._setMostRecentlyUsedTrees([]);
     if (JSON.parse(this._storage.mostRecentlyUsedTrees).length != 3)
-      this._setMostRecentlyUsedTrees(Controller.keysFromObject(Config.repoNames).slice(0, 3));
+      this._setMostRecentlyUsedTrees(Controller.keysFromObject(Config.treeInfo).slice(0, 3));
     return JSON.parse(this._storage.mostRecentlyUsedTrees);
   },
 
@@ -221,7 +221,7 @@ var UserInterface = {
     var moreListContainer = $('<div id="moreListContainer" class="dropdown"><h2>more</h2></div></li>').appendTo("#treechooser");
     var moreList = $('<ul id="moreList"></ul>').appendTo(moreListContainer);
     var self = this;
-    Controller.keysFromObject(Config.repoNames).forEach(function (tree, i) {
+    Controller.keysFromObject(Config.treeInfo).forEach(function (tree, i) {
       var isMostRecentlyUsedTree = (self._storage.mostRecentlyUsedTrees.indexOf(tree) != -1);
       var treeLink = self._treeName == tree ?
         "<strong>" + tree + "</strong>" :
@@ -524,14 +524,14 @@ var UserInterface = {
 
   _linkBugs: function UserInterface__linkBugs(text, addOrangefactorLink) {
     var buglink = '<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=$2">$1$2</a>';
-    if (addOrangefactorLink && Config.treesWithOrangeFactor.indexOf(this._treeName) != -1) {
+    if (addOrangefactorLink && "orangeFactor" in Config.treeInfo[this._treeName]) {
       var today = new Date();
       var sixtyDaysAgo = new Date(today.getTime() - (1000 * 60 * 60 * 24 * 60));
       buglink += ' [<a href="http://brasstacks.mozilla.com/orangefactor/?display=Bug&endday=' +
                   this._ISODateString(today) + '&startday=' + this._ISODateString(sixtyDaysAgo) + '&bugid=$2">orangefactor</a>]'
     }
     return text.replace(/(bug\s*|b=)([1-9][0-9]*)\b/ig, buglink)
-           .replace(/(changeset\s*)?([0-9a-f]{12})\b/ig, '<a href="http://hg.mozilla.org/' + Config.repoNames[this._treeName] + '/rev/$2">$1$2</a>');
+           .replace(/(changeset\s*)?([0-9a-f]{12})\b/ig, '<a href="http://hg.mozilla.org/' + Config.treeInfo[this._treeName].primaryRepo + '/rev/$2">$1$2</a>');
   },
 
   _isFailureState: function UserInterface__isFailureState(state) {
@@ -763,7 +763,7 @@ var UserInterface = {
         }
         return a.startTime.getTime() - b.startTime.getTime();
       }
-      if (Config.treesWithGroups.indexOf(self._treeName) != -1 &&
+      if ("hasGroups" in Config.treeInfo[self._treeName] &&
           Controller.keysFromObject(Config.groupedMachineTypes).indexOf(machineType) != -1) {
         displayedResults.sort(function machineResultSortOrderComparison(a, b) {
           // machine.type does not mess up the numeric/alphabetic sort
@@ -818,7 +818,7 @@ var UserInterface = {
   },
 
   _changesetURL: function UserInterface__changesetUrl(rev) {
-      return 'http://hg.mozilla.org/' + Config.repoNames[this._treeName] + '/rev/' + rev;
+      return 'http://hg.mozilla.org/' + Config.treeInfo[this._treeName].primaryRepo + '/rev/' + rev;
   },
 
   _setPusherFromClick: function UserInterface__setPusherFromClick(pusher) {

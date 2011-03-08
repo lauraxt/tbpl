@@ -40,7 +40,7 @@ var Controller = {
     var noIgnore = ("noignore" in params) && (params.noignore == "1");
     var onlyUnstarred = ("onlyunstarred" in params) && (params.onlyunstarred == "1");
 
-    if (!(this.treeName in Config.repoNames))
+    if (!(this.treeName in Config.treeInfo))
       throw "wrongtree"; // er, hm.
 
     this._data = new Data(this.treeName, noIgnore, Config);
