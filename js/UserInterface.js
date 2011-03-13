@@ -696,6 +696,9 @@ var UserInterface = {
 
     // The Mobile tree uses both mochitest1 and mochitest-1 as machine names.
     match = /mochitest\-?([1-9])/.exec(machine.name);
+    if (match && /qt/i.test(machine.name))
+      match[1] += "q";
+
     if (match)
       return match[1];
 

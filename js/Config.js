@@ -123,6 +123,7 @@ var Config = {
     "Nightly" : "N",
     "Shark Nightly" : "Ns",
     "Mobile Desktop Nightly" : "Nm",
+    "Maemo Qt Nightly" : "Nq",
     "Mochitest" : "M",
     "Crashtest-IPC" : "Cipc",
     "Crashtest" : "C",

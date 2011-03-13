@@ -464,6 +464,7 @@ Data.prototype = {
       var type =
         /talos/i.test(name) ? "Talos Performance" :
         /mobile desktop .* nightly/i.test(name) ? "Mobile Desktop Nightly" :
+        /maemo .* qt .* nightly/i.test(name) ? "Maemo Qt Nightly" :
         /nightly/i.test(name) ? "Nightly" :
         /spidermonkey-dtrace/i.test(name) ? "SpiderMonkey DTrace" :
         /spidermonkey-nomethodjit/i.test(name) ? "SpiderMonkey --disable-methodjit" :
