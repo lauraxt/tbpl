@@ -71,6 +71,10 @@ var Config = {
       primaryRepo: "projects/build-system",
       hasGroups: true,
     },
+    "Devtools": {
+      primaryRepo: "devtools",
+      hasGroups: true,
+    },
     "Graphics": {
       primaryRepo: "projects/graphics",
       hasGroups: true,
