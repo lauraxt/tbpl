@@ -290,7 +290,7 @@ var AddCommentUI = {
       who: email,
       note: comment,
     }, callback);
-    machineResult.note += "[<b><a href=mailto:" + email + ">" + email + "</a></b>]<br>" + comment;
+    machineResult.note += "[<b>" + email + "</b>]<br>" + comment;
   },
 
   _postOneBug: function AddCommentUI__postOneBug(id, header, logLink, email, summary, callback) {
