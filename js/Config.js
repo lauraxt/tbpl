@@ -72,7 +72,7 @@ var Config = {
       hasGroups: true,
     },
     "Devtools": {
-      primaryRepo: "devtools",
+      primaryRepo: "projects/devtools",
       hasGroups: true,
     },
     "Graphics": {
