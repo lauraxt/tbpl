@@ -39,12 +39,13 @@ var Controller = {
     var pusher = ("pusher" in params) && params.pusher;
     var noIgnore = ("noignore" in params) && (params.noignore == "1");
     var onlyUnstarred = ("onlyunstarred" in params) && (params.onlyunstarred == "1");
+    var jobName = ("jobname" in params) && params.jobname;
 
     if (!(this.treeName in Config.treeInfo))
       throw "wrongtree"; // er, hm.
 
     this._data = new Data(this.treeName, noIgnore, Config);
-    this._uiCallbacks = UserInterface.init(this, onlyUnstarred, pusher);
+    this._uiCallbacks = UserInterface.init(this, onlyUnstarred, pusher, jobName);
 
     var initialPushRangeParams = this._getInitialPushRangeParams(params);
     var initialPushRange = initialPushRangeParams.range;

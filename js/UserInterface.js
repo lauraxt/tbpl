@@ -10,13 +10,15 @@ var UserInterface = {
   _storage: null,
   _onlyUnstarred: false,
   _pusher: "",
+  _machine: "",
 
-  init: function UserInterface_init(controller, onlyUnstarred, pusher) {
+  init: function UserInterface_init(controller, onlyUnstarred, pusher, jobName) {
     var self = this;
     this._controller = controller;
     this._treeName = controller.treeName;
     this._onlyUnstarred = onlyUnstarred;
     this._pusher = pusher || "";
+    this._machine = jobName || "";
     this._data = controller.getData();
     this._setupStorage();
 
@@ -345,10 +347,12 @@ var UserInterface = {
     var items = [];
 
     params.pusher = this._pusher;
+    params.jobname = this._machine;
     params.onlyunstarred = this._onlyUnstarred ? "1" : "";
 
     for (var key in params) {
       if ((key == "pusher" && !this._pusher)
+          || (key == "jobname" && !this._machine)
           || (key == "onlyunstarred") && !this._onlyUnstarred) {
         continue;
       }
@@ -363,6 +367,7 @@ var UserInterface = {
     if (history && "pushState" in history) {
       var state = {
         pusher: this._pusher,
+        jobname: this._machine,
         onlyUnstarred: this._onlyUnstarred,
       };
       history.pushState(state, "", this._getParamsString());
@@ -393,13 +398,26 @@ var UserInterface = {
     });
   },
 
+  _updateMachineFilter: function UserInterface__updateMachineFilter(machine) {
+    document.getElementById('machine').value = machine;
+    this._machine = machine;
+
+    var self = this;
+    var pushes = this._controller.valuesFromObject(this._data.getPushes());
+    for (var i = 0; i < pushes.length; ++i) {
+      this.handleUpdatedPush(pushes[i]);
+    }
+  },
+
   _initFilters: function UserInterface__initFilters() {
     var onlyUnstarredCheckbox = document.getElementById('onlyUnstarred');
     var pusherField = document.getElementById('pusher');
+    var machineField = document.getElementById('machine');
 
     // Use the values passed in parameter as the default values.
     onlyUnstarredCheckbox.checked = this._onlyUnstarred;
     pusherField.value = this._pusher;
+    machineField.value = this._machine;
 
     var self = this;
 
@@ -418,15 +436,25 @@ var UserInterface = {
       self._updatePusherFilter(pusherField.value);
       self._updateLocation();
     }
+
+    machineField.onchange = function() {
+      self._updateMachineFilter(machineField.value);
+      self._updateLocation();
+      self._updateTreeStatus();
+    }
   },
 
   _getFailingJobs: function UserInterface__getFailingJobs() {
     var machines = this._data.getMachines();
+    var machineFilter = this._machine ? new RegExp(this._machine, "i") : null;
     var failing = [];
     var self = this;
 
     machines.forEach(function addMachineToTreeStatus1(machine) {
       var result = machine.latestFinishedRun;
+
+      if (machineFilter && machine.name.match(machineFilter) == null)
+        return;
 
       // Ignore machines without run information.
       if (!result) {
@@ -460,11 +488,13 @@ var UserInterface = {
       if (!state) {
         var params = self._controller.getParams();
         self._updatePusherFilter(params.pusher ? params.pusher : "");
+        self._updateMachineFilter(params.jobname ? params.jobname : "");
         self._updateUnstarredFilter(params.onlyunstarred == '1');
         return;
       }
 
       self._updatePusherFilter(state['pusher'] ? state['pusher'] : "");
+      self._updateMachineFilter(state['jobname'] ? state['jobname'] : "");
       self._updateUnstarredFilter(state['onlyUnstarred']);
     }
 
@@ -760,13 +790,26 @@ var UserInterface = {
   },
 
   _filterDisplayedResults: function UserInterface__filterDisplayedResults(results) {
-    if (!this._onlyUnstarred)
+    if (!this._onlyUnstarred && !this._machine)
       return results;
 
     var self = this;
-    return results.filter(function (result) {
-      return self._isUnstarredFailure(result);
-    });
+    var filteredResults = results;
+
+    if (this._onlyUnstarred) {
+     filteredResults = filteredResults.filter(function (result) {
+        return self._isUnstarredFailure(result);
+      });
+    }
+
+    if (this._machine) {
+     var machineFilter = new RegExp(this._machine, "i");
+     filteredResults = filteredResults.filter(function (result) {
+       return machineFilter.test(result.machine.name);
+     });
+    }
+
+    return filteredResults;
   },
 
   _buildHTMLForOS: function UserInterface__buildHTMLForOS(os, debug, results) {
