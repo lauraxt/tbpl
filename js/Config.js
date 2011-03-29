@@ -13,6 +13,7 @@ var Config = {
   useGoogleCalendar: true,
   jsonPendingOrRunningBaseURL: "http://build.mozilla.org/builds/",
   htmlPendingOrRunningBaseURL: "http://build.mozilla.org/builds/",
+  selfServeAPIBaseURL: "https://build.mozilla.org/buildapi/self-serve",
   alternateTinderboxPushlogURL: "http://build.mozillamessaging.com/tinderboxpushlog/?tree=",
   alternateTinderboxPushlogName: "Mozilla Messaging",
   wooBugURL: "http://brasstacks.mozilla.com/starcomment.php", // war-on-orange database
@@ -31,24 +32,30 @@ var Config = {
       primaryRepo: "mozilla-central",
       hasGroups: true,
       orangeFactor: true,
+      buildbotBranch: "mozilla-central",
     },
     "Firefox4.0": {
       primaryRepo: "releases/mozilla-2.0",
       hasGroups: true,
+      buildbotBranch: "mozilla-2.0",
     },
     "Firefox3.6": {
       primaryRepo: "releases/mozilla-1.9.2",
+      buildbotBranch: "mozilla-1.9.2",
     },
     "Firefox3.5": {
       primaryRepo: "releases/mozilla-1.9.1",
+      buildbotBranch: "mozilla-1.9.1",
     },
     "TraceMonkey": {
       primaryRepo: "tracemonkey",
       hasGroups: true,
+      buildbotBranch: "tracemonkey",
     },
     "Jaegermonkey": {
       primaryRepo: "projects/jaegermonkey",
       hasGroups: true,
+      buildbotBranch: "jaegermonkey",
     },
     "Electrolysis": {
       primaryRepo: "projects/electrolysis",
@@ -57,19 +64,23 @@ var Config = {
     "Places": {
       primaryRepo: "projects/places",
       hasGroups: true,
+      buildbotBranch: "places",
     },
     "Mobile": {
       primaryRepo: "mozilla-central",
       otherRepo: "mobile-browser",
       hasGroups: true,
+      buildbotBranch: "mozilla-central",
     },
     "MozillaTry": {
       primaryRepo: "try",
       hasGroups: true,
+      buildbotBranch: "try",
     },
     "Build-System": {
       primaryRepo: "projects/build-system",
       hasGroups: true,
+      buildbotBranch: "build-system",
     },
     "Devtools": {
       primaryRepo: "projects/devtools",
@@ -86,14 +97,17 @@ var Config = {
     "Birch": {
       primaryRepo: "projects/birch",
       hasGroups: true,
+      buildbotBranch: "birch",
     },
     "Cedar": {
       primaryRepo: "projects/cedar",
       hasGroups: true,
+      buildbotBranch: "cedar",
     },
     "Maple": {
       primaryRepo: "projects/maple",
       hasGroups: true,
+      buildbotBranch: "maple",
     },
   },
   groupedMachineTypes: {

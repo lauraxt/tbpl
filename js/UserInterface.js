@@ -922,7 +922,12 @@ var UserInterface = {
       '" href="' + this._controller.getURLForSinglePushView(push.toprev) + '">' +
       self._getDisplayDate(push.date) + '</a>' +
       ' <span class="talosCompare">(<label>compare: <input class="revsToCompare" type="checkbox" value="' + push.toprev + '"></label>)</span>' +
-      '<button class="csetList" onclick="UserInterface._listChangesetsForPush(\''+ push.toprev +'\')">List changeset URLs</button>' +
+      '<button class="csetList" onclick="UserInterface._listChangesetsForPush(\''+ push.toprev +'\')">List changeset URLs</button>';
+    var buildAPILink = this._buildAPIURL(push.toprev);
+    if (buildAPILink) {
+      nodeHtml += '<a class="buildAPI" target="_blank" href="'+ buildAPILink +'">Self-serve Build API</a>';
+    }
+    nodeHtml += 
       '</h2>\n' +
       '<ul class="results"></ul>\n' +
       '<ul class="patches"></ul>\n' +
@@ -949,6 +954,15 @@ var UserInterface = {
     var html = "<!DOCTYPE html><title>Changeset URLs for push " + toprev +
                "</title><pre>" + urls.join('\n') + "</pre>";
     window.open("data:text/html," + escape(html), "", "width=600,height=300,scrollbars=yes");
+  },
+
+  _buildAPIURL: function(toprev) {
+    var base = Config.selfServeAPIBaseURL;
+    var treeInfo = Config.treeInfo[this._treeName];
+    if (!base || !base.length || !('buildbotBranch' in treeInfo)) {
+      return null;
+    }
+    return base + "/" + treeInfo.buildbotBranch + "/rev/" + toprev;
   },
 
   clickMachineResult: function UserInterface_clickMachineResult(e, result) {

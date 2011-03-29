@@ -315,25 +315,26 @@ span.pusher:hover {
 .machineResult.retry[active=true]      { background-color: #00C; }
 .machineResult.unknown[active=true]    { background-color: #111; }
 
-button.csetList {
+button.csetList, #pushes a.buildAPI {
   float: right;
   margin-top: 2px;
+  margin-left: 1.5em;
   border: 0;
   padding: 0;
   background: none;
   cursor: pointer;
-  font-family: inherit;
-  font-size: 1em;
+  font: inherit;
+  font-weight: normal;
   color: #BBB;
   -moz-transition: color 200ms ease-in-out;
   -webkit-transition: color 200ms ease-in-out;
   -o-transition: color 200ms ease-in-out;
   transition: color 200ms ease-in-out;
 }
-button.csetList:hover {
+button.csetList:hover, #pushes a.buildAPI:hover {
   text-decoration: underline;
 }
-button.csetList:active:hover {
+button.csetList:active:hover, #pushes a.buildAPI:active:hover {
   color: #888;
   -moz-transition: none;
   -webkit-transition: none;
@@ -343,7 +344,8 @@ button.csetList:active:hover {
 button.csetList::-moz-focus-inner {
   border: 0;
 }
-#pushes > li:not(:hover) button.csetList {
+#pushes > li:not(:hover) button.csetList,
+#pushes > li:not(:hover) a.buildAPI {
   color: transparent;
 }
 
