@@ -250,24 +250,31 @@ var UserInterface = {
   },
 
   _buildTreeInfo: function UserInterface__buildTreeInfo() {
-    $.ajax({
-      url: "http://tinderbox.mozilla.org/" + this._treeName + "/status.html",
-      dataType: "text",
-      success: function (data) {
-        var div = $("<div>").html(data);
-        $("#preamble", div).remove();
-        $("#status-container", div).contents().appendTo("#tree-status");
-        if (!Config.useGoogleCalendar) {
-          ["#sheriff", "#releng"].forEach(function (role) {
-            var info = $(role, div).contents();
-            if (!info.text())
-              $("<div>Unknown</div>").replaceAll(role);
-            else
-              info.replaceAll(role);
-          });
+    function refreshTreeStatus(aSelf) {
+      $.ajax({
+        url: "http://tinderbox.mozilla.org/" + aSelf._treeName + "/status.html",
+        dataType: "text",
+        success: function (data) {
+          var div = $("<div>").html(data);
+          $("#preamble", div).remove();
+          $("#tree-status").empty();
+          $("#status-container", div).contents().appendTo("#tree-status");
+          if (!Config.useGoogleCalendar) {
+            ["#sheriff", "#releng"].forEach(function (role) {
+              var info = $(role, div).contents();
+              if (!info.text())
+                $("<div>Unknown</div>").replaceAll(role);
+              else
+                info.replaceAll(role);
+            });
+          }
         }
-      }
-    });
+      });
+    }
+
+    // Initialize the tree status then update it every 5 minutes.
+    refreshTreeStatus(this);
+    setInterval(refreshTreeStatus, 1000 * 60 * 5, this);
 
     var treeInfo = $('#treeInfo');
     var primaryRepo = Config.treeInfo[this._treeName].primaryRepo;
