@@ -396,7 +396,7 @@ Data.prototype = {
   },
 
   machineGroup: function Data_machineGroup(machineType) {
-    if (!"hasGroups" in this._config.treeInfo[this._treeName])
+    if (!("hasGroups" in this._config.treeInfo[this._treeName]))
       return machineType;
     for (var groupname in this._config.groupedMachineTypes) {
       if (this._config.groupedMachineTypes[groupname].indexOf(machineType) != -1)
