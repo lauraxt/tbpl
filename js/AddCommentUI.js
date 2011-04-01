@@ -36,6 +36,19 @@ var AddCommentUI = {
     });
     $("#logNoteEmail").get(0).value = self._getEmail();
     $("#addNotePopup").draggable({ containment: 'window', handle: 'form, h2, table, tbody, tr, th, td, label, p' });
+
+    $("#addNotePopup").droppable({
+        greedy: true,
+        drop: function(ev, ui) {
+            var id = ui.draggable.attr('resultID');
+            ui.draggable.attr('active', true);
+            if (id) {
+                self.addToBuilds[id] = true;
+                self.updateUI();
+            }
+        }
+    });
+
     $("#addNoteForm").bind("submit", function addNoteFormSubmit() {
       self.submit();
       $("#addNotePopup").fadeOut('fast', function afterAddNotePopupFadeOutAfterSubmit() {

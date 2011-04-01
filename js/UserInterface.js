@@ -746,6 +746,8 @@ var UserInterface = {
       }).join('\n')
     );
     document.title = document.title.replace(/\[\d*\]/, "[" + unstarred + "]");
+
+      $(".machineResult").draggable({ helper: 'clone' });
   },
 
   _useLocalTime: function UserInterface__useLocalTime() {
