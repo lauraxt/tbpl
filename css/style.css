@@ -690,6 +690,10 @@ em.testfail {
   -webkit-border-radius: 4px;
   border-radius: 4px;
 }
+#addNotePopup #logNoteRuns {
+  font-style: italic;
+  color: #ddd;
+}
 #addNotePopup #logNoteSuggestions a {
   color: #aaf;
   white-space: nowrap;

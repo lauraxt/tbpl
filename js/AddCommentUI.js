@@ -233,7 +233,9 @@ var AddCommentUI = {
     for (var i in this.addToBuilds) {
       html += UserInterface._machineResultLink(Controller.getData().getMachineResult(i))
     }
-    $("#logNoteRuns").html(html ? html : "(none selected)");
+    html = html ? html + "&nbsp;(drag additional builds here)"
+                : "(none selected - drag builds here)";
+    $("#logNoteRuns").html(html);
     UserInterface._markActiveResultLinks(); // XXX fix this
   },
 
