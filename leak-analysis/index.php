@@ -76,14 +76,14 @@ function analyze($tree, $id) {
     }
     if (count($leaks)) {
       foreach ($leaks as $testName => $num) {
-        $result .= "<h1 style=\"color: red;\">$testName leaked $num DOMWINDOW(s)</h1>";
+        $result .= "<div style=\"color: red;\">$testName leaked $num DOMWINDOW(s)</div>";
         // Heuristic for bug 538462
         if (preg_match("/test_unknownContentType_dialog_layout\.xul$/", $testName)) {
           $result .= "<p>(This is <a href=\"https://bugzilla.mozilla.org/show_bug.cgi?id=538462\">bug 538462</a>.)</p>";
         }
       }
     } else {
-      $result = "<h1 style=\"color: green;\">No DOMWINDOWs leaked!</h1>";
+      $result = "<div style=\"color: green;\">No DOMWINDOWs leaked!</div>";
     }
   }
   file_put_contents($file, $result);
