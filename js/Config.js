@@ -82,6 +82,12 @@ var Config = {
       hasGroups: true,
       buildbotBranch: "mozilla-central",
     },
+    "Mobile2.0": {
+      primaryRepo: "releases/mozilla-2.1",
+      otherRepo: "releases/mobile-2.0",
+      hasGroups: true,
+      buildbotBranch: "mozilla-2.1",
+    },
     "MozillaTry": {
       primaryRepo: "try",
       hasGroups: true,
