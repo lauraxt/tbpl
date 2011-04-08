@@ -389,6 +389,8 @@ var UserInterface = {
     for (var i = 0; i < pushes.length; ++i) {
       this.handleUpdatedPush(pushes[i]);
     }
+
+    this._updateTreeStatus();
   },
 
   _updatePusherFilter: function UserInterface__updatePusherFilter(pusher) {
@@ -414,6 +416,8 @@ var UserInterface = {
     for (var i = 0; i < pushes.length; ++i) {
       this.handleUpdatedPush(pushes[i]);
     }
+
+    this._updateTreeStatus();
   },
 
   _initFilters: function UserInterface__initFilters() {
@@ -447,7 +451,6 @@ var UserInterface = {
     machineField.onchange = function() {
       self._updateMachineFilter(machineField.value);
       self._updateLocation();
-      self._updateTreeStatus();
     }
   },
 
@@ -460,13 +463,18 @@ var UserInterface = {
     machines.forEach(function addMachineToTreeStatus1(machine) {
       var result = machine.latestFinishedRun;
 
-      if (machineFilter && machine.name.match(machineFilter) == null)
-        return;
-
       // Ignore machines without run information.
       if (!result) {
         return;
       }
+
+      // Ignore filtered jobs.
+      if (machineFilter && machine.name.match(machineFilter) == null)
+        return;
+      if (self._onlyUnstarred && result.note) {
+        return;
+      }
+
 
       switch (result.state)
       {
