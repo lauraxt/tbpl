@@ -405,6 +405,8 @@ var UserInterface = {
         $(this).show();
       }
     });
+
+    this._updateTreeStatus();
   },
 
   _updateMachineFilter: function UserInterface__updateMachineFilter(machine) {
@@ -454,27 +456,87 @@ var UserInterface = {
     }
   },
 
+  _getCurrentResults: function UserInterface__getCurrentResults() {
+    // If there is no pusher filter, the current results are the last results
+    // for each machines.
+    if (!this._pusher) {
+      var results = [];
+      var machines = this._data.getMachines();
+      machines.forEach(function getLastResultFromMachines(machine) {
+        if (machine.latestFinishedRun) {
+          results.push(machine.latestFinishedRun);
+        }
+      });
+
+      return results;
+    }
+
+    // Whene there is a pusher filter set, we get the current result by
+    // traversing all pushes, keep the non-filtered one and get the results
+    // from the newest to the oldest.
+    // We set the results in a dictionary that takes the machine name. Thus, we
+    // are sure we do not add twice a result for the same job.
+    var results = {};
+    var pushes = Controller.valuesFromObject(this._data.getPushes());
+    var oses = Controller.keysFromObject(Config.OSNames);
+    var types = ['debug', 'opt'];
+    var groups = Controller.keysFromObject(Config.testNames);
+
+    for (var i = pushes.length-1; i >= 0; --i) {
+      if (pushes[i].pusher != this._pusher) {
+        continue;
+      }
+      if (!pushes[i].results) {
+        continue;
+      }
+
+      for (var x = 0; x < oses.length; ++x) {
+        var os = oses[x];
+        if (!pushes[i].results[os]) {
+          continue;
+        }
+        for (var y = 0; y < types.length; ++y) {
+          var type = types[y];
+          if (!pushes[i].results[os][type]) {
+            continue;
+          }
+          for (var z = 0; z < groups.length; ++z) {
+            var group = groups[z];
+            if (!pushes[i].results[os][type][group]) {
+              continue;
+            }
+            for (var j = 0; j < pushes[i].results[os][type][group].length; ++j) {
+              var result = pushes[i].results[os][type][group][j];
+              var key = result.machine.name;
+
+              if ((result.state == "pending" || result.state == "retry" ||
+                   result.state == "unknown") ||
+                  (results[key] && result.startTime < results[key].startTime)) {
+                continue;
+              }
+              results[key] = result;
+            }
+          }
+        }
+      }
+    }
+
+    return Controller.valuesFromObject(results);
+  },
+
   _getFailingJobs: function UserInterface__getFailingJobs() {
-    var machines = this._data.getMachines();
+    var results = this._getCurrentResults();
     var machineFilter = this._machine ? new RegExp(this._machine, "i") : null;
     var failing = [];
     var self = this;
 
-    machines.forEach(function addMachineToTreeStatus1(machine) {
-      var result = machine.latestFinishedRun;
-
-      // Ignore machines without run information.
-      if (!result) {
-        return;
-      }
-
+    results.forEach(function addResultsToTreeStatus1(result) {
       // Ignore filtered jobs.
-      if (machineFilter && machine.name.match(machineFilter) == null)
+      if (machineFilter && result.machine.name.match(machineFilter) == null)
         return;
       if (self._onlyUnstarred && result.note) {
         return;
       }
-
 
       switch (result.state)
       {
