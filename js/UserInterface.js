@@ -812,7 +812,7 @@ var UserInterface = {
     if (machine.name.match(/unit chrome/))
       return "c";
 
-    if (machine.name.match(/unit browser\-chrome/))
+    if (machine.name.match(/browser\-chrome/))
       return "b-c";
 
     return "";

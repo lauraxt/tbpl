@@ -472,7 +472,7 @@ Data.prototype = {
         /spidermonkey-shark/i.test(name) ? "SpiderMonkey Shark" :
         /shark/i.test(name) ? "Shark Nightly" :
         /mochitest/i.test(name) ? "Mochitest" :
-        /unit (browser-)?chrome/i.test(name) ? "Mochitest" :
+        /unit chrome|browser-chrome/i.test(name) ? "Mochitest" :
         /crashtest-ipc/.test(name) ? "Crashtest-IPC" :
         /crashtest/i.test(name) ? "Crashtest" :
         /jsreftest/i.test(name) ? "JSReftest" :
