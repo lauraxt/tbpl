@@ -34,12 +34,12 @@ var Config = {
       orangeFactor: true,
       buildbotBranch: "mozilla-central",
     },
-    "Firefox Beta": {
+    "Mozilla-Beta": {
       primaryRepo: "mozilla-beta",
       hasGroups: true,
       buildbotBranch: "mozilla-beta",
     },
-    "Aurora": {
+    "Mozilla-Aurora": {
       primaryRepo: "mozilla-aurora",
       hasGroups: true,
       buildbotBranch: "mozilla-aurora",
