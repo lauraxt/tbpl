@@ -140,6 +140,16 @@ var Config = {
       hasGroups: true,
       buildbotBranch: "larch",
     },
+    "Accessibility": {
+      primaryRepo: "projects/accessibility",
+      hasGroups: true,
+      buildbotBranch: "accessibility",
+    },
+    "Private-Browsing": {
+      primaryRepo: "projects/private-browsing",
+      hasGroups: true,
+      buildbotBranch: "private-browsing",
+    },
   },
   groupedMachineTypes: {
     "Mochitest" : ["Mochitest"],
