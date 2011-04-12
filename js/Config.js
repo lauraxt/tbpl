@@ -156,7 +156,8 @@ var Config = {
     "Reftest" : ["Crashtest", "Crashtest-IPC",
       "Reftest", "Reftest-IPC", "JSReftest"],
     "SpiderMonkey" : ["SpiderMonkey DTrace", "SpiderMonkey --disable-methodjit",
-      "SpiderMonkey --disable-tracejit", "SpiderMonkey Shark"],
+      "SpiderMonkey --disable-tracejit", "SpiderMonkey Shark",
+      "SpiderMonkey --enable-sm-fail-on-warnings"],
   },
   OSNames: {
     "linux": "Linux",
@@ -179,6 +180,7 @@ var Config = {
     "SpiderMonkey --disable-methodjit" : "¬m",
     "SpiderMonkey --disable-tracejit" : "¬t",
     "SpiderMonkey Shark" : "s",
+    "SpiderMonkey --enable-sm-fail-on-warnings" : "e",
     "Nightly" : "N",
     "Shark Nightly" : "Ns",
     "Mobile Desktop Nightly" : "Nm",

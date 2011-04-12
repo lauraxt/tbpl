@@ -470,6 +470,7 @@ Data.prototype = {
         /spidermonkey-nomethodjit/i.test(name) ? "SpiderMonkey --disable-methodjit" :
         /spidermonkey-notracejit/i.test(name) ? "SpiderMonkey --disable-tracejit" :
         /spidermonkey-shark/i.test(name) ? "SpiderMonkey Shark" :
+        /spidermonkey-warnaserr/i.test(name) ? "SpiderMonkey --enable-sm-fail-on-warnings" :
         /shark/i.test(name) ? "Shark Nightly" :
         /mochitest/i.test(name) ? "Mochitest" :
         /unit chrome|browser-chrome/i.test(name) ? "Mochitest" :
