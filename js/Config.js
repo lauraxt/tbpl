@@ -34,6 +34,16 @@ var Config = {
       orangeFactor: true,
       buildbotBranch: "mozilla-central",
     },
+    "Firefox Beta": {
+      primaryRepo: "mozilla-beta",
+      hasGroups: true,
+      buildbotBranch: "mozilla-beta",
+    },
+    "Aurora": {
+      primaryRepo: "mozilla-aurora",
+      hasGroups: true,
+      buildbotBranch: "mozilla-aurora",
+    },
     "Firefox4.0": {
       primaryRepo: "releases/mozilla-2.0",
       hasGroups: true,
@@ -108,6 +118,21 @@ var Config = {
       primaryRepo: "projects/maple",
       hasGroups: true,
       buildbotBranch: "maple",
+    },
+    "Alder": {
+      primaryRepo: "projects/alder",
+      hasGroups: true,
+      buildbotBranch: "alder",
+    },
+    "Holly": {
+      primaryRepo: "projects/holly",
+      hasGroups: true,
+      buildbotBranch: "holly",
+    },
+    "Larch": {
+      primaryRepo: "projects/larch",
+      hasGroups: true,
+      buildbotBranch: "larch",
     },
   },
   groupedMachineTypes: {
