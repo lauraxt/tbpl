@@ -315,9 +315,9 @@ span.pusher:hover {
 .machineResult.retry[active=true]      { background-color: #00C; }
 .machineResult.unknown[active=true]    { background-color: #111; }
 
-button.csetList, #pushes a.buildAPI {
+#pushes a.csetList, #pushes a.buildAPI {
   float: right;
-  margin-top: 2px;
+  margin-top: 0;
   margin-left: 1.5em;
   border: 0;
   padding: 0;
@@ -331,22 +331,24 @@ button.csetList, #pushes a.buildAPI {
   -o-transition: color 200ms ease-in-out;
   transition: color 200ms ease-in-out;
 }
-button.csetList:hover, #pushes a.buildAPI:hover {
+a.csetList:hover, #pushes a.buildAPI:hover {
   text-decoration: underline;
 }
-button.csetList:active:hover, #pushes a.buildAPI:active:hover {
+a.csetList:active:hover, #pushes a.buildAPI:active:hover {
   color: #888;
   -moz-transition: none;
   -webkit-transition: none;
   -o-transition: none;
   transition: none;
 }
-button.csetList::-moz-focus-inner {
-  border: 0;
-}
-#pushes > li:not(:hover) button.csetList,
+#pushes > li:not(:hover) a.csetList,
 #pushes > li:not(:hover) a.buildAPI {
   color: transparent;
+}
+.talosCompare input {
+  margin-top: 0;
+  margin-bottom: 0;
+  vertical-align: middle;
 }
 
 /* helps the color-blind */

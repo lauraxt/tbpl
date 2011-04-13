@@ -992,7 +992,7 @@ var UserInterface = {
       '" href="' + this._controller.getURLForSinglePushView(push.toprev) + '">' +
       self._getDisplayDate(push.date) + '</a>' +
       ' <span class="talosCompare">(<label>compare: <input class="revsToCompare" type="checkbox" value="' + push.toprev + '"></label>)</span>' +
-      '<button class="csetList" onclick="UserInterface._listChangesetsForPush(\''+ push.toprev +'\')">List changeset URLs</button>';
+      '<a class="csetList" onclick="UserInterface._listChangesetsForPush(\''+ push.toprev +'\'); return false" href="#">List changeset URLs</a>';
     var buildAPILink = this._buildAPIURL(push.toprev);
     if (buildAPILink) {
       nodeHtml += '<a class="buildAPI" target="_blank" href="'+ buildAPILink +'">Self-serve Build API</a>';
