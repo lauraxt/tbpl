@@ -635,6 +635,14 @@ var UserInterface = {
         AddCommentUI.clearAutoStarBugs();
         event.preventDefault();
       }
+
+      // Show the starring UI when pressing 'c'.
+      if (event.which == 99) {
+        if (self._activeResult) {
+          AddCommentUI.logLinkClick();
+          event.preventDefault();
+        }
+      }
     });
   },
 
