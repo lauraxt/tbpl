@@ -817,6 +817,11 @@ var UserInterface = {
     if (match)
       return match[1];
 
+    // Mobile split reftests and jsreftests
+    match = /reftest\-([1-9])/.exec(machine.name);
+    if (match)
+      return match[1];
+
     if (machine.name.match(/unit chrome/))
       return "c";
 
