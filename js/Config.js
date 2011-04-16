@@ -185,6 +185,7 @@ var Config = {
     "Shark Nightly" : "Ns",
     "Mobile Desktop Nightly" : "Nm",
     "Maemo Qt Nightly" : "Nq",
+    "RPM Nightly" : "Nr",
     "Mochitest" : "M",
     "Crashtest-IPC" : "Cipc",
     "Crashtest" : "C",
