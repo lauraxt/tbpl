@@ -22,7 +22,8 @@ var UserInterface = {
     this._data = controller.getData();
     this._setupStorage();
 
-    document.title = "[0] " + controller.treeName + " - Tinderboxpushlog";
+    document.title = "[0] " + this._getPrettyTreeName(controller.treeName) +
+                     " - Tinderboxpushlog";
 
     this._refreshMostRecentlyUsedTrees();
     this._buildTreeSwitcher();
@@ -105,6 +106,11 @@ var UserInterface = {
         $("#pushes").removeClass("initialload");
       },
     };
+  },
+
+  _getPrettyTreeName: function UserInterface_getPrettyTreeName(treeName) {
+    return ("prettierName" in Config.treeInfo[treeName])
+             ? Config.treeInfo[treeName].prettierName : treeName;
   },
 
   handleUpdatedPush: function UserInterface_handleUpdatedPush(push) {
@@ -225,9 +231,10 @@ var UserInterface = {
     var self = this;
     Controller.keysFromObject(Config.treeInfo).forEach(function (tree, i) {
       var isMostRecentlyUsedTree = (self._storage.mostRecentlyUsedTrees.indexOf(tree) != -1);
+      var treeName = self._getPrettyTreeName(tree);
       var treeLink = self._treeName == tree ?
-        "<strong>" + tree + "</strong>" :
-        "<a href='?tree=" + tree + "'>" + tree + "</a>";
+        "<strong>" + treeName + "</strong>" :
+        "<a href='?treeName=" + treeName + "'>" + treeName + "</a>";
       $("<li>" + treeLink + "</li>").appendTo(isMostRecentlyUsedTree ? mruList : moreList);
     });
   },
