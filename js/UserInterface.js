@@ -32,7 +32,7 @@ var UserInterface = {
     this._machine = jobName || "";
     this._data = controller.getData();
 
-    document.title = "[0] " + controller.treeName + " - Tinderboxpushlog";
+    document.title = "[0] " + this._getPrettyTreeName(controller.treeName) + " - Tinderboxpushlog";
 
     this._refreshMostRecentlyUsedTrees();
     this._buildTreeSwitcher();
@@ -178,6 +178,11 @@ var UserInterface = {
     };
   },
 
+  _getPrettyTreeName: function UserInterface_getPrettyTreeName(treeName) {
+    return ("prettierName" in Config.treeInfo[treeName])
+             ? Config.treeInfo[treeName].prettierName : treeName;
+  },
+
   handleUpdatedPush: function UserInterface_handleUpdatedPush(push) {
     $("#nopushes").remove();
     var existingPushNode = $("#push-" + push.id);
@@ -303,9 +308,10 @@ var UserInterface = {
     var self = this;
     Object.keys(Config.treeInfo).forEach(function (tree, i) {
       var isMostRecentlyUsedTree = (self._mostRecentlyUsedTrees().indexOf(tree) != -1);
+      var treeName = self._getPrettyTreeName(tree);
       var treeLink = self._treeName == tree ?
-        "<strong>" + tree + "</strong>" :
-        "<a href='?tree=" + tree + "'>" + tree + "</a>";
+        "<strong>" + treeName + "</strong>" :
+        "<a href='?tree=" + tree + "'>" + treeName + "</a>";
       $("<li>" + treeLink + "</li>").appendTo(isMostRecentlyUsedTree ? mruList : moreList);
     });
   },
