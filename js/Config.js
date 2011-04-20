@@ -88,7 +88,7 @@ var Config = {
       hasGroups: true,
       buildbotBranch: "mozilla-2.1",
     },
-    "MozillaTry": {
+    "Try": {
       primaryRepo: "try",
       hasGroups: true,
       buildbotBranch: "try",
