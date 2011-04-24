@@ -1204,7 +1204,7 @@ var UserInterface = {
           if (repo == 'try' || repo == 'try-comm-central') {
             var dir = (repo == 'try') ? "firefox" : "thunderbird";
             return '<a href="https://ftp.mozilla.org/pub/mozilla.org/' +
-                   dir + '/tryserver-builds/' + result.push.pusher + '-' +
+                   dir + '/try-builds/' + result.push.pusher + '-' +
                    result.revs[repo] + '/">go to build directory</a>';
           }
         }
