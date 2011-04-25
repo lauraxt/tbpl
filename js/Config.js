@@ -66,7 +66,6 @@ var Config = {
       primaryRepo: "projects/jaegermonkey",
       hasGroups: true,
       buildbotBranch: "jaegermonkey",
-      prettierName: "JägerMonkey",
     },
     "Electrolysis": {
       primaryRepo: "projects/electrolysis",
