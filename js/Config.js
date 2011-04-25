@@ -151,12 +151,6 @@ var Config = {
       hasGroups: true,
       buildbotBranch: "private-browsing",
     },
-    "Jetpack": {
-      primaryRepo: "projects/addon-sdk",
-      hasGroups: true,
-      buildbotBranch: "addon-sdk",
-      prettierName: "Addon-SDK",
-    },
   },
   groupedMachineTypes: {
     "Mochitest" : ["Mochitest"],
