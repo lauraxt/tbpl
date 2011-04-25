@@ -154,7 +154,7 @@ var Config = {
   groupedMachineTypes: {
     "Mochitest" : ["Mochitest"],
     "Reftest" : ["Crashtest", "Crashtest-IPC",
-      "Reftest", "Reftest-IPC", "JSReftest"],
+      "Reftest", "Reftest Unaccelerated", "Reftest-IPC", "JSReftest"],
     "SpiderMonkey" : ["SpiderMonkey DTrace", "SpiderMonkey --disable-methodjit",
       "SpiderMonkey --disable-tracejit", "SpiderMonkey Shark",
       "SpiderMonkey --enable-sm-fail-on-warnings"],
@@ -189,6 +189,7 @@ var Config = {
     "Mochitest" : "M",
     "Crashtest-IPC" : "Cipc",
     "Crashtest" : "C",
+    "Reftest Unaccelerated" : "Ru",
     "Reftest-IPC" : "Ripc",
     "Reftest" : "R",
     "JSReftest" : "J",
