@@ -322,14 +322,15 @@ Data.prototype = {
     var key = pendingOrRunning + "-" + run.id;
     var revs = {};
     revs[Config.treeInfo[this._treeName].primaryRepo] = rev;
-    return {
+    return new MachineResult({
+      tree: this._treeName,
       runID: key,
       machine: machine,
       startTime: new Date(run[{pending: "submitted_at", running: "start_time"}[pendingOrRunning]] * 1000),
       revs: revs,
       push: this._pushes[rev],
       state: pendingOrRunning,
-    };
+    });
   },
 
   _addResultToPush: function Data__addResultToPush(result) {
@@ -407,6 +408,27 @@ Data.prototype = {
 
   getMachineResult: function Data_getMachineResult(id) {
     return this._finishedResultsWithPush[id];
+  },
+
+  getUnfinishedMachineResult: function Data_getUnfinishedMachineResult(runID) {
+    var self = this;
+
+    function getMachineResult(status) {
+      var jobs = self["_" + status + "Jobs"];
+      for (var repo in jobs) {
+        for (var rev in jobs[repo]) {
+          for (var i = 0; i < jobs[repo][rev].length; i++) {
+            var job = jobs[repo][rev][i];
+            if (job.id == runID) {
+              return self._machineResultFromPendingOrRunningRun(status, job, rev);
+            }
+          }
+        }
+      }
+    }
+
+    return getMachineResult("pending") ||
+           getMachineResult("running");
   },
 
   getPushForRev: function Data_getPushForRev(toprev) {
@@ -495,8 +517,16 @@ Data.prototype = {
       if (!os || !type)
         return;
 
-      this._machines[name] = {name: name, os: os, type: type, debug: debug,
-        latestFinishedRun: null, runs: 0, runtime: 0, averageCycleTime: 0};
+      this._machines[name] = new Machine({
+        name: name,
+        os: os,
+        type: type,
+        debug: debug,
+        latestFinishedRun: null,
+        runs: 0,
+        runtime: 0,
+        averageCycleTime: 0
+      });
     }
     return this._machines[name];
   },
@@ -540,4 +570,51 @@ Data.prototype = {
   getPushes: function Data_getPushes() {
     return this._pushes;
   },
+};
+
+function Machine(data) {
+  for (var k in data) {
+    this[k] = data[k];
+  }
 }
+
+Machine.prototype = {
+  getShortDescription: function Machine_getShortDescription() {
+    var number = this.machineNumber();
+    return this.type + (number ? " " + number : "") + (this.debug ? " debug" : " opt");
+  },
+
+  getShortDescriptionWithOS: function Machine_getShortDescriptionWithOS() {
+    return Config.OSNames[this.os] + " " + this.getShortDescription();
+  },
+
+  machineNumber: function Machine_machineNumber() {
+    var match = /([0-9]+)\/[0-9]/.exec(this.name);
+    if (match)
+      return match[1];
+
+    if (this.name.match(/mochitest\-other/))
+      return "oth";
+
+    // The Mobile tree uses both mochitest1 and mochitest-1 as machine names.
+    match = /mochitest\-?([1-9])/.exec(this.name);
+    if (match && /qt/i.test(this.name))
+      match[1] += "q";
+
+    if (match)
+      return match[1];
+
+    // Mobile split reftests and jsreftests
+    match = /reftest\-([1-9])/.exec(this.name);
+    if (match)
+      return match[1];
+
+    if (this.name.match(/unit chrome/))
+      return "c";
+
+    if (this.name.match(/unit browser\-chrome/))
+      return "b-c";
+
+    return "";
+  },
+};

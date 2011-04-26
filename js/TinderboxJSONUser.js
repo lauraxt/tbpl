@@ -162,10 +162,19 @@ function MachineResult(data) {
   for (var i in data) {
     this[i] = data[i];
   }
+  this._finished = ['building', 'running', 'pending'].indexOf(this.state) == -1;
 }
 
 MachineResult.prototype = {
+  isFinished: function MachineResult_isFinished() {
+    return this._finished;
+  },
+
   getTestResults: function MachineResult_getTestResults() {
+    if (!this._finished) {
+      return [];
+    }
+
     var self = this;
     var machine = this.machine;
     var scrape = this._scrape;
@@ -174,16 +183,16 @@ MachineResult.prototype = {
     return (function callRightScrapeParser(fun) {
       return (fun[machine.type] ? fun[machine.type] : fun.generic).call(self, scrape);
     })({
-      "Unit Test": self.getUnitTestResults,
-      "Mochitest": self.getUnitTestResults,
-      "Everythingelse Test": self.getUnitTestResults,
-      "Talos Performance": self.getTalosResults,
-      "Build": self.getScrapeResults,
-      "generic": self.getScrapeResults
+      "Unit Test": self._getUnitTestResults,
+      "Mochitest": self._getUnitTestResults,
+      "Everythingelse Test": self._getUnitTestResults,
+      "Talos Performance": self._getTalosResults,
+      "Build": self._getScrapeResults,
+      "generic": self._getScrapeResults
     });
   },
   
-  getScrapeResults: function MachineResult_getScrapeResults(scrape) {
+  _getScrapeResults: function MachineResult__getScrapeResults(scrape) {
     return $(scrape).map(function parseGenericTestScrapeLine() {
       if (this.match(/rev\:/) || this.match(/s\:/) || this.match(/try\-/))
         return null;
@@ -192,7 +201,7 @@ MachineResult.prototype = {
     }).filter(function filterNull() { return this; }).get();
   },
   
-  getUnitTestResults: function MachineResult_getUnitTestResults(scrape) {
+  _getUnitTestResults: function MachineResult__getUnitTestResults(scrape) {
     return $(scrape).map(function parseUnitTestScrapeLine() {
       var match = this.match(/(.*)<br\/>(.*)/);
       return match && {
@@ -202,7 +211,7 @@ MachineResult.prototype = {
     }).filter(function filterNull() { return this; }).get();
   },
   
-  getTalosResults: function MachineResult_getTalosResults(scrape) {
+  _getTalosResults: function MachineResult__getTalosResults(scrape) {
     var seriesURLs = {};
     var foundSomething = false;
     var cell = document.createElement("td");
@@ -236,5 +245,43 @@ MachineResult.prototype = {
         "resultURL": resultURL
       };
     }).filter(function filterNull() { return this; }).get());
+  },
+
+  getBuildIDForSimilarBuild: function MachineResult_getBuildIDForSimilarBuild(callback, failCallback, timeoutCallback) {
+    if (!this._finished) {
+      return this.runID;
+    }
+
+    // We don't know the build ID number for a finished build, but from
+    // the information exposed by the Build API we can find out the
+    // build ID for a "similar" build, one that was of the same type and
+    // on the same revision.
+    var self = this;
+    if (this._similarBuildID) {
+      callback(this._similarBuildID);
+      return;
+    }
+
+    var tree = Config.treeInfo[this.tree].buildbotBranch;
+    var rev = this.revs[Config.treeInfo[this.tree].primaryRepo];
+    BuildAPI.getBuildsForRevision(
+      tree, rev,
+      function getBuildID_BuildsLoaded(builds) {
+        try {
+          builds = builds.filter(function(b) { return b.buildername == self.machine.name });
+          if (!builds.length) {
+            throw "could not find build";
+          }
+          self._similarBuildID = builds[0].build_id;
+          callback(self._similarBuildID);
+        } catch (e) {
+          failCallback(e);
+        }
+      },
+      failCallback, timeoutCallback);
+  },
+
+  getBuildbotBranch: function MachineResult_getBuildbotBranch() {
+    return Config.treeInfo[this.tree].buildbotBranch;
   },
 };

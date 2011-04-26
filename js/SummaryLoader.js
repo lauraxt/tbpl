@@ -20,7 +20,7 @@ var SummaryLoader = {
   },
 
   setupSummaryLoader: function SummaryLoader_setupSummaryLoader(result, box) {
-    if (result.state == "building" || result.state == "success")
+    if (["building", "success", "pending", "running"].indexOf(result.state) != -1)
       return;
   
     var summaryLoader = $("#summaryLoader").get(0);

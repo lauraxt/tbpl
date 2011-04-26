@@ -18,8 +18,32 @@ var Controller = {
     return values;
   },
 
-  stripTags: function Controller_stripTags(text) {
-    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  keyValuePairsFromObject: function Controller_keyValuePairsFromObject(obj) {
+    var pairs = [];
+    for (var key in obj) {
+      pairs.push([key, obj[key]]);
+    }
+    return pairs;
+  },
+
+  copyObject: function Controller_copyObject(obj) {
+    var res = { };
+    for (var key in obj) {
+      res[key] = obj[key];
+    }
+    return res;
+  },
+
+  escapeContent: function Controller_escapeContent(text) {
+    return text.replace(/&/g, "&amp;")
+               .replace(/</g, "&lt;");
+  },
+
+  escapeAttribute: function Controller_escapeAttribute(text) {
+    return this.escapeContent(text)
+               .replace(/>/g, "&gt;")
+               .replace(/"/g, "&quot;")
+               .replace(/'/g, "&apos;");
   },
 
   treeName: Config.defaultTreeName,

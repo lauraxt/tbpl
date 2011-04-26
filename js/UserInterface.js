@@ -11,6 +11,9 @@ var UserInterface = {
   _onlyUnstarred: false,
   _pusher: "",
   _machine: "",
+  _statusMessageIDs: { },
+  _lastMessageID: 0,
+  _nextBuildRequest: 0,
 
   init: function UserInterface_init(controller, onlyUnstarred, pusher, jobName) {
     var self = this;
@@ -154,34 +157,56 @@ var UserInterface = {
   },
 
   updateStatus: function UserInterface_updateStatus(status) {
+    var self = this;
     if (status) {
       this._updateTreeStatus();
     }
-    var statusSpan = $("#loading");
-    statusSpan.removeClass("loading");
-    statusSpan.removeClass("fail");
-    var text = "";
-    if (status) {
-      if (status.loadpercent < 1) {
-        text += "Loading " + Math.ceil(status.loadpercent * 100) + "% …";
-        statusSpan.addClass("loading");
-      } else if (status.failed) {
-        text += "Loading failed: " + status.failed.join(", ");
-        statusSpan.addClass("fail");
+
+    function showStatusMessage(statusType, messageText, messageType) {
+      if (!self._statusMessageIDs[statusType]) {
+        var mid = self.showMessage(messageText, messageType);
+        if (messageType) {
+          self._statusMessageIDs[statusType] = mid;
+        }
+      } else {
+        self.updateMessage(self._statusMessageIDs[statusType], messageText, messageType);
+        if (!messageType) {
+          self._statusMessageIDs[statusType] = 0;
+        }
       }
     }
+
+    var text = "", type = "";
+    if (status) {
+      if (status.loadpercent < 1) {
+        text = "Loading " + Math.ceil(status.loadpercent * 100) + "% …";
+        type = "loading";
+      } else if (status.failed) {
+        text = "Loading failed: " + status.failed.join(", ");
+        type = "error";
+      }
+    }
+    showStatusMessage("loading", text, type);
+
     var numComments = AddCommentUI.numSendingComments;
     if (numComments) {
-      text += " Sending " + numComments + " " + (numComments == 1 ? "comment" : "comments") + "…";
-      statusSpan.addClass("loading");
+      text = "Sending " + numComments + " " + (numComments == 1 ? "comment" : "comments") + "…";
+      type = "loading";
+    } else {
+      text = "";
+      type = "";
     }
+    showStatusMessage("sendingComments", text, type);
+
     var numBugs = AddCommentUI.numSendingBugs;
     if (numBugs) {
-      text += " Marking " + numBugs + " " + (numBugs == 1 ? "bug" : "bugs") + "…";
-      statusSpan.addClass("loading");
+      text = "Marking " + numBugs + " " + (numBugs == 1 ? "bug" : "bugs") + "…";
+      type = "loading";
+    } else {
+      text = "";
+      type = "";
     }
-    statusSpan.css("visibility", text ? "visible" : "hidden");
-    statusSpan.html(text);
+    showStatusMessage("sendingBugs", text, type);
   },
 
   _setupStorage: function UserInterface__setupStorage() {
@@ -773,8 +798,7 @@ var UserInterface = {
   },
 
   _resultTitle: function UserInterface__resultTitle(result) {
-    var number = this._numberForMachine(result.machine);
-    var type = result.machine.type + (number ? " " + number : "") + (result.machine.debug ? " debug" : " opt");
+    var type = result.machine.getShortDescription();
     return {
       "pending": type + ' is pending',
       "running": type + ' is still running',
@@ -801,54 +825,21 @@ var UserInterface = {
       + 'mins';
   },
 
-  _numberForMachine: function UserInterface__numberForMachine(machine) {
-    var match = /([0-9]+)\/[0-9]/.exec(machine.name);
-    if (match)
-      return match[1];
-
-    if (machine.name.match(/mochitest\-other/))
-      return "oth";
-
-    // The Mobile tree uses both mochitest1 and mochitest-1 as machine names.
-    match = /mochitest\-?([1-9])/.exec(machine.name);
-    if (match && /qt/i.test(machine.name))
-      match[1] += "q";
-
-    if (match)
-      return match[1];
-
-    // Mobile split reftests and jsreftests
-    match = /reftest\-([1-9])/.exec(machine.name);
-    if (match)
-      return match[1];
-
-    if (machine.name.match(/unit chrome/))
-      return "c";
-
-    if (machine.name.match(/browser\-chrome/))
-      return "b-c";
-
-    return "";
-  },
-
   _machineResultLink: function UserInterface__machineResultLink(machineResult, onlyNumber) {
     var machine = machineResult.machine;
-    /*
-     * pending or running builds should not link to a log and should not open
-     * the details panel because the runID will change once the run is finished
-     * and because the details show no more info than the tooltip
-     */
-    return '<a' + (['running', 'pending'].indexOf(machineResult.state) == -1 ?
-      ' href="' + machineResult.briefLogURL + '"' +
+    var linkText = machine.type == "Mochitest" && onlyNumber ?
+      machine.machineNumber() :
+      Config.testNames[machine.type] + machine.machineNumber();
+    if (machineResult.note)
+      linkText += '*';
+    return '<a' +
+      (machineResult.isFinished() ? ' href="' + machineResult.briefLogURL + '"' : '') +
       ' resultID="' + machineResult.runID + '"' +
       (machineResult.runID == this._activeResult ? ' active="true"' : '') +
-      ' onclick="UserInterface.clickMachineResult(event, this)"' : "") +
-    ' class="machineResult ' + machineResult.state +
-    '" title="' + this._resultTitle(machineResult) +
-    '">' + (machine.type == "Mochitest" && onlyNumber ? this._numberForMachine(machine) :
-      Config.testNames[machine.type] + this._numberForMachine(machine)) +
-    (machineResult.note ? '*' : '') +
-    '</a>';
+      ' onclick="UserInterface.clickMachineResult(event, this)"' +
+      ' class="machineResult ' + machineResult.state + '"' +
+      ' title="' + this._resultTitle(machineResult) + '"' +
+      '>' + linkText + '</a>';
   },
 
   _addSuggestionLink: function UserInterface__addSuggestionLink(machineResults, target) {
@@ -931,8 +922,8 @@ var UserInterface = {
           Controller.keysFromObject(Config.groupedMachineTypes).indexOf(machineType) != -1) {
         displayedResults.sort(function machineResultSortOrderComparison(a, b) {
           // machine.type does not mess up the numeric/alphabetic sort
-          var numA = a.machine.type + self._numberForMachine(a.machine);
-          var numB = b.machine.type + self._numberForMachine(b.machine);
+          var numA = a.machine.type + a.machine.machineNumber();
+          var numB = b.machine.type + b.machine.machineNumber();
           if (numA == numB)
             return resultOrder(a, b);
 
@@ -1053,6 +1044,79 @@ var UserInterface = {
     this._resultLinkClick(result);
   },
 
+  _permanentMessagesShowing: function UserInterface__loadingMessagesShowing() {
+    return document.querySelectorAll("#messages .loading, #messages .error").length > 0;
+  },
+
+  hideMessages: function UserInterface_hideMessages(onlyIfNoneLoading) {
+    if (onlyIfNoneLoading && this._permanentMessagesShowing()) {
+      return;
+    }
+
+    if (this._messageTimer) {
+      clearTimeout(this._messageTimer);
+    }
+
+    $("#messages").hide().empty();
+  },
+
+  _resetMessageTimer: function UserInterface__resetMessageTimer() {
+    if (this._messageTimer) {
+      clearTimeout(this._messageTimer);
+      this._messageTimer = 0;
+    }
+    if (this._permanentMessagesShowing()) {
+      return;
+    }
+
+    var self = this;
+    this._messageTimer = setTimeout(function() {
+      self._messageTimer = 0;
+      self.hideMessages();
+    }, 8000);
+  },
+
+  _showMessage: function UserInterface__showMessage(div, message, type) {
+    var messages = document.getElementById("messages");
+
+    if (message == '') {
+      if (div.parentNode) {
+        messages.removeChild(div);
+        if (!messages.firstChild) {
+          this.hideMessages();
+        }
+      }
+      return;
+    }
+
+    messages.style.display = 'inline-block';
+    div.className = type || '';
+    div.innerHTML = (type == 'error' ? '<a class="messageDismiss" href="#" onclick="UserInterface.updateMessage(\'' + div.id + '\', \'\'); return false"></a>'
+                                     : '') +
+                    Controller.escapeContent(message);
+    if (!div.parentNode) {
+      messages.appendChild(div);
+    }
+  },
+
+  showMessage: function UserInterface_showMessage(message, type) {
+    if (message == '') {
+      return;
+    }
+
+    var mid = "message" + ++this._lastMessageID;
+    var div = document.createElement("div");
+    div.setAttribute("id", mid);
+    this._showMessage(div, message, type);
+    this._resetMessageTimer();
+    return mid;
+  },
+
+  updateMessage: function UserInterface_updateMessage(mid, message, type) {
+    this._showMessage(document.getElementById(mid), message, type);
+    this._resetMessageTimer();
+  },
+
   /**
    * Finds pushes with checked boxes in the UI, gets the first revision number
    * from each, and opens mconnors talos compare script in a new window.
@@ -1168,9 +1232,72 @@ var UserInterface = {
       this._getDisplayTime(result.endTime) + ', ') + this._timeString(result);
   },
 
+  _makeStatusCallback: function UserInterface__makeStatusCallback(mid, s, type, fn) {
+    var self = this;
+    return function statusCallback(e) {
+      if (e && String(e).match(/^\[object ProgressEvent/)) {
+        e = 'network error';
+      }
+      self.updateMessage(mid, s + (e ? ' (' + e + ')': ''), type);
+      if (fn) fn();
+    }
+  },
+
+  _rebuildButtonClick: function UserInterface__rebuildButtonClick(rebuildButton, runID) {
+    var result = this._data.getMachineResult(runID);
+    var desc = result.machine.getShortDescriptionWithOS();
+
+    var mid = this.showMessage('Requesting rebuild of ' + desc + '…', 'loading');
+    var onSuccess = this._makeStatusCallback(mid, 'Rebuild of ' + desc + ' requested.');
+    var onTimeout = this._makeStatusCallback(mid, 'Rebuild request for ' + desc + ' timed out.', 'error');
+    var onFailure = this._makeStatusCallback(mid, 'Rebuild request for ' + desc + ' failed.', 'error');
+
+    // Leave at least 3 seconds between rebuild requests.
+    var now = Date.now();
+    var delay = Math.max(this._nextBuildRequest - now, 0);
+    this._nextBuildRequest = now + delay + 3000;
+    setTimeout(function() {
+      result.getBuildIDForSimilarBuild(
+        function rebuildButtonClick_GotBuildID(buildID) {
+          try {
+            BuildAPI.rebuild(result.getBuildbotBranch(), buildID, onSuccess, onFailure, onTimeout);
+          } catch (e) {
+            onFailure(e);
+          }
+        },
+        onFailure, onTimeout);
+    }, delay);
+  },
+
+  _cancelButtonClick: function UserInterface__cancelButtonClick(cancelButton, requestOrBuildID) {
+    function showCancelButton() {
+      cancelButton.style.display = 'inline';
+    }
+
+    var result = this._data.getUnfinishedMachineResult(requestOrBuildID);
+    var desc = result.machine.getShortDescriptionWithOS();
+
+    var mid = this.showMessage('Requesting cancellation of ' + desc + '…', 'loading');
+    var onSuccess = this._makeStatusCallback(mid, 'Cancellation of ' + desc + ' requested.');
+    var onTimeout = this._makeStatusCallback(mid, 'Cancellation request for ' + desc + ' timed out.', 'error', showCancelButton);
+    var onFailure = this._makeStatusCallback(mid, 'Cancellation request for ' + desc + ' failed.', 'error', showCancelButton);
+
+    cancelButton.style.display = 'none';
+
+    var method = result.state == 'pending' ? 'cancelRequest' : 'cancelBuild';
+    BuildAPI[method](result.getBuildbotBranch(), requestOrBuildID, onSuccess, onFailure, onTimeout);
+  },
+
   _displayResult: function UserInterface__displayResult() {
     var self = this;
-    var result = this._data.getMachineResult(this._activeResult);
+    var result;
+    if (this._activeResult) {
+      result = this._data.getMachineResult(this._activeResult);
+      if (!result) {
+        var run = this._activeResult.replace(/^pending-|running-/, '');
+        result = this._data.getUnfinishedMachineResult(run);
+      }
+    }
     var box = $("#details");
     var body = $("body");
     if (!result) {
@@ -1187,8 +1314,18 @@ var UserInterface = {
       box.addClass("hasStar");
     box.html((function htmlForResultInBottomBar() {
       var revs = result.revs;
+      function makeButton(image, type, arg) {
+        return '<img src="images/' + image + '"' +
+               ' title="' + type + '"' +
+               ' onclick="UserInterface._' + type.toLowerCase() + 'ButtonClick(this, \'' + arg + '\')">';
+      }
       return '<div><h3>' + result.machine.name +
       ' [<span class="state ' + result.state + '">' + result.state + '</span>]</h3>\n' +
+      '<div class="buildButtons">' +
+      (result.state == 'pending' || result.state == 'running' ?
+        makeButton('tango-process-stop.png', 'Cancel', result.runID.replace(/^(pending|running)-/, '')) :
+        makeButton('tango-list-add.png', 'Rebuild', result.runID)) +
+      '</div>' +
       '<span>using revision' + (Controller.keysFromObject(revs).length != 1 ? 's' : '') + ': ' + (function(){
         var ret = [];
         for(var repo in revs) {
@@ -1210,37 +1347,55 @@ var UserInterface = {
         }
         return '';
       })() +
-      '<a href="' + result.briefLogURL + '">view brief log</a>' +
-      '<a href="' + result.fullLogURL + '">view full log</a>' +
-      '<div id="autoStar"></div>' +
-      '<a class="addNote" href="http://tinderbox.mozilla.org/addnote.cgi?log=' + self._treeName + '/' + result.runID + '">add a comment</a>' +
-      '<span class="duration">' + self._durationDisplay(result) + '</span></div>' +
+      (function htmlForLogs() {
+        if (result.state == 'running' || result.state == 'pending') {
+          return '';
+        }
+        return '<a href="' + result.briefLogURL + '">view brief log</a>' +
+               '<a href="' + result.fullLogURL + '">view full log</a>';
+      })() +
+      (function htmlForAddComment() {
+        if (result.state == 'running' || result.state == 'pending') {
+          return '';
+        }
+        return '<div id="autoStar"></div>' +
+               '<a class="addNote" href="http://tinderbox.mozilla.org/addnote.cgi?log=' + self._treeName + '/' + result.runID + '">add a comment</a>';
+      })() +
+      (function htmlForDuration() {
+        if (result.state == 'pending')
+          return '';
+        return '<span class="duration">' + self._durationDisplay(result) + '</span>';
+      })() +
+      '</div>' +
       (function htmlForTestResults() {
         var testResults = result.getTestResults();
-        if (!testResults.length)
-          return '';
-        return '<ul id="results">\n' +
-        testResults.map(function htmlForTestResultEntry(r) {
-          return '<li>' + r.name +
-            (r.result ? ': ' + (r.resultURL ? '<a href="' + r.resultURL.replace(/"/g, "&quot;") +
-                                              '">' + r.result + '</a>'
-                                            : r.result)
+        return '<div id="results">' +
+          (testResults.length ? 
+            '<ul>\n' +
+            testResults.map(function htmlForTestResultEntry(r) {
+              return '<li>' + r.name +
+                (r.result ? ': ' + (r.resultURL ? '<a href="' + Controller.escapeAttribute(r.resultURL) +
+                                                  '">' + Controller.escapeContent(r.result) + '</a>'
+                                                : r.result)
                       : '') +
-            (r.detailsURL ? ' (<a href="' + r.detailsURL.replace(/"/g, "&quot;") +
-                            '">details</a>)'
-                          : '') +
-            '</li>';
-        }).join("") +
-        '</ul>';
+                (r.detailsURL ? ' (<a href="' + Controller.escapeAttribute(r.detailsURL) +
+                                '">details</a>)'
+                              : '') +
+                '</li>';
+            }).join("") +
+            '</ul>' : '') +
+          '</div>';
       })() +
-      (function htmlForPopup() {
-        return '<div class="stars">' +
-        (function htmlForNoteInPopup() {
-          if (!result.note)
-            return '';
-          return '<div class="note">' +
-          self._linkBugs(result.note, true) + '</div>';
-        })() + '<div class="summary"><span id="summaryLoader"></span></div></div>';
+       (function htmlForPopup() {
+         return '<div class="stars">' +
+          (function htmlForNoteInPopup() {
+            if (!result.note)
+              return '';
+            return '<div class="note">' +
+            self._linkBugs(result.note, true) + '</div>';
+          })() +
+          (result.state == 'running' || result.state == 'pending' ? '' : '<div class="summary"><span id="summaryLoader"></span></div>') +
+          '</div>';
       })();
     })());
     AddCommentUI.updateUI();

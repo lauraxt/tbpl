@@ -25,11 +25,6 @@ p {
   top: 0;
   left: 0;
 }
-#loadingWrapper {
-  width: 300px;
-  margin: auto;
-  text-align: center;
-}
 #status {
   padding: 4px;
   position: absolute;
@@ -280,6 +275,9 @@ span.pusher:hover {
   float: left;
   outline: none !important;
 }
+a.machineResult {
+  cursor: pointer;
+}
 .machineResult:hover {
   text-decoration: none;
 }
@@ -312,6 +310,8 @@ span.pusher:hover {
 .machineResult.testfailed[active=true] { background-color: #F70; }
 .machineResult.busted[active=true]     { background-color: #D00; }
 .machineResult.exception[active=true]  { background-color: #818; }
+.machineResult.running[active=true]    { background-color: #999; }
+.machineResult.pending[active=true]    { background-color: #DDD; }
 .machineResult.retry[active=true]      { background-color: #00C; }
 .machineResult.unknown[active=true]    { background-color: #111; }
 
@@ -420,7 +420,7 @@ body.details > #details
   position: absolute;
   top: 0px;
   height: 120px;
-  width: 450px;
+  width: 500px;
 }
 
 #details > div > h3 {
@@ -507,11 +507,11 @@ body.details > #details
 
 #results {
   margin: 0;
-  padding: 5px 0 0 30px;
+  padding: 5px 0 0 10px;
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 450px;
+  left: 500px;
   right: 0;
   overflow: hidden;
   overflow-x: auto;
@@ -522,6 +522,11 @@ body.details > #details
   -moz-column-width: 280px;
   -webkit-column-width: 280px;
   column-width: 280px;
+}
+
+#results > ul {
+  margin: 0;
+  padding-left: 15px;
 }
 
 em.testfail {
@@ -755,4 +760,54 @@ em.testfail {
   background-color: #ffffff;
   border: 1px solid black;
   font-size: 0.6em;
+}
+
+#messagesPanel {
+  position: absolute;
+  top: 0;
+  left: 48px;
+  right: 48px;
+  text-align: center;
+  pointer-events: none;
+} 
+
+#messages {
+  border: 1px solid #ddd;
+  border-top: none;
+  background: rgba(255, 255, 192, 0.8);
+  padding: 4px;
+  display: none;
+  margin: 0 auto;
+  cursor: default;
+  pointer-events: all;
+}
+
+.buildButtons {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.buildButtons > img {
+  cursor: pointer;
+}
+
+#messages .error {
+  color: red;
+}
+
+#messages .messageDismiss {
+  width: 16px;
+  height: 16px;
+  background: url(../images/closebutton-dark.svg) top left no-repeat;
+  cursor: pointer;
+  display: inline-block;
+  margin-right: 4px;
+  vertical-align: bottom;
+  opacity: 0.8;
+}
+
+#messages .messageDismiss:hover {
+  opacity: 1;
 }
