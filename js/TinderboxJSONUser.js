@@ -224,7 +224,7 @@ MachineResult.prototype = {
     });
   
     if (!foundSomething)
-      return this.getScrapeResults(scrape);
+      return this._getScrapeResults(scrape);
 
     var failLines = $(scrape).map(function parseFailedTalosRunScrapeLine() {
       return this.match(/FAIL\:(.*)/) && { name: this };
