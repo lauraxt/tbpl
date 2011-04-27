@@ -612,7 +612,7 @@ Machine.prototype = {
     if (this.name.match(/unit chrome/))
       return "c";
 
-    if (this.name.match(/unit browser\-chrome/))
+    if (this.name.match(/browser\-chrome/))
       return "b-c";
 
     return "";
