@@ -101,14 +101,17 @@ var Config = {
     "Devtools": {
       primaryRepo: "projects/devtools",
       hasGroups: true,
+      buildbotBranch: "devtools",
     },
     "Graphics": {
       primaryRepo: "projects/graphics",
       hasGroups: true,
+      buildbotBranch: "graphics",
     },
     "Services-Central": {
       primaryRepo: "services/services-central",
       hasGroups: true,
+      buildbotBranch: "services-central",
     },
     "Birch": {
       primaryRepo: "projects/birch",
