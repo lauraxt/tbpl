@@ -11,17 +11,27 @@ if (!preg_match('/^[a-zA-Z0-9\.-]+$/', $_GET["tree"]))
 if (!preg_match('/^\d+\.\d+\.\d+\.gz$/', $_GET["id"]))
   die("invalid id");
 
-if (!isset($_GET["starred"]) || $_GET["starred"] != "true")
-  $_GET["starred"] = false;
-else
-  $_GET["starred"] = true;
+if (isset($_GET["reftest"]) && $_GET["reftest"] == "true") {
+  $type = "reftest";
+} elseif (isset($_GET["starred"]) && $_GET["starred"] == "true") {
+  $type = "starred";
+} else {
+  $type = "notstarred";
+}
 
 header("Content-Type: text/plain,charset=utf-8");
 header("Access-Control-Allow-Origin: *");
-echo getSummary($_GET["tree"], $_GET["id"], $_GET["starred"]);
 
-function getSummary($tree, $id, $starred) {
-  $file = "../summaries/" . $tree . "_" . $id . "_" . ($starred ? "" : "not") . "starred";
+echo getSummary($_GET["tree"], $_GET["id"], $type);
+
+function getSummary($tree, $id, $type) {
+  if ($type != "starred" && $type != "notstarred" && $type != "reftest")
+    die("invalid type passed to getSummary");
+
+  $reftest = $type == "reftest";
+  $starred = $type == "starred";
+
+  $file = "../summaries/" . $tree . "_" . $id . "_" . $type;
   if (file_exists($file))
     return file_get_contents($file);
 
@@ -38,6 +48,7 @@ function getSummary($tree, $id, $starred) {
   stream_set_timeout($fp, 20);
   stream_set_blocking($fp, 0);
   $foundSummaryStart = false;
+  $foundLogStart = false;
   $fileExistedAfterAll = false;
   $isStillRunning = false;
   global $signature;
@@ -49,7 +60,7 @@ function getSummary($tree, $id, $starred) {
     }
     $line = fgets($fp, 1024);
     if ($line != "") {
-      if (!$foundSummaryStart) {
+      if (!$foundSummaryStart && !$foundLogStart) {
         if (preg_match("/Build Error Summary.*Build Error Log.*No More Errors/i", $line)) {
           $isStillRunning = true;
           break;
@@ -58,25 +69,43 @@ function getSummary($tree, $id, $starred) {
           // Summary is empty.
           break;
         }
-        if (preg_match_all("/Build Error Summary.*<PRE>(.*)$/i", $line, $m)) {
-          $foundSummaryStart = true;
-          $line = $m[1][0] . "\n";
+      }
+      if ($reftest) {
+        if (!$foundLogStart) {
+          if (preg_match("/Build Error Log.*<PRE>(.*)$/i", $line, $m)) {
+            $line = $m[0] . "\n";
+            $foundLogStart = true;
+          } else {
+            continue;
+          }
+        }
+        if (preg_match("/(REFTEST (?:TEST-UNEXPECTED| *IMAGE|number of).*)/", $line, $m)) {
+          $line = $m[0] . "\n";
+          $line = strip_tags($line);
+          $lines[] = $line;
+        }
+      } else {
+        if (!$foundSummaryStart) {
+          if (preg_match_all("/Build Error Summary.*<PRE>(.*)$/i", $line, $m)) {
+            $foundSummaryStart = true;
+            $line = $m[1][0] . "\n";
+            $line = strip_tags($line);
+            $lines[] = $line;
+            if (!$starred)
+              processLine($lines, $line);
+          }
+          if (strlen($signature) == 0 &&
+              preg_match("#<b>(.*\d{4}/\d{2}/\d{2}&nbsp;\d{2}:\d{2}:\d{2})</b>#i", $line, $matches)) {
+            $signature = $matches[1];
+          }
+        } else {
+          if (preg_match("/Build Error Log/i", $line)) 
+            break;
           $line = strip_tags($line);
           $lines[] = $line;
           if (!$starred)
             processLine($lines, $line);
         }
-        if (strlen($signature) == 0 &&
-            preg_match("#<b>(.*\d{4}/\d{2}/\d{2}&nbsp;\d{2}:\d{2}:\d{2})</b>#i", $line, $matches)) {
-          $signature = $matches[1];
-        }
-      } else {
-        if (preg_match("/Build Error Log/i", $line))
-          break;
-        $line = strip_tags($line);
-        $lines[] = $line;
-        if (!$starred)
-          processLine($lines, $line);
       }
     } else {
       usleep(80 * 1000);

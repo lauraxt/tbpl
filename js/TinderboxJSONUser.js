@@ -139,6 +139,7 @@ var TinderboxJSONUser = {
         "briefLogURL": "http://tinderbox.mozilla.org/showlog.cgi?log=" + tree + '/' + machineRunID,
         "fullLogURL": "http://tinderbox.mozilla.org/showlog.cgi?log=" + tree + '/' + machineRunID + '&fulltext=1',
         "summaryURL": Config.baseURL + "php/getSummary.php?tree=" + tree + "&id=" + machineRunID,
+        "reftestLogURL": Config.baseURL + "php/getSummary.php?tree=" + tree + "&id=" + machineRunID + '&reftest=true',
         "revs": revs,
         "note": note,
         "errorParser": build.errorparser,

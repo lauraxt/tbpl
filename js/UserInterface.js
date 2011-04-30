@@ -1354,6 +1354,28 @@ var UserInterface = {
         return '<a href="' + result.briefLogURL + '">view brief log</a>' +
                '<a href="' + result.fullLogURL + '">view full log</a>';
       })() +
+      (function htmlForReftests() {
+        if (result.state == 'running' || result.state == 'pending' ||
+            result.machine.type != 'Reftest') {
+          return '';
+        }
+        var baseURL = Config.baseURL || document.baseURI.replace(/\/[^\/]+$/, '/');
+        var html =
+          '<!DOCTYPE html>' +
+          '<title>Loading reftest analyzer for ' + result.tree + ' ' + result.machine.name + '</title>' +
+          '<link rel="stylesheet" href="' + baseURL + 'css/style.css">' +
+          '<body><p class="loading">Retrieving reftest log...</p>' +
+          '<script src="' + baseURL + 'js/jquery.js"></script>' +
+          '<script src="' + baseURL + 'js/NetUtils.js"></script>' +
+          '<script>\n' +
+          'function encode(s) { return escape(s).replace(/=/g, "%3d") }\n' +
+          'NetUtils.loadText(' + self._makeJSString(baseURL + result.reftestLogURL) + ',\n' +
+          '                   function(log) { window.location.replace("http://hg.mozilla.org/mozilla-central/raw-file/tip/layout/tools/reftest/reftest-analyzer.xhtml#log=" + encode(encode(log))) },\n' +
+          '                   function() { $("p").removeClass("loading").text("Fetching reftest log failed.") },\n' +
+          '                   function() { $("p").removeClass("loading").text("Fetching reftest log timed out.") });\n' +
+          '</script>';
+        return '<a href="data:text/html,' + escape(html) + '">open reftest analyzer</a>';
+      })() +
       (function htmlForAddComment() {
         if (result.state == 'running' || result.state == 'pending') {
           return '';
@@ -1400,6 +1422,10 @@ var UserInterface = {
     })());
     AddCommentUI.updateUI();
     SummaryLoader.setupSummaryLoader(result, box.get(0));
+  },
+
+  _makeJSString: function UserInterface_makeJSString(s) {
+    return '"' + s.replace(/[\\\/'"]/g, '\\$&') + '"';
   },
 
 };
