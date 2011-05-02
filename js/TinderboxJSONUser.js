@@ -250,7 +250,8 @@ MachineResult.prototype = {
 
   getBuildIDForSimilarBuild: function MachineResult_getBuildIDForSimilarBuild(callback, failCallback, timeoutCallback) {
     if (!this._finished) {
-      return this.runID;
+      callback(this.runID.replace(/^(pending|running)-/, ''));
+      return;
     }
 
     // We don't know the build ID number for a finished build, but from

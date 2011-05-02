@@ -1244,7 +1244,8 @@ var UserInterface = {
   },
 
   _rebuildButtonClick: function UserInterface__rebuildButtonClick(rebuildButton, runID) {
-    var result = this._data.getMachineResult(runID);
+    var result = this._data.getMachineResult(runID) ||
+                 this._data.getUnfinishedMachineResult(runID);
     var desc = result.machine.getShortDescriptionWithOS();
 
     var mid = this.showMessage('Requesting rebuild of ' + desc + '…', 'loading');
@@ -1322,9 +1323,10 @@ var UserInterface = {
       return '<div><h3>' + result.machine.name +
       ' [<span class="state ' + result.state + '">' + result.state + '</span>]</h3>\n' +
       '<div class="buildButtons">' +
+      makeButton('tango-list-add.png', 'Rebuild', result.runID.replace(/^(pending|running)-/, '')) +
       (result.state == 'pending' || result.state == 'running' ?
         makeButton('tango-process-stop.png', 'Cancel', result.runID.replace(/^(pending|running)-/, '')) :
-        makeButton('tango-list-add.png', 'Rebuild', result.runID)) +
+        '') +
       '</div>' +
       '<span>using revision' + (Controller.keysFromObject(revs).length != 1 ? 's' : '') + ': ' + (function(){
         var ret = [];
