@@ -153,6 +153,11 @@ var Config = {
       hasGroups: true,
       buildbotBranch: "private-browsing",
     },
+    "UX": {
+      primaryRepo: "projects/ux",
+      hasGroups: true,
+      buildbotBranch: "ux",
+    },
   },
   groupedMachineTypes: {
     "Mochitest" : ["Mochitest"],
