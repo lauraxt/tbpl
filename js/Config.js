@@ -35,12 +35,12 @@ var Config = {
       buildbotBranch: "mozilla-central",
     },
     "Mozilla-Beta": {
-      primaryRepo: "mozilla-beta",
+      primaryRepo: "releases/mozilla-beta",
       hasGroups: true,
       buildbotBranch: "mozilla-beta",
     },
     "Mozilla-Aurora": {
-      primaryRepo: "mozilla-aurora",
+      primaryRepo: "releases/mozilla-aurora",
       hasGroups: true,
       buildbotBranch: "mozilla-aurora",
     },
