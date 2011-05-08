@@ -58,7 +58,7 @@ function getSummary($tree, $id, $type) {
       $fileExistedAfterAll = true;
       break;
     }
-    $line = fgets($fp, 1024);
+    $line = fgets($fp);
     if ($line != "") {
       if (!$foundSummaryStart && !$foundLogStart) {
         if (preg_match("/Build Error Summary.*Build Error Log.*No More Errors/i", $line)) {
