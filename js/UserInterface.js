@@ -669,6 +669,14 @@ var UserInterface = {
           event.preventDefault();
         }
       }
+
+      // Toggle 'commenting' status on space bar
+      if (event.which == 32) {
+        if (self._activeResult) {
+          self._toggleCommenting(self._activeResult);
+          event.preventDefault();
+        }
+      }
     });
   },
 
@@ -738,7 +746,6 @@ var UserInterface = {
           title = "(starred) " + title;
         }
         return '<a href="' + machineResult.briefLogURL + '"' +
-               ' onclick="UserInterface.clickMachineResult(event, this)"' +
                ' class="' + className + '"' +
                ' title="' + title + '"' +
                (machineResult.runID == self._activeResult ? ' active="true"' : '') +
@@ -748,7 +755,24 @@ var UserInterface = {
     );
     document.title = document.title.replace(/\[\d*\]/, "[" + unstarred + "]");
 
-      $(".machineResult").draggable({ helper: 'clone' });
+    $(".machineResult").draggable({ helper: 'clone' });
+    $(".machineResult").click(function (event) {
+      if (event.ctrlKey || event.metaKey) {
+        var id = $(this).attr('resultID');
+        self._toggleCommenting(id);
+        event.preventDefault();
+      } else {
+        self.clickMachineResult(event, this);
+      }
+    });
+  },
+
+  _toggleCommenting: function UserInterface__toggleCommenting(id) {
+    if (id in AddCommentUI.addToBuilds)
+      delete AddCommentUI.addToBuilds[id];
+    else
+      AddCommentUI.addToBuilds[id] = true;
+    AddCommentUI.updateUI();
   },
 
   _useLocalTime: function UserInterface__useLocalTime() {
@@ -839,7 +863,6 @@ var UserInterface = {
       (machineResult.isFinished() ? ' href="' + machineResult.briefLogURL + '"' : '') +
       ' resultID="' + machineResult.runID + '"' +
       (machineResult.runID == this._activeResult ? ' active="true"' : '') +
-      ' onclick="UserInterface.clickMachineResult(event, this)"' +
       ' class="machineResult ' + machineResult.state +
         (machineResult.runID in AddCommentUI.addToBuilds ? ' commenting' : '') +
       '"' +
