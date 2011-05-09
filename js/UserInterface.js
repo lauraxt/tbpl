@@ -7,6 +7,8 @@ var UserInterface = {
   _treeName: "",
   _data: null,
   _activeResult: "",
+  _selectedBuilds: { },
+  _selectedRevs: { },
   _storage: null,
   _onlyUnstarred: false,
   _pusher: "",
@@ -131,7 +133,17 @@ var UserInterface = {
         pushNode.hide();
       }
     }
+    var self = this;
     $(".revlink").draggable({ helper: 'clone' });
+
+    $(".revlink").unbind('click.selectedRev');
+    $(".revlink").bind('click.selectedRev', function (event) {
+      if (event.ctrlKey || event.metaKey) {
+        self._toggleSelectedRev($(this).attr('data-rev'));
+        return false;
+      }
+      return true;
+    });
   },
 
   _getInsertBeforeAnchor: function UserInterface__getInsertBeforeAnchor(push) {
@@ -721,16 +733,14 @@ var UserInterface = {
 
       // Show the starring UI
       if (action == 'show-comment') {
-        if (self._activeResult) {
-          AddCommentUI.logLinkClick();
-          return false;
-        }
+        AddCommentUI.openCommentBox();
+        return false;
       }
 
-      // Toggle 'commenting' status on space bar
+      // Toggle 'selected' status
       if (action == 'select') {
         if (self._activeResult) {
-          self._toggleCommenting(self._activeResult);
+          self._toggleSelectedBuild(self._activeResult);
           return false;
         }
       }
@@ -815,23 +825,47 @@ var UserInterface = {
     document.title = document.title.replace(/\[\d*\]/, "[" + unstarred + "]");
 
     $(".machineResult").draggable({ helper: 'clone' });
-    $(".machineResult").click(function (event) {
-      if (event.ctrlKey || event.metaKey) {
-        var id = $(this).attr('resultID');
-        self._toggleCommenting(id);
-        event.preventDefault();
-      } else {
-        self.clickMachineResult(event, this);
-      }
+    $(".machineResult").unbind('click.selectedRev');
+    $(".machineResult").bind('click.selectedRev', function (event) {
+      var id = $(this).attr('resultID');
+      if (event.ctrlKey || event.metaKey)
+        self._toggleSelectedBuild(id);
+      else
+        self._resultLinkClick(id);
+      return false;
     });
   },
 
-  _toggleCommenting: function UserInterface__toggleCommenting(id) {
-    if (id in AddCommentUI.addToBuilds)
-      delete AddCommentUI.addToBuilds[id];
-    else
-      AddCommentUI.addToBuilds[id] = true;
+  _toggleSelectedBuild: function UserInterface__toggleSelectedBuild(id) {
+    var selected;
+    if (id in this._selectedBuilds) {
+      delete this._selectedBuilds[id];
+      selected = false;
+    } else {
+      this._selectedBuilds[id] = true;
+      selected = true;
+    }
     AddCommentUI.updateUI();
+    return selected;
+  },
+
+  _toggleSelectedRev: function UserInterface__toggleSelectedRev(rev, force) {
+    var add;
+    if (typeof(force) != "undefined")
+      add = force;
+    else
+      add = !(rev in this._selectedRevs);
+
+    if (add) {
+      this._selectedRevs[rev] = true;
+      AddCommentUI.addRevToComment(rev);
+    } else {
+      delete this._selectedRevs[rev];
+      AddCommentUI.removeRevFromComment(rev);
+    }
+    AddCommentUI.updateUI();
+    this._markSelected();
+    return add;
   },
 
   _useLocalTime: function UserInterface__useLocalTime() {
@@ -923,7 +957,7 @@ var UserInterface = {
       ' resultID="' + machineResult.runID + '"' +
       (machineResult.runID == this._activeResult ? ' active="true"' : '') +
       ' class="machineResult ' + machineResult.state +
-        (machineResult.runID in AddCommentUI.addToBuilds ? ' commenting' : '') +
+        (machineResult.runID in this._selectedBuilds ? ' selected' : '') +
       '"' +
       ' title="' + this._resultTitle(machineResult) + '"' +
       '>' + linkText + '</a>';
@@ -1054,7 +1088,7 @@ var UserInterface = {
     var self = this;
     return push.patches.map(function buildHTMLForPushPatch(patch, patchIndex) {
       return '<li>\n' +
-      '<a class="revlink" href="' + self._changesetURL(patch.rev) + '">' + patch.rev +
+      '<a class="revlink" data-rev="' + patch.rev + '" href="' + self._changesetURL(patch.rev) + '">' + patch.rev +
       '</a>\n<div><span><span class="author">' + patch.author + '</span> &ndash; ' +
       '<span class="desc">' + self._linkBugs(patch.desc.split("\n")[0], false) + '</span>' +
       (function buildHTMLForPatchTags() {
@@ -1135,11 +1169,6 @@ var UserInterface = {
       return null;
     }
     return base + "/" + treeInfo.buildbotBranch + "/rev/" + toprev;
-  },
-
-  clickMachineResult: function UserInterface_clickMachineResult(e, result) {
-    e.preventDefault();
-    this._resultLinkClick(result);
   },
 
   _permanentMessagesShowing: function UserInterface__loadingMessagesShowing() {
@@ -1266,8 +1295,7 @@ var UserInterface = {
       this._setActiveResult("");
   },
 
-  _resultLinkClick: function UserInterface__resultLinkClick(link) {
-    var resultID = link.getAttribute("resultID");
+  _resultLinkClick: function UserInterface__resultLinkClick(resultID) {
     this._setActiveResult(resultID, true);
     AddCommentUI.clearAutoStarBugs();
   },
@@ -1277,10 +1305,14 @@ var UserInterface = {
       $('.machineResult[resultID="' + this._activeResult + '"]').attr("active", "true");
   },
 
-  _markCommentingResultLinks: function UserInterface__markCommentingResultLinks() {
-    $('.machineResult').removeClass('commenting');
-    for (var id in AddCommentUI.addToBuilds) {
-      $('.machineResult[resultID="' + id + '"]').addClass('commenting');
+  _markSelected: function UserInterface__markSelected() {
+    $('.machineResult').removeClass('selected');
+    for (var id in this._selectedBuilds) {
+      $('.machineResult[resultID="' + id + '"]').addClass('selected');
+    }
+    $('.revlink').removeClass('selected');
+    for (var rev in this._selectedRevs) {
+      $('.revlink[data-rev="' + rev + '"]').addClass('selected');
     }
   },
 

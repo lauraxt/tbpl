@@ -335,7 +335,8 @@ a.machineResult {
   background-color: #111;
 }
 
-#pushes .machineResult.commenting {
+#pushes .machineResult.selected,
+#pushes .revlink.selected {
   background-color: #FE5;
 }
 

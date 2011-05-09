@@ -3,7 +3,6 @@
 
 var AddCommentUI = {
 
-  addToBuilds: {},
   addToBugs: {},
   numSendingComments: 0,
   numSendingCommentChangedCallback: function empty() {},
@@ -18,7 +17,7 @@ var AddCommentUI = {
     this._storage = storage;
     var self = this;
     $("a.addNote").live("click", function addNoteLinkClick() {
-      self.logLinkClick();
+      self.openCommentBox();
       return false;
     });
     $("#autoStar").live("click", function autoStarClick() {
@@ -34,27 +33,19 @@ var AddCommentUI = {
     $("#logNoteEmail").bind("change", function logNoteEmailChange() {
       self._setEmail(this.value);
     });
-    $("#logNoteEmail").get(0).value = self._getEmail();
+    $("#logNoteEmail").val(self._getEmail());
     $("#addNotePopup").draggable({ containment: 'window', handle: 'form, h2, table, tbody, tr, th, td, label, p' });
 
     $("#addNotePopup").droppable({
         greedy: true,
         drop: function(ev, ui) {
-            var id = ui.draggable.attr('resultID');
-            if (id) {
-                self.addToBuilds[id] = true;
-                self.updateUI();
-            } else if (ui.draggable.hasClass('revlink')) {
-                var rev = ui.draggable.text();
-                var box = $("#logNoteText");
-                var text = box.val();
-                if (text.indexOf(rev) == -1) {
-                  if (text.match(/[^\n]$/))
-                    box.val(text + "\n" + rev + "\n");
-                  else
-                    box.val(text + rev + "\n");
-                }
-            }
+          var id = ui.draggable.attr('resultID');
+          if (id) {
+            UserInterface._selectedBuilds[id] = true;
+            self.updateUI();
+          } else if (ui.draggable.hasClass('revlink')) {
+            UserInterface._toggleSelectedRev(ui.draggable.attr('data-rev'), true);
+          }
         }
     });
 
@@ -62,9 +53,14 @@ var AddCommentUI = {
       self.submit();
       $("#addNotePopup").fadeOut('fast', function afterAddNotePopupFadeOutAfterSubmit() {
         self.reset();
+        UserInterface._markSelected();
       });
       return false;
     });
+
+    // Defeat the keep-text-on-reload feature, because it results in
+    // comments containing changesets that are no longer selected.
+    $("#logNoteText").val('');
   },
 
   updateUI: function AddCommentUI_updateUI() {
@@ -75,8 +71,9 @@ var AddCommentUI = {
   },
 
   reset: function AddCommentUI_reset() {
-    $("#logNoteText").get(0).value = "";
-    this.addToBuilds = {};
+    $("#logNoteText").val('');
+    UserInterface._selectedBuilds = {};
+    UserInterface._selectedRevs = {};
     this.addToBugs = {};
     this.updateUI();
   },
@@ -84,9 +81,10 @@ var AddCommentUI = {
   submit: function AddCommentUI_submit() {
     var self = this;
     var data = Controller.getData();
-    var email = $("#logNoteEmail").get(0).value;
-    var comment = $("#logNoteText").get(0).value;
-    Controller.keysFromObject(this.addToBuilds).forEach(function(id) {
+    var email = $("#logNoteEmail").val();
+    var comment = $("#logNoteText").val();
+    var builds = Controller.keysFromObject(UserInterface._selectedBuilds);
+    builds.forEach(function(id) {
       var result = data.getMachineResult(id);
       self._postOneComment(email, comment, result, function oneLessCommentPending() {
         self.pendingCommentsChanged(-1, result);
@@ -94,7 +92,7 @@ var AddCommentUI = {
       self.pendingCommentsChanged(1);
     });
     var bugsSubmitData = {};
-    for (var i in this.addToBuilds) {
+    for each (var i in builds) {
       var machineResult = data.getMachineResult(i);
       if (!machineResult.suggestions)
         continue;
@@ -121,26 +119,20 @@ var AddCommentUI = {
     this.clearAutoStarBugs();
   },
 
-  logLinkClick: function AddCommentUI_logLinkClick() {
-    // XXX fix activeResult
-    var div = $("#addNotePopup").fadeIn('fast');
-    if (!this.addToBuilds[UserInterface._activeResult]) {
-      this.addToBuilds[UserInterface._activeResult] = true;
-      var focusTextfield = ($("#logNoteEmail").get(0).value ? $("#logNoteText") : $("#logNoteEmail")).get(0);
-      focusTextfield.focus();
-      focusTextfield.select();
-    } else {
-      delete this.addToBuilds[UserInterface._activeResult];
-    }
+  openCommentBox: function AddCommentUI_openCommentBox() {
+    $("#addNotePopup").fadeIn('fast');
+    if (UserInterface._activeResult)
+      UserInterface._toggleSelectedBuild(UserInterface._activeResult);
+    var focusTextfield = ($("#logNoteEmail").val() ? $("#logNoteText") : $("#logNoteEmail")).get(0);
+    focusTextfield.focus();
+    focusTextfield.select();
     this.updateUI();
   },
 
   commentWithoutUI: function AddCommentUI_commentWithoutUI() {
     if (this._popupIsOpen() || !$("#autoStar").hasClass("active"))
       return;
-    if (!this.addToBuilds[UserInterface._activeResult]) {
-      this.addToBuilds[UserInterface._activeResult] = true;
-    }
+    UserInterface._selectedBuilds[UserInterface._activeResult] = true;
     this.updateUI();
     var submit = $("#addNoteForm input[type=submit]");
     if (!submit.get(0).disabled) {
@@ -207,19 +199,19 @@ var AddCommentUI = {
   },
 
   toggleSuggestion: function AddCommentUI_toggleSuggestion(id, link) {
-    var box = $("#logNoteText").get(0);
-    if (box.value == "") {
+    var box = $("#logNoteText");
+    if (box.val() == "") {
       this.addToBugs[id] = true;
-      box.value = link.textContent;
+      box.val(link.textContent);
       $(link).addClass("added");
     } else {
-      if (box.value.indexOf(link.textContent) >= 0) {
+      if (box.val().indexOf(link.textContent) >= 0) {
         delete this.addToBugs[id];
-        box.value = box.value.replace(new RegExp("(, )?" + link.textContent), "");
+        box.val(box.val().replace(new RegExp("(, )?" + link.textContent), ""));
         $(link).removeClass("added");
       } else {
         this.addToBugs[id] = true;
-        box.value += ", " + link.textContent;
+        box.val(box.val() + ", " + link.textContent);
         $(link).addClass("added");
       }
     }
@@ -239,20 +231,23 @@ var AddCommentUI = {
 
   _updateBuildList: function AddCommentUI__updateBuildList() {
     var html = "";
-    for (var i in this.addToBuilds) {
-      html += UserInterface._machineResultLink(Controller.getData().getMachineResult(i))
+    for (var i in UserInterface._selectedBuilds) {
+      // Ignore jobs that have not finished
+      var result = Controller.getData().getMachineResult(i);
+      if (result)
+        html += UserInterface._machineResultLink(result);
     }
     html = html ? html + "&nbsp;(drag additional builds here)"
                 : "(none selected - drag builds here)";
     $("#logNoteRuns").html(html);
     UserInterface._markActiveResultLinks(); // XXX fix this
-    UserInterface._markCommentingResultLinks();
+    UserInterface._markSelected();
   },
 
   _updateSuggestions: function AddCommentUI__updateSuggestions() {
     $("#logNoteSuggestions").empty();
     var added = false;
-    for (var i in this.addToBuilds) {
+    for (var i in UserInterface._selectedBuilds) {
       added = true;
       UserInterface._addSuggestionLink(Controller.getData().getMachineResult(i),
                                        $("#logNoteSuggestions"));
@@ -266,14 +261,34 @@ var AddCommentUI = {
   _updateLogLinkText: function AddCommentUI__updateLogLinkText() {
     $("a.addNote").text(
       !this._popupIsOpen() ? "add a comment" :
-        (this.addToBuilds[UserInterface._activeResult] ? "don't add the comment to this build" :
+        (UserInterface._selectedBuilds[UserInterface._activeResult] ? "don't add the comment to this build" :
                                           "add the comment to this build, too"));
   },
 
   _buildListIsEmpty: function AddCommentUI__buildListIsEmpty() {
-    for (var i in this.addToBuilds)
+    for (var i in UserInterface._selectedBuilds)
       return false;
     return true;
+  },
+
+  addRevToComment: function AddCommentUI_addRevToComment(rev) {
+    // Add the revision hash to the comment on a line by itself, but only if it
+    // does not appear in the comment already
+    var box = $("#logNoteText");
+    var text = box.val();
+    if (text.indexOf(rev) == -1) {
+      if (text.match(/[^\n]$/))
+        box.val(text + "\n" + rev + "\n");
+      else
+        box.val(text + rev + "\n");
+    }
+  },
+
+  removeRevFromComment: function AddCommentUI_removeRevFromComment(rev) {
+    // Remove whole line containing the given rev, if it exists
+    var box = $("#logNoteText");
+    // Note that /./ never matches a newline in JS
+    box.val(box.val().replace(new RegExp(".*" + rev + ".*\n?", ""), ""));
   },
 
   _popupIsOpen: function AddCommentUI__popupIsOpen() {
