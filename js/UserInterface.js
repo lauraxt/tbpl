@@ -482,6 +482,51 @@ var UserInterface = {
     }
   },
 
+  // Get all jobs' results, optionally filtered by a pusher
+  _getAllResults: function UserInterface__getAllResults() {
+    var results = [];
+    var oses = Controller.keysFromObject(Config.OSNames);
+    var types = ['debug', 'opt'];
+    var groups = Controller.keysFromObject(Config.testNames);
+
+    var pushes = Controller.valuesFromObject(this._data.getPushes());
+    pushes = pushes.filter(function (push) {
+      if (this._pusher && push.pusher != this._pusher)
+        return false;
+      if (!push.results)
+        return false;
+      return true;
+    });
+    
+    for each (var push in pushes) {
+      for each (var os in oses) {
+        if (!push.results[os])
+          continue;
+
+        for each (var type in types) {
+          if (!push.results[os][type])
+            continue;
+
+          for each (var group in groups) {
+            if (!push.results[os][type][group])
+              continue;
+
+            for each (var result in push.results[os][type][group]) {
+              results.push(result);
+            }
+          }
+        }
+      }
+    }
+
+    return results.filter(function (result) {
+      return !(result.state == 'pending' ||
+               result.state == 'retry' ||
+               result.state == 'unknown');
+    });
+  },
+
+  // Get the latest result for each job type, optionally filtered by pusher
   _getCurrentResults: function UserInterface__getCurrentResults() {
     // If there is no pusher filter, the current results are the last results
     // for each machines.
@@ -497,7 +542,7 @@ var UserInterface = {
       return results;
     }
 
-    // Whene there is a pusher filter set, we get the current result by
+    // When there is a pusher filter set, we get the current result by
     // traversing all pushes, keep the non-filtered one and get the results
     // from the newest to the oldest.
     // We set the results in a dictionary that takes the machine name. Thus, we
@@ -550,8 +595,7 @@ var UserInterface = {
     return Controller.valuesFromObject(results);
   },
 
-  _getFailingJobs: function UserInterface__getFailingJobs() {
-    var results = this._getCurrentResults();
+  _getFailingJobs: function UserInterface__getFailingJobs(results) {
     var machineFilter = this._machine ? new RegExp(this._machine, "i") : null;
     var failing = [];
     var self = this;
@@ -622,36 +666,40 @@ var UserInterface = {
 
       // Move between unstarred failing jobs with 'N' and 'P' keys.
       if (event.which == 110 || event.which == 112) {
-        var unstarred = self._getFailingJobs();
-
-        // We actually got the failing jobs, we want the unstarred ones.
-        for (var i = unstarred.length-1; i >= 0; --i) {
-          if (!self._isUnstarredFailure(unstarred[i])) {
-            unstarred.splice(i, 1);
-          }
-        }
+        // We want only the unstarred failures
+        var failures = self._getFailingJobs(self._getAllResults());
+        var unstarred = failures.filter(function (job) {
+          return self._isUnstarredFailure(job);
+        });
 
         if (unstarred.length == 0) {
           return;
         }
 
+        // Sort by display order (note that result.order is only meaningful
+        // with respect to a single push)
+        unstarred.sort(function (a,b) {
+          if (a.push.id != b.push.id)
+            return b.push.id < a.push.id ? -1 : 1;
+
+          var da = a.order || 0;
+          var db = b.order || 0;
+          return da < db ? -1 : (da > db ? 1 : 0);
+        });
+
+        var advance = (event.which == '110') ? 1 : -1;
+
         // Set the default value (if nothing is currently selected).
-        var result = (event.which == '110') ? 0 : unstarred.length - 1;
+        var result = (advance > 0) ? 0 : unstarred.length - 1;
 
         if (self._activeResult) {
           for (var i = 0; i < unstarred.length; ++i) {
             if (unstarred[i].runID == self._activeResult) {
-              if (event.which == '110') {
-                result = ++i;
-              } else {
-                result = --i;
-              }
-
-              if (result >= unstarred.length) {
+              result = i + advance;
+              if (result >= unstarred.length)
                 result = 0;
-              } else if (result < 0) {
+              else if (result < 0)
                 result = unstarred.length - 1;
-              }
               break;
             }
           }
@@ -727,7 +775,7 @@ var UserInterface = {
   },
 
   _updateTreeStatus: function UserInterface__updateTreeStatus() {
-    var failing = this._getFailingJobs();
+    var failing = this._getFailingJobs(this._getCurrentResults());
     var unstarred = 0;
     for (var i = 0; i < failing.length; ++i) {
       if (this._isUnstarredFailure(failing[i])) {
@@ -921,31 +969,26 @@ var UserInterface = {
     return filteredResults;
   },
 
-  _buildHTMLForOS: function UserInterface__buildHTMLForOS(os, debug, results) {
+  _buildHTMLForOS: function UserInterface__buildHTMLForOS(os, debug, results, order) {
     var self = this;
-    var osresults = Controller.keysFromObject(Config.testNames).map(function buildHTMLForPushResultsOnOSForMachineType(machineType) {
-      if (!results[machineType])
-        return '';
 
-      var displayedResults = self._filterDisplayedResults(results[machineType]);
-      if (displayedResults.length == 0)
-        return '';
-
-      // Sort results.
-      function resultOrder(a, b) {
-        // Sort finished before running before pending results,
-        // and then via start time.
-        if (a.state != b.state &&
-            (a.state == "pending" || b.state == "pending" ||
-             a.state == "running" || b.state == "running")) {
-          // When does b go after a? Return -1 in those cases.
-          if ((b.state == "pending") ||
-              (b.state == "running" && a.state != "pending"))
-            return -1;
-          return 1;
-        }
-        return a.startTime.getTime() - b.startTime.getTime();
+    // Sort finished before running before pending results, and then via start
+    // time.
+    function resultOrder(a, b) {
+      if (a.state != b.state &&
+          (a.state == "pending" || b.state == "pending" ||
+           a.state == "running" || b.state == "running")) {
+        // When does b go after a? Return -1 in those cases.
+        if ((b.state == "pending") ||
+            (b.state == "running" && a.state != "pending"))
+          return -1;
+        return 1;
       }
+      return a.startTime.getTime() - b.startTime.getTime();
+    }
+
+    var osresults = Controller.keysFromObject(Config.testNames).map(function buildHTMLForPushResultsOnOSForMachineType(machineType) {
+      var displayedResults = self._filterDisplayedResults(results[machineType] || []);
       if ("hasGroups" in Config.treeInfo[self._treeName] &&
           Controller.keysFromObject(Config.groupedMachineTypes).indexOf(machineType) != -1) {
         displayedResults.sort(function machineResultSortOrderComparison(a, b) {
@@ -957,26 +1000,42 @@ var UserInterface = {
 
           return numA > numB ? 1 : -1;
         });
-        return self._machineGroupResultLink(machineType, displayedResults);
+        return { 'machineType': machineType, 'results': displayedResults };
       }
+
       displayedResults.sort(resultOrder);
-      return displayedResults.map(function linkMachineResults(a) { return self._machineResultLink(a); }).join(" ");
+      return displayedResults;
+    });
+
+    var oshtml = osresults.map(function (osresult) {
+      if ('machineType' in osresult) {
+        for each (var result in osresult.results) {
+          result.order = ++order[0];
+        }
+        return self._machineGroupResultLink(osresult.machineType, osresult.results);
+      } else {
+        return osresult.map(function (result) {
+          result.order = ++order[0];
+          return self._machineResultLink(result);
+        }).join(" ");
+      }
     }).join("");
 
-    if (!osresults)
+    if (!oshtml)
       return '';
 
     return '<li><span class="os ' + os + '">' + Config.OSNames[os] + debug +
-    '</span><span class="osresults">' + osresults + '</span></li>';
+    '</span><span class="osresults">' + oshtml + '</span></li>';
   },
 
   _buildHTMLForPushResults: function UserInterface__buildHTMLForPushResults(push) {
     var self = this;
+    var order = [ 0 ];
     return Controller.keysFromObject(Config.OSNames).map(function buildHTMLForPushResultsOnOS(os) {
       if (!push.results || !push.results[os])
         return '';
-      return (push.results[os].opt   ? self._buildHTMLForOS(os, " opt"  , push.results[os].opt  ) : '') +
-             (push.results[os].debug ? self._buildHTMLForOS(os, " debug", push.results[os].debug) : '');
+      return (push.results[os].opt   ? self._buildHTMLForOS(os, " opt"  , push.results[os].opt  , order) : '') +
+             (push.results[os].debug ? self._buildHTMLForOS(os, " debug", push.results[os].debug, order) : '');
     }).join("\n");
   },
 
