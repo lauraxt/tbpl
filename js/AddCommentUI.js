@@ -41,7 +41,6 @@ var AddCommentUI = {
         greedy: true,
         drop: function(ev, ui) {
             var id = ui.draggable.attr('resultID');
-            ui.draggable.attr('active', true);
             if (id) {
                 self.addToBuilds[id] = true;
                 self.updateUI();
@@ -65,7 +64,7 @@ var AddCommentUI = {
     this._updateSuggestions();
   },
 
-  reset: function AddCommentUI_resut() {
+  reset: function AddCommentUI_reset() {
     $("#logNoteText").get(0).value = "";
     this.addToBuilds = {};
     this.addToBugs = {};
@@ -237,6 +236,7 @@ var AddCommentUI = {
                 : "(none selected - drag builds here)";
     $("#logNoteRuns").html(html);
     UserInterface._markActiveResultLinks(); // XXX fix this
+    UserInterface._markCommentingResultLinks();
   },
 
   _updateSuggestions: function AddCommentUI__updateSuggestions() {

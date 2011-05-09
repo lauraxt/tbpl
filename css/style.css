@@ -294,26 +294,50 @@ a.machineResult {
 .pending    { color: #DDD !important; }
 .retry      { color: #00C !important; }
 .unknown    { color: #000 !important; }
-.machineResult.success:hover    { background-color: #4A0; }
-.machineResult.testfailed:hover { background-color: #F70; }
-.machineResult.busted:hover     { background-color: #E00; }
-.machineResult.exception:hover  { background-color: #818; }
-.machineResult.retry:hover      { background-color: #00D; }
-.machineResult.unknown:hover    { background-color: #111; }
-.machineResult.success:active    { background-color: #5B1; }
-.machineResult.testfailed:active { background-color: #F81; }
-.machineResult.busted:active     { background-color: #F00; }
-.machineResult.exception:active  { background-color: #928; }
-.machineResult.retry:active      { background-color: #00F; }
-.machineResult.unknown:active    { background-color: #222; }
-.machineResult.success[active=true]    { background-color: #4A0; }
-.machineResult.testfailed[active=true] { background-color: #F70; }
-.machineResult.busted[active=true]     { background-color: #D00; }
-.machineResult.exception[active=true]  { background-color: #818; }
-.machineResult.running[active=true]    { background-color: #999; }
-.machineResult.pending[active=true]    { background-color: #DDD; }
-.machineResult.retry[active=true]      { background-color: #00C; }
-.machineResult.unknown[active=true]    { background-color: #111; }
+
+.machineResult.success:hover,
+.machineResult.success[active=true]    {
+  background-color: #4A0;
+}
+
+.machineResult.testfailed:hover,
+.machineResult.testfailed[active=true] {
+  background-color: #F70;
+}
+
+.machineResult.busted:hover,
+.machineResult.busted[active=true]     {
+  background-color: #D00;
+}
+
+.machineResult.exception:hover,
+.machineResult.exception[active=true]  {
+  background-color: #818;
+}
+
+.machineResult.running:hover,
+.machineResult.running[active=true]    {
+  background-color: #999;
+}
+
+.machineResult.pending:hover,
+.machineResult.pending[active=true]    {
+  background-color: #DDD;
+}
+
+.machineResult.retry:hover,
+.machineResult.retry[active=true]      {
+  background-color: #00C;
+}
+
+.machineResult.unknown:hover,
+.machineResult.unknown[active=true]    {
+  background-color: #111;
+}
+
+#pushes .machineResult.commenting {
+  background-color: #FE5;
+}
 
 #pushes a.csetList, #pushes a.buildAPI {
   float: right;

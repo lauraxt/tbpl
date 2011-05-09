@@ -839,7 +839,9 @@ var UserInterface = {
       ' resultID="' + machineResult.runID + '"' +
       (machineResult.runID == this._activeResult ? ' active="true"' : '') +
       ' onclick="UserInterface.clickMachineResult(event, this)"' +
-      ' class="machineResult ' + machineResult.state + '"' +
+      ' class="machineResult ' + machineResult.state +
+        (machineResult.runID in AddCommentUI.addToBuilds ? ' commenting' : '') +
+      '"' +
       ' title="' + this._resultTitle(machineResult) + '"' +
       '>' + linkText + '</a>';
   },
@@ -1179,6 +1181,13 @@ var UserInterface = {
   _markActiveResultLinks: function UserInterface__markActiveResultLinks() {
     if (this._activeResult)
       $('.machineResult[resultID="' + this._activeResult + '"]').attr("active", "true");
+  },
+
+  _markCommentingResultLinks: function UserInterface__markCommentingResultLinks() {
+    $('.machineResult').removeClass('commenting');
+    for (var id in AddCommentUI.addToBuilds) {
+      $('.machineResult[resultID="' + id + '"]').addClass('commenting');
+    }
   },
 
   _setActiveResult: function UserInterface__setActiveResult(resultID, scroll) {
