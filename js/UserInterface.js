@@ -14,6 +14,13 @@ var UserInterface = {
   _statusMessageIDs: { },
   _lastMessageID: 0,
   _nextBuildRequest: 0,
+  _keymap: { 'j': 'prev-unstarred',
+             'p': 'prev-unstarred',
+             'k': 'next-unstarred',
+             'n': 'next-unstarred',
+             'u': 'toggle-unstarred',
+             ' ': 'select',
+             'c': 'show-comment' },
 
   init: function UserInterface_init(controller, onlyUnstarred, pusher, jobName) {
     var self = this;
@@ -657,15 +664,17 @@ var UserInterface = {
         return;
       }
 
-      // Toggle "Only unstarred" filter on 'U' key.
-      if (event.which == 117) {
+      var action = self._keymap[String.fromCharCode(event.which)];
+
+      // Toggle "Only unstarred" filter
+      if (action == 'toggle-unstarred') {
         self._updateUnstarredFilter(!self._onlyUnstarred);
         self._updateLocation();
-        event.preventDefault();
+        return false;
       }
 
-      // Move between unstarred failing jobs with 'N' and 'P' keys.
-      if (event.which == 110 || event.which == 112) {
+      // Move between unstarred failing jobs
+      if (action == 'next-unstarred' || action == 'prev-unstarred') {
         // We want only the unstarred failures
         var failures = self._getFailingJobs(self._getAllResults());
         var unstarred = failures.filter(function (job) {
@@ -687,10 +696,10 @@ var UserInterface = {
           return da < db ? -1 : (da > db ? 1 : 0);
         });
 
-        var advance = (event.which == '110') ? 1 : -1;
+        var advance = (action == 'next-unstarred') ? 1 : -1;
 
         // Set the default value (if nothing is currently selected).
-        var result = (advance > 0) ? 0 : unstarred.length - 1;
+        var result = (action == 'next-unstarred') ? 0 : unstarred.length - 1;
 
         if (self._activeResult) {
           for (var i = 0; i < unstarred.length; ++i) {
@@ -707,24 +716,26 @@ var UserInterface = {
 
         self._setActiveResult(unstarred[result].runID, true);
         AddCommentUI.clearAutoStarBugs();
-        event.preventDefault();
+        return false;
       }
 
-      // Show the starring UI when pressing 'c'.
-      if (event.which == 99) {
+      // Show the starring UI
+      if (action == 'show-comment') {
         if (self._activeResult) {
           AddCommentUI.logLinkClick();
-          event.preventDefault();
+          return false;
         }
       }
 
       // Toggle 'commenting' status on space bar
-      if (event.which == 32) {
+      if (action == 'select') {
         if (self._activeResult) {
           self._toggleCommenting(self._activeResult);
-          event.preventDefault();
+          return false;
         }
       }
+
+      return true;
     });
   },
 
