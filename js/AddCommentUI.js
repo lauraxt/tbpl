@@ -44,6 +44,16 @@ var AddCommentUI = {
             if (id) {
                 self.addToBuilds[id] = true;
                 self.updateUI();
+            } else if (ui.draggable.hasClass('revlink')) {
+                var rev = ui.draggable.text();
+                var box = $("#logNoteText");
+                var text = box.val();
+                if (text.indexOf(rev) == -1) {
+                  if (text.match(/[^\n]$/))
+                    box.val(text + "\n" + rev + "\n");
+                  else
+                    box.val(text + rev + "\n");
+                }
             }
         }
     });

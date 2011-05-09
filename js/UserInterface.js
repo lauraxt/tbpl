@@ -124,6 +124,7 @@ var UserInterface = {
         pushNode.hide();
       }
     }
+    $(".revlink").draggable({ helper: 'clone' });
   },
 
   _getInsertBeforeAnchor: function UserInterface__getInsertBeforeAnchor(push) {
