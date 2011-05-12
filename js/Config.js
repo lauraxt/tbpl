@@ -37,11 +37,13 @@ var Config = {
     "Mozilla-Beta": {
       primaryRepo: "releases/mozilla-beta",
       hasGroups: true,
+      orangeFactor: true,
       buildbotBranch: "mozilla-beta",
     },
     "Mozilla-Aurora": {
       primaryRepo: "releases/mozilla-aurora",
       hasGroups: true,
+      orangeFactor: true,
       buildbotBranch: "mozilla-aurora",
     },
     "Firefox4.0": {
@@ -60,6 +62,7 @@ var Config = {
     "TraceMonkey": {
       primaryRepo: "tracemonkey",
       hasGroups: true,
+      orangeFactor: true,
       buildbotBranch: "tracemonkey",
     },
     "Jaegermonkey": {
@@ -74,6 +77,7 @@ var Config = {
     "Places": {
       primaryRepo: "projects/places",
       hasGroups: true,
+      orangeFactor: true,
       buildbotBranch: "places",
     },
     "Mobile": {
