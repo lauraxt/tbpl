@@ -2,8 +2,8 @@
 /* -*- Mode: PHP; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 /* vim: set sw=2 ts=2 et tw=80 : */
 
-require_once './tbplbot-password.php';
-require_once './JSON.php';
+require_once 'tbplbot-password.php';
+require_once 'inc/JSON.php';
 
 if (!defined('TBPLBOT_PASSWORD'))
   die('Invalid configuration!');

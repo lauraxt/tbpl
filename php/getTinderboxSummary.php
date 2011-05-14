@@ -154,7 +154,7 @@ function processLine(&$lines, $line) {
 }
 
 function parseJSON($json) {
-  require_once "./JSON.php";
+  require_once 'inc/JSON.php';
   $engine = new Services_JSON();
   return $engine->decode($json);
 }
