@@ -554,6 +554,10 @@ body.details > #details
   padding-left: 15px;
 }
 
+#results > p {
+  font-size: 1em;
+}
+
 em.testfail {
   font-style: normal;
   font-weight: bold;

@@ -171,13 +171,21 @@ MachineResult.prototype = {
     return this._finished;
   },
 
-  getTestResults: function MachineResult_getTestResults() {
+  getTestResults: function MachineResult_getTestResults(callback) {
     if (!this._finished) {
       return [];
     }
 
     var self = this;
     var machine = this.machine;
+    if (!("_scrape" in this)) {
+      this._getScrape(function (scrape) {
+        self._scrape = scrape;
+        callback(self);
+      });
+      return null;
+    }
+
     var scrape = this._scrape;
     if (!scrape)
       return [];

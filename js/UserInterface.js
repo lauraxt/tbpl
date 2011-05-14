@@ -1426,18 +1426,21 @@ var UserInterface = {
     BuildAPI[method](result.getBuildbotBranch(), requestOrBuildID, onSuccess, onFailure, onTimeout);
   },
 
+  _activeResultObject: function UserInterface__activeResultObject() {
+    if (!this._activeResult)
+      return null;
+    var result = this._data.getMachineResult(this._activeResult);
+    if (result)
+      return result;
+    var run = this._activeResult.replace(/^pending-|running-/, '');
+    return this._data.getUnfinishedMachineResult(run);
+  },
+
   _displayResult: function UserInterface__displayResult() {
     var self = this;
-    var result;
-    if (this._activeResult) {
-      result = this._data.getMachineResult(this._activeResult);
-      if (!result) {
-        var run = this._activeResult.replace(/^pending-|running-/, '');
-        result = this._data.getUnfinishedMachineResult(run);
-      }
-    }
     var box = $("#details");
     var body = $("body");
+    var result = this._activeResultObject();
     if (!result) {
       body.removeClass("details");
       box.removeAttr("state");
@@ -1529,7 +1532,11 @@ var UserInterface = {
       })() +
       '</div>' +
       (function htmlForTestResults() {
-        var testResults = result.getTestResults();
+        var testResults = result.getTestResults(function testResultsLoaded(result) {
+          self._testResultsLoaded(result);
+        });
+        if (testResults === null)
+          return '<div id="results"><p class="loading">Loading results...</p></div>';
         return '<div id="results">' +
           (testResults.length ? 
             '<ul>\n' +
@@ -1561,6 +1568,11 @@ var UserInterface = {
     })());
     AddCommentUI.updateUI();
     SummaryLoader.setupSummaryLoader(result, box.get(0));
+  },
+
+  _testResultsLoaded: function UserInterface__testResultsLoaded(result) {
+    if (result == this._activeResultObject())
+      this._displayResult();
   },
 
   _makeJSString: function UserInterface_makeJSString(s) {
