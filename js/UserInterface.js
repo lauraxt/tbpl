@@ -269,7 +269,7 @@ var UserInterface = {
     var moreList = $('<ul id="moreList"></ul>').appendTo(moreListContainer);
     var self = this;
     Controller.keysFromObject(Config.treeInfo).forEach(function (tree, i) {
-      var isMostRecentlyUsedTree = (self._storage.mostRecentlyUsedTrees.indexOf(tree) != -1);
+      var isMostRecentlyUsedTree = (self._mostRecentlyUsedTrees().indexOf(tree) != -1);
       var treeLink = self._treeName == tree ?
         "<strong>" + tree + "</strong>" :
         "<a href='?tree=" + tree + "'>" + tree + "</a>";
