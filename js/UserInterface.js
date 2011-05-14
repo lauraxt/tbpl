@@ -302,22 +302,32 @@ var UserInterface = {
       });
     }
 
-    // Initialize the tree status then update it every 5 minutes.
-    refreshTreeStatus(this);
-    setInterval(refreshTreeStatus, 1000 * 60 * 5, this);
+    if (this._treeName in Config.treeInfo) {
+      // Initialize the tree status then update it every 5 minutes.
+      refreshTreeStatus(this);
+      setInterval(refreshTreeStatus, 1000 * 60 * 5, this);
 
-    var treeInfo = $('#treeInfo');
-    var primaryRepo = Config.treeInfo[this._treeName].primaryRepo;
-    $('<dt>Pushlog:</dt><dd><a href="http://hg.mozilla.org/' + primaryRepo + '/pushloghtml">' +
-      Config.treeInfo[this._treeName].primaryRepo +
-      '</a></dd>').appendTo(treeInfo);
+      var treeInfo = $('#treeInfo');
+      var primaryRepo = Config.treeInfo[this._treeName].primaryRepo;
+      $('<dt>Pushlog:</dt><dd><a href="http://hg.mozilla.org/' + primaryRepo + '/pushloghtml">' +
+        Config.treeInfo[this._treeName].primaryRepo +
+        '</a></dd>').appendTo(treeInfo);
 
-    if ('otherRepo' in Config.treeInfo[this._treeName]) {
-      var otherRepo = Config.treeInfo[this._treeName].otherRepo;
+      if ('otherRepo' in Config.treeInfo[this._treeName]) {
+        var otherRepo = Config.treeInfo[this._treeName].otherRepo;
 
-      $('<dt></dt><dd><a href="http://hg.mozilla.org/' + otherRepo + '/pushloghtml">' +
-      Config.treeInfo[this._treeName].otherRepo +
-      '</a></dd>').appendTo(treeInfo);
+        $('<dt></dt><dd><a href="http://hg.mozilla.org/' + otherRepo + '/pushloghtml">' +
+        Config.treeInfo[this._treeName].otherRepo +
+        '</a></dd>').appendTo(treeInfo);
+      }
+    } else {
+      $("#wrongtree").html(
+        "The tree “" + this.treeName + "” does not exist in Tinderboxpushlog. " +
+        "Please choose a tree from the list on the upper left.<br/>" +
+        'Maybe the tree you’re looking for is on the <a href="' +
+        Config.alternateTinderboxPushlogURL + this.treeName +
+        '">' + Config.alternateTinderboxPushlogName +
+        ' version of Tinderboxpushlog</a>.');
     }
 
     // This returns early if we're not using the google calendar.

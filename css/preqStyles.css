@@ -1,6 +1,0 @@
-body.noJavaScript .withJavaScript,
-body.noFirefox3 .withFirefox3,
-body.withJavaScript .noJavaScript,
-body.withFirefox3 .noFirefox3 {
-  display: none;
-}

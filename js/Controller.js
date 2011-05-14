@@ -13,6 +13,7 @@ var Controller = {
   _params: {},
 
   init: function Controller_init() {
+    $("body").removeClass("noscript");
     var params = this._parseParams();
     this._params = params;
     this.treeName = (("tree" in params) && params.tree) || Config.defaultTreeName;
@@ -21,11 +22,12 @@ var Controller = {
     var onlyUnstarred = ("onlyunstarred" in params) && (params.onlyunstarred == "1");
     var jobName = ("jobname" in params) && params.jobname;
 
-    if (!(this.treeName in Config.treeInfo))
-      throw "wrongtree"; // er, hm.
 
     this._data = new Data(this.treeName, noIgnore, Config);
     this._uiCallbacks = UserInterface.init(this, onlyUnstarred, pusher, jobName);
+
+    if (!(this.treeName in Config.treeInfo))
+      return;
 
     var initialPushRangeParams = this._getInitialPushRangeParams(params);
     var initialPushRange = initialPushRangeParams.range;

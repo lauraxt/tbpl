@@ -4,17 +4,13 @@
 <meta charset="utf-8">
 <title>Tinderboxpushlog</title>
 <link rel="stylesheet" type="text/css" href="css/style.css">
-<link rel="stylesheet" type="text/css" href="css/preqStyles.css">
 <link rel="alternate stylesheet" type="text/css" href="css/justStarring.css" title="Just Starring">
 <!-- Favicon courtesy of FAMFAMFAM silk - http://famfamfam.com/ -->
 <link rel="shortcut icon" href="images/favicon.png"/>
 </head>
-<body class="noJavaScript noFirefox3">
-<script type="text/javascript" src="js/checkPreqs.js"></script>
-<p class="noJavaScript">Please enable JavaScript.</p>
-<p class="noFirefox3 withJavaScript">Please use Firefox 3.0 or later to view Tinderboxpushlog.</p>
+<body class="noscript">
 
-<div id="topbar" class="withFirefox3">
+<div id="topbar">
   <div id="config">
     <div id="legendContainer" class="dropdown"><h2>Legend</h2><dl id="legend"></dl></div>
     <div id="treeInfoContainer" class="dropdown"><h2>Tree Info</h2><dl id="treeInfo">
@@ -38,9 +34,15 @@
   </div>
 </div>
 
-<ul id="pushes" class="withFirefox3 initialload">
-  <li id="nopushes">There are no pushes to be displayed. Use the down arrow to add older pushes.</li>
-</ul>
+<div id="container">
+  <noscript>
+    You need to enable JavaScript in order to use Tinderboxpushlog.
+  </noscript>
+  <p id="wrongtree"></p>
+  <ul id="pushes" class="initialload">
+    <li id="nopushes">There are no pushes to be displayed. Use the down arrow to add older pushes.</li>
+  </ul>
+</div>
 
 <div id="details">
 </div>
@@ -88,7 +90,7 @@
 <script type="text/javascript" src="js/LoadTracker.js"></script>
 <script type="text/javascript" src="js/Controller.js"></script>
 <script type="text/javascript" src="js/utils.js"></script>
-<script type="text/javascript" src="js/script.js"></script>
+<script type="text/javascript">Controller.init();</script>
 
 </body>
 </html>
