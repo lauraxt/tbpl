@@ -12,14 +12,55 @@
 
 <div id="topbar">
   <div id="config">
-    <div id="legendContainer" class="dropdown"><h2>Legend</h2><dl id="legend"></dl></div>
-    <div id="treeInfoContainer" class="dropdown"><h2>Tree Info</h2><dl id="treeInfo">
+    <div id="helpContainer" class="dropdown"><h2>Help</h2>
+      <div class="dropdownContents">
+        <div class="header">
+          Documentation is available at <a href='https://wiki.mozilla.org/Tinderboxpushlog'>https://wiki.mozilla.org/Tinderboxpushlog</a>
+        </div>
+        <table>
+          <tr>
+            <th>Legend</th>
+            <th>Keyboard/Mouse</th>
+          </tr>
+          <tr>
+            <td>
+              <dl id="legend-other">
+                <dt>…*</dt><dd>commented</dd>
+                <dt class="pending">lightgray</dt><dd>pending</dd>
+                <dt class="running">gray</dt><dd>running</dd>
+                <dt class="success">green</dt><dd>success</dd>
+                <dt class="testfailed">orange</dt><dd>tests failed</dd>
+                <dt class="exception">purple</dt><dd>infrastructure exception</dd>
+                <dt class="busted">red</dt><dd>build error</dd>
+                <dt class="retry">blue</dt><dd>build has been restarted</dd>
+                <dt class="unknown">black</dt><dd>unknown error</dd>
+              </dl>
+            </td>
+            <td>
+              <dl id="shortcuts"></dl>
+            </td>
+          </tr>
+          <tr>
+            <td colspan='2'><hr></td>
+          </tr>
+          <tr>
+            <th>Builds</th>
+            <th>Tests</th>
+          </tr>
+          <tr>
+            <td><dl id="legend-builds"></dl></td>
+            <td><dl id="legend-tests"></dl></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div id="treeInfoContainer" class="dropdown"><h2>Tree Info</h2><dl id="treeInfo" class="dropdownContents">
       <dt>Sheriff:</dt><dd><span id="sheriff"><span id="current-sheriff"><span style="opacity: 0.7">loading</span></span> (<a href="http://www.google.com/calendar/embed?src=j6tkvqkuf9elual8l2tbuk2umk%40group.calendar.google.com" target="_blank">schedule</a>)</span></dd>
       <dt>Buildduty:</dt><dd><span id="releng"><span id="current-releng"><span style="opacity: 0.7">loading</span></span> (<a href="http://www.google.com/calendar/embed?src=aelh98g866kuc80d5nbfqo6u54%40group.calendar.google.com" target="_blank">schedule</a>)</span></dd>
     </dl></div>
-    <div class="dropdown"><h2>Infrastructure</h2><dl id="infrastructure"></dl></div>
+    <div class="dropdown"><h2>Infrastructure</h2><dl id="infrastructure" class="dropdownContents"></dl></div>
     <div class="dropdown"><h2>Filters</h2>
-      <ul id="filters">
+      <ul id="filters" class="dropdownContents">
         <li><label>Pusher<input type="email" id="pusher"></label></li>
         <li><label>Job Name<input type="text" id="machine"></label></li>
         <li><label>Only unstarred<input type="checkbox" id="onlyUnstarred"></label></li>

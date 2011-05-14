@@ -15,13 +15,21 @@ var UserInterface = {
   _statusMessageIDs: { },
   _lastMessageID: 0,
   _nextBuildRequest: 0,
-  _keymap: { 'j': 'prev-unstarred',
-             'p': 'prev-unstarred',
-             'k': 'next-unstarred',
-             'n': 'next-unstarred',
-             'u': 'toggle-unstarred',
-             ' ': 'select',
-             'c': 'show-comment' },
+  _keymap: {
+    'u': 'toggle-unstarred',
+    'c': 'show-comment',
+    'j': 'prev-unstarred',
+    'k': 'next-unstarred',
+    'p': 'prev-unstarred',
+    'n': 'next-unstarred',
+    ' ': 'select'
+  },
+  _cmddoc: { 'prev-unstarred': 'Highlight previous unstarred failure',
+             'next-unstarred': 'Highlight next unstarred failure',
+             'toggle-unstarred': 'Toggle showing only unstarred failures',
+             'select': 'Select/deselect active build or changeset',
+             'show-comment': 'Show the comment box'
+           },
 
   init: function UserInterface_init(controller, onlyUnstarred, pusher, jobName) {
     var self = this;
@@ -36,6 +44,7 @@ var UserInterface = {
 
     this._refreshMostRecentlyUsedTrees();
     this._buildTreeSwitcher();
+    this._buildShortcuts();
     this._buildLegend();
     this._buildTreeInfo();
     this._initFilters();
@@ -306,7 +315,7 @@ var UserInterface = {
   _buildTreeSwitcher: function UserInterface__buildTreeSwitcher() {
     var mruList = $('<ul id="mruList"></ul>').appendTo("#treechooser");
     var moreListContainer = $('<div id="moreListContainer" class="dropdown"><h2>more</h2></div></li>').appendTo("#treechooser");
-    var moreList = $('<ul id="moreList"></ul>').appendTo(moreListContainer);
+    var moreList = $('<ul id="moreList" class="dropdownContents"></ul>').appendTo(moreListContainer);
     var self = this;
     Object.keys(Config.treeInfo).forEach(function (tree, i) {
       var isMostRecentlyUsedTree = (self._mostRecentlyUsedTrees().indexOf(tree) != -1);
@@ -318,21 +327,28 @@ var UserInterface = {
     });
   },
 
-  _buildLegend: function UserInterface__buildLegend() {
-    var legend = $('#legend');
-    for (var name in Config.testNames) {
-      $('<dt>' + Config.testNames[name] + '</dt><dd>' + name + '</dd>').appendTo(legend);
+  _buildShortcuts: function UserInterface__buildShortcuts() {
+    var shortcuts = $('#shortcuts');
+
+    for (var key in this._keymap) {
+      var action = this._keymap[key];
+      var keydesc = key;
+      if (keydesc == ' ')
+        keydesc = 'space';
+      $('<dt>' + keydesc + '</dt><dd>' + (this._cmddoc[action] || action) + '</dd>').appendTo(shortcuts);
     }
-    $('<dt>…*</dt><dd>commented</dd>' +
-      '<dt class="pending">lightgray</dt><dd>pending</dd>' +
-      '<dt class="running">gray</dt><dd>running</dd>' +
-      '<dt class="success">green</dt><dd>success</dd>' +
-      '<dt class="testfailed">orange</dt><dd>tests failed</dd>' +
-      '<dt class="exception">purple</dt><dd>infrastructure exception</dd>' +
-      '<dt class="busted">red</dt><dd>build error</dd>' +
-      '<dt class="retry">blue</dt><dd>build has been restarted</dd>' +
-      '<dt class="unknown">black</dt><dd>unknown error</dd>' +
-      '').appendTo(legend);
+    $('<dt>Click</dt><dd>Choose an active build and display its details</dd>').appendTo(shortcuts);
+    $('<dt>Ctrl/Cmd-Click</dt><dd>Select/deselect build or changeset</dd>').appendTo(shortcuts);
+    $('<dt>Drag</dt><dd>Add build or changeset to comment</dd>').appendTo(shortcuts);
+  },
+
+  _buildLegend: function UserInterface__buildLegend() {
+    for (var name in Config.buildNames) {
+      $('<dt>' + Config.buildNames[name] + '</dt><dd>' + name + '</dd>').appendTo($('#legend-builds'));
+    }
+    for (var name in Config.testNames) {
+      $('<dt>' + Config.testNames[name] + '</dt><dd>' + name + '</dd>').appendTo($('#legend-tests'));
+    }
   },
 
   _buildTreeInfo: function UserInterface__buildTreeInfo() {
@@ -473,7 +489,7 @@ var UserInterface = {
     var results = [];
     var oses = Object.keys(Config.OSNames);
     var types = ['debug', 'opt'];
-    var groups = Object.keys(Config.testNames);
+    var groups = Object.keys(Config.resultNames);
 
     var pushes = Object.values(this._data.getPushes());
     pushes = pushes.filter(function (push) {
@@ -537,7 +553,7 @@ var UserInterface = {
     var pushes = Object.values(this._data.getPushes());
     var oses = Object.keys(Config.OSNames);
     var types = ['debug', 'opt'];
-    var groups = Object.keys(Config.testNames);
+    var groups = Object.keys(Config.resultNames);
 
     for (var i = pushes.length-1; i >= 0; --i) {
       if (pushes[i].pusher != this._pusher) {
@@ -911,7 +927,7 @@ var UserInterface = {
     var machine = machineResult.machine;
     var linkText = machine.type == "Mochitest" && onlyNumber ?
       machine.machineNumber() :
-      Config.testNames[machine.type] + machine.machineNumber();
+      Config.resultNames[machine.type] + machine.machineNumber();
     if (machineResult.note)
       linkText += '*';
     return '<a' +
@@ -946,7 +962,7 @@ var UserInterface = {
       return "";
     var self = this;
     return '<span class="machineResultGroup" machineType="' +
-    Config.testNames[machineType] +
+    Config.resultNames[machineType] +
     '"> ' +
     machineResults.map(function linkMachineResult(a) { return self._machineResultLink(a, true); }).join(" ") +
     ' </span>';
@@ -993,7 +1009,7 @@ var UserInterface = {
       return a.startTime.getTime() - b.startTime.getTime();
     }
 
-    var osresults = Object.keys(Config.testNames).map(function buildHTMLForPushResultsOnOSForMachineType(machineType) {
+    var osresults = Object.keys(Config.resultNames).map(function buildHTMLForPushResultsOnOSForMachineType(machineType) {
       var displayedResults = self._filterDisplayedResults(results[machineType] || []);
       if ("hasGroups" in Config.treeInfo[self._treeName] &&
           Object.keys(Config.groupedMachineTypes).indexOf(machineType) != -1) {

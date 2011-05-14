@@ -190,7 +190,7 @@ var Config = {
     "maemo4": "Maemo 4",
     "maemo5": "Maemo 5"
   },
-  testNames: {
+  buildNames: {
     "Build" : "B",
     "Qt Build" : "Bq",
     "Mobile Desktop Build" : "Bm",
@@ -204,7 +204,9 @@ var Config = {
     "Shark Nightly" : "Ns",
     "Mobile Desktop Nightly" : "Nm",
     "Maemo Qt Nightly" : "Nq",
-    "RPM Nightly" : "Nr",
+    "RPM Nightly" : "Nr"
+  },
+  testNames: {
     "Mochitest" : "M",
     "Crashtest-IPC" : "Cipc",
     "Crashtest" : "C",
@@ -376,3 +378,11 @@ var Config = {
     "twinopen"
   ]
 };
+
+Config.resultNames = {};
+for (var b in Config.buildNames) {
+  Config.resultNames[b] = Config.buildNames[b];
+}
+for (var t in Config.testNames) {
+  Config.resultNames[t] = Config.testNames[t];
+}

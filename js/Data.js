@@ -495,7 +495,7 @@ Data.prototype = {
 
       var debug = /debug/i.test(name) || /(leak|bloat)/i.test(name);
 
-      // see Config.testNames
+      // see Config.testNames and Config.buildNames
       var type =
         /talos/i.test(name) ? "Talos Performance" :
         /mobile desktop .* nightly/i.test(name) ? "Mobile Desktop Nightly" :

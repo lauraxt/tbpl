@@ -59,7 +59,7 @@ p {
 .dropdown h2::after {
 	content: " ↓";
 }
-.dropdown ul, .dropdown dl {
+.dropdownContents {
   margin: 0;
   padding: 0;
   display: inline;
@@ -74,8 +74,14 @@ p {
   -webkit-box-shadow: 1px 1px 5px #ccc;
   box-shadow: 1px 1px 5px #ccc;
 }
-.dropdown:not(.open) ul, .dropdown:not(.open) dl {
+.dropdown:not(.open) .dropdownContents {
   display: none !important;
+}
+.dropdownContents td {
+  vertical-align: top;
+}
+.dropdownContents th {
+  text-decoration: underline;
 }
 #moreList, #moreList li, #filters li {
   display: block;
@@ -89,8 +95,20 @@ p {
   position: absolute;
   font-weight: bold;
 }
-#legend dd {
+.dropdownContents .header {
+  font-weight: bold;
+  text-align: center;
+  background: lightgray;
+}
+#helpContainer dl {
+  margin: 0px 2em 0px 0px;
+}
+#helpContainer dd {
   margin-left: 6em;
+  position: relative;
+}
+#shortcuts dd {
+  margin-left: 10em;
 }
 #treeInfo dd {
   margin-left: 6em;
