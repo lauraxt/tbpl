@@ -19,7 +19,7 @@ Data.prototype = {
     if (!this._mostRecentPush)
       return null;
     return {
-      startID: this._mostRecentPush.id - Controller.valuesFromObject(this._pushes).length,
+      startID: this._mostRecentPush.id - Object.values(this._pushes).length,
       endID: this._mostRecentPush.id,
     };
   },
@@ -200,7 +200,7 @@ Data.prototype = {
   },
 
   _getSortedPushesArray: function Data__getSortedPushesArray(unsortedPushesObject) {
-    var pushes = Controller.valuesFromObject(unsortedPushesObject);
+    var pushes = Object.values(unsortedPushesObject);
     pushes.sort(function(a,b) { return a.date - b.date; });
     return pushes;
   },
@@ -532,7 +532,7 @@ Data.prototype = {
   },
 
   getMachines: function Data_getMachines() {
-    return Controller.valuesFromObject(this._machines);
+    return Object.values(this._machines);
   },
 
   _getPendingOrRunningBuilds: function Data__getPendingOrRunningBuilds(pendingOrRunning, loadTracker, loadCallback) {

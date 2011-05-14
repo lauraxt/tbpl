@@ -65,12 +65,12 @@ var NetUtils = {
 
     var body;
     if (values) {
-      var pairs = Controller.keyValuePairsFromObject(values);
+      var pairs = Object.keyValuePairs(values);
       body = pairs.map(function(p) { return enc(p[0]) + '=' + enc(p[1]) })
                   .join('&');
     }
 
-    var headers = requestHeaders ? Controller.copyObject(requestHeaders) : { };
+    var headers = requestHeaders ? Object.clone(requestHeaders) : { };
     headers['Content-Type'] = 'application/x-www-form-urlencoded';
     if ('_charset_' in headers) {
       headers._charset_ = 'US-ASCII';

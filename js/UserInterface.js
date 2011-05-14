@@ -9,7 +9,6 @@ var UserInterface = {
   _activeResult: "",
   _selectedBuilds: { },
   _selectedRevs: { },
-  _storage: null,
   _onlyUnstarred: false,
   _pusher: "",
   _machine: "",
@@ -32,7 +31,6 @@ var UserInterface = {
     this._pusher = pusher || "";
     this._machine = jobName || "";
     this._data = controller.getData();
-    this._setupStorage();
 
     document.title = "[0] " + controller.treeName + " - Tinderboxpushlog";
 
@@ -75,7 +73,7 @@ var UserInterface = {
     });
 
     SummaryLoader.init();
-    AddCommentUI.init("http://tinderbox.mozilla.org/addnote.cgi", this._storage);
+    AddCommentUI.init("http://tinderbox.mozilla.org/addnote.cgi");
     AddCommentUI.registerNumSendingCommentChangedCallback(function commentSendUpdater(changedResult) {
       self.updateStatus();
       if (changedResult) {
@@ -229,30 +227,17 @@ var UserInterface = {
     showStatusMessage("sendingBugs", text, type);
   },
 
-  _setupStorage: function UserInterface__setupStorage() {
-    try {
-      this._storage = window.localStorage;
-    } catch (e) {}
-    if (!this._storage) {
-      try {
-        if (window.globalStorage)
-          this._storage = globalStorage[location.host];
-      } catch (e) {}
-    }
-    this._storage = this._storage || {};
-  },
-
   _mostRecentlyUsedTrees: function() {
-    if (!("mostRecentlyUsedTrees" in this._storage) ||
-        !this._storage.mostRecentlyUsedTrees)
+    if (!("mostRecentlyUsedTrees" in storage) ||
+        !storage.mostRecentlyUsedTrees)
       this._setMostRecentlyUsedTrees([]);
-    if (JSON.parse(this._storage.mostRecentlyUsedTrees).length != 3)
-      this._setMostRecentlyUsedTrees(Controller.keysFromObject(Config.treeInfo).slice(0, 3));
-    return JSON.parse(this._storage.mostRecentlyUsedTrees);
+    if (JSON.parse(storage.mostRecentlyUsedTrees).length != 3)
+      this._setMostRecentlyUsedTrees(Object.keys(Config.treeInfo).slice(0, 3));
+    return JSON.parse(storage.mostRecentlyUsedTrees);
   },
 
   _setMostRecentlyUsedTrees: function(trees) {
-    this._storage.mostRecentlyUsedTrees = JSON.stringify(trees);
+    storage.mostRecentlyUsedTrees = JSON.stringify(trees);
   },
 
   _refreshMostRecentlyUsedTrees: function UserInterface__refreshMostRecentlyUsedTrees() {
@@ -268,7 +253,7 @@ var UserInterface = {
     var moreListContainer = $('<div id="moreListContainer" class="dropdown"><h2>more</h2></div></li>').appendTo("#treechooser");
     var moreList = $('<ul id="moreList"></ul>').appendTo(moreListContainer);
     var self = this;
-    Controller.keysFromObject(Config.treeInfo).forEach(function (tree, i) {
+    Object.keys(Config.treeInfo).forEach(function (tree, i) {
       var isMostRecentlyUsedTree = (self._mostRecentlyUsedTrees().indexOf(tree) != -1);
       var treeLink = self._treeName == tree ?
         "<strong>" + tree + "</strong>" :
@@ -430,7 +415,7 @@ var UserInterface = {
     document.getElementById('onlyUnstarred').checked = state;
     this._onlyUnstarred = state;
 
-    var pushes = this._controller.valuesFromObject(this._data.getPushes());
+    var pushes = Object.values(this._data.getPushes());
     for (var i = 0; i < pushes.length; ++i) {
       this.handleUpdatedPush(pushes[i]);
     }
@@ -459,7 +444,7 @@ var UserInterface = {
     this._machine = machine;
 
     var self = this;
-    var pushes = this._controller.valuesFromObject(this._data.getPushes());
+    var pushes = Object.values(this._data.getPushes());
     for (var i = 0; i < pushes.length; ++i) {
       this.handleUpdatedPush(pushes[i]);
     }
@@ -504,11 +489,11 @@ var UserInterface = {
   // Get all jobs' results, optionally filtered by a pusher
   _getAllResults: function UserInterface__getAllResults() {
     var results = [];
-    var oses = Controller.keysFromObject(Config.OSNames);
+    var oses = Object.keys(Config.OSNames);
     var types = ['debug', 'opt'];
-    var groups = Controller.keysFromObject(Config.testNames);
+    var groups = Object.keys(Config.testNames);
 
-    var pushes = Controller.valuesFromObject(this._data.getPushes());
+    var pushes = Object.values(this._data.getPushes());
     pushes = pushes.filter(function (push) {
       if (this._pusher && push.pusher != this._pusher)
         return false;
@@ -567,10 +552,10 @@ var UserInterface = {
     // We set the results in a dictionary that takes the machine name. Thus, we
     // are sure we do not add twice a result for the same job.
     var results = {};
-    var pushes = Controller.valuesFromObject(this._data.getPushes());
-    var oses = Controller.keysFromObject(Config.OSNames);
+    var pushes = Object.values(this._data.getPushes());
+    var oses = Object.keys(Config.OSNames);
     var types = ['debug', 'opt'];
-    var groups = Controller.keysFromObject(Config.testNames);
+    var groups = Object.keys(Config.testNames);
 
     for (var i = pushes.length-1; i >= 0; --i) {
       if (pushes[i].pusher != this._pusher) {
@@ -611,7 +596,7 @@ var UserInterface = {
       }
     }
 
-    return Controller.valuesFromObject(results);
+    return Object.values(results);
   },
 
   _getFailingJobs: function UserInterface__getFailingJobs(results) {
@@ -869,14 +854,14 @@ var UserInterface = {
   },
 
   _useLocalTime: function UserInterface__useLocalTime() {
-    return this._storage.useLocalTime == "true"; // Storage stores Strings, not Objects :-(
+    return storage.useLocalTime == "true"; // Storage stores Strings, not Objects :-(
   },
 
   _setUseLocalTime: function UserInterface__setUseLocalTime(value) {
     if (value)
-      this._storage.useLocalTime = "true";
+      storage.useLocalTime = "true";
     else
-      delete this._storage.useLocalTime;
+      delete storage.useLocalTime;
   },
 
   _getTimezoneAdaptedDate: function UserInterface__getTimezoneAdaptedDate(date) {
@@ -887,18 +872,13 @@ var UserInterface = {
     return new Date(date.getTime() + hoursdiff * 60 * 60 * 1000);
   },
 
-  _pad: function UserInterface__pad(n) {
-    return n < 10 ? '0' + n : n;
-  },
-
   _getDisplayDate: function UserInterface__getDisplayDate(date) {
     var timezoneName = this._useLocalTime() ? "" : " " + Config.mvtTimezoneName;
     var d = this._getTimezoneAdaptedDate(date);
-    var pad = this._pad;
     // Thu Jan 7 20:25:03 2010 (PST)
     return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()] + " " +
     ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][d.getMonth()] + " " +
-    d.getDate() + " " + pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds()) + " " +
+    d.getDate() + " " + d.getHours().pad() + ":" + d.getMinutes().pad() + ":" + d.getSeconds().pad() + " " +
     d.getFullYear() + timezoneName;
   },
 
@@ -907,14 +887,13 @@ var UserInterface = {
       return '';
 
     var d = this._getTimezoneAdaptedDate(date);
-    var pad = this._pad;
-    return pad(d.getHours()) + ":" + pad(d.getMinutes());
+    return d.getHours().pad() + ":" + d.getMinutes().pad();
   },
 
   _ISODateString: function(date) {
     return date.getUTCFullYear() + '-' +
-           this._pad(date.getUTCMonth() + 1) + '-' +
-           this._pad(date.getUTCDate());
+           (date.getUTCMonth() + 1).pad() + '-' +
+           date.getUTCDate().pad();
   },
 
   _resultTitle: function UserInterface__resultTitle(result) {
@@ -1032,10 +1011,10 @@ var UserInterface = {
       return a.startTime.getTime() - b.startTime.getTime();
     }
 
-    var osresults = Controller.keysFromObject(Config.testNames).map(function buildHTMLForPushResultsOnOSForMachineType(machineType) {
+    var osresults = Object.keys(Config.testNames).map(function buildHTMLForPushResultsOnOSForMachineType(machineType) {
       var displayedResults = self._filterDisplayedResults(results[machineType] || []);
       if ("hasGroups" in Config.treeInfo[self._treeName] &&
-          Controller.keysFromObject(Config.groupedMachineTypes).indexOf(machineType) != -1) {
+          Object.keys(Config.groupedMachineTypes).indexOf(machineType) != -1) {
         displayedResults.sort(function machineResultSortOrderComparison(a, b) {
           // machine.type does not mess up the numeric/alphabetic sort
           var numA = a.machine.type + a.machine.machineNumber();
@@ -1076,7 +1055,7 @@ var UserInterface = {
   _buildHTMLForPushResults: function UserInterface__buildHTMLForPushResults(push) {
     var self = this;
     var order = [ 0 ];
-    return Controller.keysFromObject(Config.OSNames).map(function buildHTMLForPushResultsOnOS(os) {
+    return Object.keys(Config.OSNames).map(function buildHTMLForPushResultsOnOS(os) {
       if (!push.results || !push.results[os])
         return '';
       return (push.results[os].opt   ? self._buildHTMLForOS(os, " opt"  , push.results[os].opt  , order) : '') +
@@ -1220,7 +1199,7 @@ var UserInterface = {
     div.className = type || '';
     div.innerHTML = (type == 'error' ? '<a class="messageDismiss" href="#" onclick="UserInterface.updateMessage(\'' + div.id + '\', \'\'); return false"></a>'
                                      : '') +
-                    Controller.escapeContent(message);
+                    message.escapeContent();
     if (!div.parentNode) {
       messages.appendChild(div);
     }
@@ -1468,7 +1447,7 @@ var UserInterface = {
         makeButton('tango-process-stop.png', 'Cancel', result.runID.replace(/^(pending|running)-/, '')) :
         '') +
       '</div>' +
-      '<span>using revision' + (Controller.keysFromObject(revs).length != 1 ? 's' : '') + ': ' + (function(){
+      '<span>using revision' + (Object.keys(revs).length != 1 ? 's' : '') + ': ' + (function(){
         var ret = [];
         for(var repo in revs) {
           ret.push('<a href="http://hg.mozilla.org/' + repo + '/rev/' + revs[repo] + '">' + repo + '/' + revs[repo] + '</a>');
@@ -1542,11 +1521,11 @@ var UserInterface = {
             '<ul>\n' +
             testResults.map(function htmlForTestResultEntry(r) {
               return '<li>' + r.name +
-                (r.result ? ': ' + (r.resultURL ? '<a href="' + Controller.escapeAttribute(r.resultURL) +
-                                                  '">' + Controller.escapeContent(r.result) + '</a>'
+                (r.result ? ': ' + (r.resultURL ? '<a href="' + r.resultURL.escapeAttribute() +
+                                                  '">' + r.result.escapeContent + '</a>'
                                                 : r.result)
                       : '') +
-                (r.detailsURL ? ' (<a href="' + Controller.escapeAttribute(r.detailsURL) +
+                (r.detailsURL ? ' (<a href="' + r.detailsURL.escapeAttribute() +
                                 '">details</a>)'
                               : '') +
                 '</li>';

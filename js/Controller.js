@@ -2,50 +2,6 @@
 /* vim: set sw=2 ts=2 et tw=80 : */
 
 var Controller = {
-  keysFromObject: function Controller_keysFromObject(obj) {
-    var keys = [];
-    for (var key in obj) {
-      keys.push(key);
-    }
-    return keys;
-  },
-
-  valuesFromObject: function Controller_valuesFromObject(obj) {
-    var values = [];
-    for (var key in obj) {
-      values.push(obj[key]);
-    }
-    return values;
-  },
-
-  keyValuePairsFromObject: function Controller_keyValuePairsFromObject(obj) {
-    var pairs = [];
-    for (var key in obj) {
-      pairs.push([key, obj[key]]);
-    }
-    return pairs;
-  },
-
-  copyObject: function Controller_copyObject(obj) {
-    var res = { };
-    for (var key in obj) {
-      res[key] = obj[key];
-    }
-    return res;
-  },
-
-  escapeContent: function Controller_escapeContent(text) {
-    return text.replace(/&/g, "&amp;")
-               .replace(/</g, "&lt;");
-  },
-
-  escapeAttribute: function Controller_escapeAttribute(text) {
-    return this.escapeContent(text)
-               .replace(/>/g, "&gt;")
-               .replace(/"/g, "&quot;")
-               .replace(/'/g, "&apos;");
-  },
-
   treeName: Config.defaultTreeName,
 
   _uiCallbacks: null,
@@ -114,13 +70,13 @@ var Controller = {
   },
 
   getURLForPusherFilteringView: function Controller_getURLForPusherFilteringView(pusher) {
-    var params = $.extend({}, this._params); // fancy way of cloning an object
+    var params = Object.clone(this._params);
     params.pusher = pusher;
     return this._createURLForParams(params);
   },
 
   getURLForSinglePushView: function Controller_getURLForSinglePushView(rev) {
-    var params = $.extend({}, this._params);
+    var params = Object.clone(this._params);
     params.rev = rev;
     return this._createURLForParams(params);
   },
@@ -150,8 +106,7 @@ var Controller = {
   },
 
   getParams: function Controller_getParams() {
-    // Return a copy of _params.
-    return $.extend({}, this._params);
+    return Object.clone(this._params);
   },
 
   _getInitialPushRangeParams: function Controller__getInitialPushRangeParams(params) {

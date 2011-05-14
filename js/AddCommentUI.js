@@ -9,12 +9,10 @@ var AddCommentUI = {
   numSendingBugs: 0,
   numSendingBugChangedCallback: function empty() {},
   _submitURL: "",
-  _storage: {},
   _autoStarBugs: {},
 
-  init: function AddCommentUI_init(submitURL, storage) {
+  init: function AddCommentUI_init(submitURL) {
     this._submitURL = submitURL;
-    this._storage = storage;
     var self = this;
     $("a.addNote").live("click", function addNoteLinkClick() {
       self.openCommentBox();
@@ -83,7 +81,7 @@ var AddCommentUI = {
     var data = Controller.getData();
     var email = $("#logNoteEmail").val();
     var comment = $("#logNoteText").val();
-    var builds = Controller.keysFromObject(UserInterface._selectedBuilds);
+    var builds = Object.keys(UserInterface._selectedBuilds);
     builds.forEach(function(id) {
       var result = data.getMachineResult(id);
       self._postOneComment(email, comment, result, function oneLessCommentPending() {
@@ -169,7 +167,7 @@ var AddCommentUI = {
 
   updateAutoStarState: function AddCommentUI_updateAutoStarState() {
     var autoStar = $("#autoStar");
-    if (Controller.keysFromObject(this._autoStarBugs).length) {
+    if (Object.keys(this._autoStarBugs).length) {
       autoStar.addClass("active");
       autoStar.attr("title", "Click to star this orange using the suggestions selected");
     } else {
@@ -218,11 +216,11 @@ var AddCommentUI = {
   },
 
   _getEmail: function AddCommentUI__getEmail() {
-    return this._storage.email || "";
+    return storage.email || "";
   },
 
   _setEmail: function AddCommentUI__setEmail(email) {
-    this._storage.email = email;
+    storage.email = email;
   },
 
   _updateSubmitButton: function AddCommentUI__updateSubmitButton() {
