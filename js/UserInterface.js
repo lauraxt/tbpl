@@ -778,7 +778,7 @@ var UserInterface = {
     );
     document.title = document.title.replace(/\[\d*\]/, "[" + unstarred + "]");
 
-    $(".machineResult").draggable({ helper: 'clone' });
+    $(".machineResult:not(.pending):not(.running)").draggable({ helper: 'clone' });
     $(".machineResult").unbind('click.selectedRev');
     $(".machineResult").bind('click.selectedRev', function (event) {
       var id = $(this).attr('resultID');
