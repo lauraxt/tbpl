@@ -37,10 +37,67 @@ var Controller = {
     this._loadInterval = setInterval(function startStatusRequestIntervalCallback() {
       self.refreshData();
     }, Config.loadInterval * 1000);
+
+    // Initialize the tree status then update it every 5 minutes.
+    self.refreshTreeStatus();
+    setInterval(function () { self.refreshTreeStatus(); }, 1000 * 60 * 5);
+
+    if (Config.useGoogleCalendar)
+      self.initCalendar();
   },
 
   getData: function Controller_getData() {
     return this._data;
+  },
+
+  refreshTreeStatus: function Controller_refreshTreeStatus() {
+    var self = this;
+    $.ajax({
+      url: "http://tinderbox.mozilla.org/" + this.treeName + "/status.html",
+      dataType: "text",
+      success: function (data) {
+        self._uiCallbacks.updateTreeStatus(data, !Config.useGoogleCalendar);
+      }
+    });
+  },
+
+  initCalendar: function Controller_initCalendar() {
+    var self = this;
+    google.setOnLoadCallback(function() {
+      var service = new google.gdata.calendar.CalendarService("mozilla-tinderbox");
+
+      var items = {
+        "sheriff": "http://www.google.com/calendar/feeds/j6tkvqkuf9elual8l2tbuk2umk%40group.calendar.google.com/public/full",
+        "releng" : "http://www.google.com/calendar/feeds/aelh98g866kuc80d5nbfqo6u54%40group.calendar.google.com/public/full"
+      };
+
+      function refreshItem(role, url) {
+        // Ignore DST and find Mozilla Standard Time
+        var mst = new Date(Date.now() +
+                           (new Date()).getTimezoneOffset() * 60 * 1000 +
+                           Config.mvtTimezoneOffset * 60 * 60 * 1000);
+
+        var query = new google.gdata.calendar.CalendarEventQuery(url);
+        query.setMinimumStartTime(new google.gdata.DateTime(mst, true));
+        query.setOrderBy("starttime");
+        query.setSortOrder("ascending");
+        query.setMaxResults("1");
+        query.setSingleEvents(true);
+
+        service.getEventsFeed(query, function(root) {
+          self._uiCallbacks.updateCalendar(role, root.feed.getEntries());
+        }, function(error) {
+          self._uiCallbacks.updateCalendar(role, null, error);
+        });
+      }
+
+      for (var role in items) {
+        var url = items[role];
+        refreshItem(role, url);
+        setInterval(refreshItem, 1000 * 60 * 60 /* every hour */, role, url);
+      }
+    });
+    google.load("gdata", "1.s");
   },
 
   /**

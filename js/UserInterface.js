@@ -114,6 +114,37 @@ var UserInterface = {
       handleInitialPushlogLoad: function () {
         $("#pushes").removeClass("initialload");
       },
+      updateTreeStatus: function (data, calendarFallback) {
+        var div = $("<div>").html(data);
+        $("#preamble", div).remove();
+        $("#tree-status").empty();
+        $("#status-container", div).contents().appendTo("#tree-status");
+        if (calendarFallback) {
+          ["#sheriff", "#releng"].forEach(function (role) {
+            var info = $(role, div).contents();
+            if (!info.text())
+              $("<div>Unknown</div>").replaceAll(role);
+            else
+              info.replaceAll(role);
+          });
+        }
+      },
+      updateCalendar: function (role, result, error) {
+        var fallbacks = {"sheriff": "#developers", "releng": "#build"};
+        if (error) {
+          $("#current-" + role).html('<span style="color:red; text-decoration:underline" title="Error: ' + ((error.cause) ? error.cause.statusText : error.message) + '">probably ' + fallbacks[role] + '</span>');
+          return;
+        }
+        if (!!result.length)
+          result = result[0].getTitle().getText();
+        else
+          result = fallbacks[role];
+
+        if (result.indexOf("#") == 0)
+          result = '<a href="irc://irc.mozilla.org/' + result.slice(1) + '">' + result + '</a>';
+
+        $("#current-" + role).html(result);
+      }
     };
   },
 
@@ -280,33 +311,7 @@ var UserInterface = {
   },
 
   _buildTreeInfo: function UserInterface__buildTreeInfo() {
-    function refreshTreeStatus(aSelf) {
-      $.ajax({
-        url: "http://tinderbox.mozilla.org/" + aSelf._treeName + "/status.html",
-        dataType: "text",
-        success: function (data) {
-          var div = $("<div>").html(data);
-          $("#preamble", div).remove();
-          $("#tree-status").empty();
-          $("#status-container", div).contents().appendTo("#tree-status");
-          if (!Config.useGoogleCalendar) {
-            ["#sheriff", "#releng"].forEach(function (role) {
-              var info = $(role, div).contents();
-              if (!info.text())
-                $("<div>Unknown</div>").replaceAll(role);
-              else
-                info.replaceAll(role);
-            });
-          }
-        }
-      });
-    }
-
     if (this._treeName in Config.treeInfo) {
-      // Initialize the tree status then update it every 5 minutes.
-      refreshTreeStatus(this);
-      setInterval(refreshTreeStatus, 1000 * 60 * 5, this);
-
       var treeInfo = $('#treeInfo');
       var primaryRepo = Config.treeInfo[this._treeName].primaryRepo;
       $('<dt>Pushlog:</dt><dd><a href="http://hg.mozilla.org/' + primaryRepo + '/pushloghtml">' +
@@ -329,64 +334,6 @@ var UserInterface = {
         '">' + Config.alternateTinderboxPushlogName +
         ' version of Tinderboxpushlog</a>.');
     }
-
-    // This returns early if we're not using the google calendar.
-    if (!Config.useGoogleCalendar)
-      return;
-
-    // Only google calendar set-up below.
-    google.setOnLoadCallback(function() {
-      var service = new google.gdata.calendar.CalendarService("mozilla-tinderbox");
-
-      var items = [
-        {
-          elem: document.getElementById("current-sheriff"),
-          calendar: "http://www.google.com/calendar/feeds/j6tkvqkuf9elual8l2tbuk2umk%40group.calendar.google.com/public/full",
-          fallback: "#developers"
-        },
-        {
-          elem: document.getElementById("current-releng"),
-          calendar: "http://www.google.com/calendar/feeds/aelh98g866kuc80d5nbfqo6u54%40group.calendar.google.com/public/full",
-          fallback: "#build"
-        }
-      ];
-
-      function refreshItem(item) {
-        // Ignore DST and find Mozilla Standard Time
-        var mst = new Date(Date.now() +
-                           (new Date()).getTimezoneOffset() * 60 * 1000 +
-                           Config.mvtTimezoneOffset * 60 * 60 * 1000);
-
-        var query = new google.gdata.calendar.CalendarEventQuery(item.calendar);
-        query.setMinimumStartTime(new google.gdata.DateTime(mst, true));
-        query.setOrderBy("starttime");
-        query.setSortOrder("ascending");
-        query.setMaxResults("1");
-        query.setSingleEvents(true);
-
-        service.getEventsFeed(query, function(root) {
-          var result = root.feed.getEntries();
-          if (!!result.length)
-            result = result[0].getTitle().getText();
-          else
-            result = item.fallback;
-
-          if (result.indexOf("#") == 0)
-            result = '<a href="irc://irc.mozilla.org/' + result.slice(1) + '">' + result + '</a>';
-
-          item.elem.innerHTML = result;
-        }, function(error) {
-          item.elem.innerHTML = '<span style="color:red; text-decoration:underline" title="Error: ' + ((error.cause) ? error.cause.statusText : error.message) + '">probably ' + item.fallback + '</span>';
-        });
-      }
-
-      for (var i in items) {
-        var item = items[i];
-        refreshItem(item);
-        setInterval(refreshItem, 1000 * 60 * 60 /* every hour */, item);
-      }
-    });
-    google.load("gdata", "1.s");
   },
 
   _getParamsString: function UserInterface__getParamsString() {
