@@ -2,6 +2,7 @@
 /* vim: set sw=2 ts=2 et tw=80 : */
 
 function Data(treeName, noIgnore, config) {
+  this._bugcache = {};
   this._treeName = treeName;
   this._noIgnore = noIgnore;
   this._config = config;
@@ -15,6 +16,18 @@ function Data(treeName, noIgnore, config) {
 };
 
 Data.prototype = {
+  getBug: function Data_getBug(id, callback) {
+    if (id in this._bugcache)
+      return callback(this._bugcache[id]);
+    var self = this;
+    $.getJSON("https://api-dev.bugzilla.mozilla.org/latest/bug?id=" + id, function (data) {
+      if (data.bugs && data.bugs[0]) {
+        self._bugcache[id] = data.bugs[0];
+        callback(data.bugs[0]);
+      }
+    });
+  },
+
   getLoadedPushRange: function Data_getLoadedPushRange() {
     if (!this._mostRecentPush)
       return null;

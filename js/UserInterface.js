@@ -711,7 +711,8 @@ var UserInterface = {
   },
 
   _linkBugs: function UserInterface__linkBugs(text, addOrangefactorLink) {
-    var buglink = '<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=$2">$1$2</a>';
+    var buglink = '<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=$2" ' +
+      'data-bugid="$2" onmouseover="UserInterface.loadBug(this);">$1$2</a>';
     if (addOrangefactorLink && "orangeFactor" in Config.treeInfo[this._treeName]) {
       var today = new Date();
       var sixtyDaysAgo = new Date(today.getTime() - (1000 * 60 * 60 * 24 * 60));
@@ -720,6 +721,17 @@ var UserInterface = {
     }
     return text.replace(/(bug\s*|b=)([1-9][0-9]*)\b/ig, buglink)
            .replace(/(changeset\s*)?([0-9a-f]{12})\b/ig, '<a href="http://hg.mozilla.org/' + Config.treeInfo[this._treeName].primaryRepo + '/rev/$2">$1$2</a>');
+  },
+
+  loadBug: function UserInterface_loadBug(elem) {
+    var id = $(elem).attr("data-bugid");
+    // avoid double request when we have a popup
+    $("[data-bugid=" + id + "]").removeAttr("onmouseover");
+    if (!id)
+      return;
+    this._data.getBug(id, function (bug) {
+      $("[data-bugid=" + id + "]").attr("title", bug.status + " - " + bug.summary);
+    });
   },
 
   _isFailureState: function UserInterface__isFailureState(state) {
