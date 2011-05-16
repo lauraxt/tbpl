@@ -12,7 +12,7 @@ var Config = {
   baseURL: "",
   useGoogleCalendar: true,
   jsonPendingOrRunningBaseURL: "http://build.mozilla.org/builds/",
-  htmlPendingOrRunningBaseURL: "http://build.mozilla.org/builds/",
+  htmlPendingOrRunningBaseURL: "http://build.mozilla.org/buildapi/",
   selfServeAPIBaseURL: "https://build.mozilla.org/buildapi/self-serve",
   alternateTinderboxPushlogURL: "http://build.mozillamessaging.com/tinderboxpushlog/?tree=",
   alternateTinderboxPushlogName: "Mozilla Messaging",

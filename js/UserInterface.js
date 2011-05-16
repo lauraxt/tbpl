@@ -192,9 +192,9 @@ var UserInterface = {
 
   handleInfraStatsUpdate: function UserInterface_handleInfraStatsUpdate(infraStats) {
     var html = '<dt>Branch</dt><dd><a href="' +
-      Config.htmlPendingOrRunningBaseURL + 'pending.html">pending</a>' +
+      Config.htmlPendingOrRunningBaseURL + 'pending">pending</a>' +
       ' / <a href="' + Config.htmlPendingOrRunningBaseURL +
-      'running.html">running</a></dd>';
+      'running">running</a></dd>';
     var total = {pending: 0, running: 0};
     for (var branch in infraStats) {
       html += "<dt>" + branch + "</dt><dd>" + infraStats[branch].pending + " / " + infraStats[branch].running + "</dd>";
