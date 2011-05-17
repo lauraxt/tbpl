@@ -1276,7 +1276,7 @@ var UserInterface = {
     if (this._activeResult) {
       var activeA = $('.results .machineResult[resultID="' + this._activeResult + '"]').get(0);
       if (activeA && scroll) {
-        this._scrollElemIntoView(activeA, document.getElementById("pushes"), 20);
+        this._scrollElemIntoView(activeA, $("#container").get(0), 20);
       }
     }
   },
