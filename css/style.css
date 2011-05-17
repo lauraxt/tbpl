@@ -155,9 +155,6 @@ iframe {
 body.details > #container {
   bottom: 121px;
 }
-body:not(.details) > #container li:last-child {
-  margin-bottom: 121px;
-}
 #pushes, .patches, .results {
   list-style: none;
   margin: 0;
