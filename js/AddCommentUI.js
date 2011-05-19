@@ -114,6 +114,7 @@ var AddCommentUI = {
       this.pendingBugsChanged(1);
     }
     this.clearAutoStarBugs();
+    this.reset();
   },
 
   openCommentBox: function AddCommentUI_openCommentBox() {
