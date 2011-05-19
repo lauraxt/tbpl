@@ -9,7 +9,6 @@ var AddCommentUI = {
   numSendingBugs: 0,
   numSendingBugChangedCallback: function empty() {},
   _submitURL: "",
-  _autoStarBugs: {},
 
   init: function AddCommentUI_init(submitURL) {
     this._submitURL = submitURL;
@@ -139,39 +138,19 @@ var AddCommentUI = {
     }
   },
 
-  addAutoStarBug: function AddCommentUI_addAutoStarBug(bugid) {
-    if (bugid in this._autoStarBugs) {
-      this._autoStarBugs[bugid]++;
-    } else {
-      this._autoStarBugs[bugid] = 1;
-      this.addToBug(bugid);
-    }
-  },
-
-  removeAutoStarBug: function AddCommentUI_removeAutoStarBug(bugid) {
-    if (bugid in this._autoStarBugs) {
-      this._autoStarBugs[bugid]--;
-      if (this._autoStarBugs[bugid] == 0) {
-        delete this._autoStarBugs[bugid];
-        this.removeFromBug(bugid);
-      }
-    }
-  },
-
   clearAutoStarBugs: function AddCommentUI_clearAutoStarBugs() {
-    for (var bugid in this._autoStarBugs) {
-      this.removeAutoStarBug(bugid);
+    for (var bugid in this.addToBugs) {
+      this.removeFromBug(bugid);
     }
   },
 
   shouldAutoStarBug: function AddCommentUI_shouldAutoStarBug(bugid) {
-    // this._autoStarBugs[bugid] == 0 should not happen.
-    return bugid in this._autoStarBugs;
+    return bugid in this.addToBugs;
   },
 
   updateAutoStarState: function AddCommentUI_updateAutoStarState() {
     var autoStar = $("#autoStar");
-    if (Object.keys(this._autoStarBugs).length) {
+    if (Object.keys(this.addToBugs).length) {
       autoStar.addClass("active");
       autoStar.attr("title", "Click to star this orange using the suggestions selected");
     } else {

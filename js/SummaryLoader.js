@@ -8,12 +8,13 @@ var SummaryLoader = {
 
   init: function SummaryLoader_init() {
     $(".stars .starSuggestion").live("click", function() {
+      var bugid = $(this).parent().attr("data-bugid");
       if ($(this).hasClass("active")) {
         $(this).removeClass("active");
-        AddCommentUI.removeAutoStarBug($(this).parent().attr("data-bugid"));
+        AddCommentUI.removeFromBug(bugid);
       } else {
         $(this).addClass("active");
-        AddCommentUI.addAutoStarBug($(this).parent().attr("data-bugid"));
+        AddCommentUI.addToBug(bugid);
       }
       AddCommentUI.updateAutoStarState();
     });
