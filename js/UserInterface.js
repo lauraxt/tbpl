@@ -917,13 +917,12 @@ var UserInterface = {
         var item = machineResults.suggestions[i];
         var link =
         $("<a href=\"#\">Bug " + item.id + "</a>").click(function() {
-          AddCommentUI.toggleSuggestion(this.getAttribute("data-id"), this);
+          AddCommentUI.toggleSuggestion(this.getAttribute("data-id"));
           return false;
         }).attr("title", "[" + item.status.trim() + "] " + item.summary)
         .attr("data-id", item.id)
         .appendTo(target);
-        if (AddCommentUI.shouldAutoStarBug(item.id))
-          link.click();
+        AddCommentUI.markSuggestedBug(item.id);
       }
     }
   },

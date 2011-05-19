@@ -144,6 +144,7 @@ var AddCommentUI = {
       this._autoStarBugs[bugid]++;
     } else {
       this._autoStarBugs[bugid] = 1;
+      this.addToBug(bugid);
     }
   },
 
@@ -152,12 +153,15 @@ var AddCommentUI = {
       this._autoStarBugs[bugid]--;
       if (this._autoStarBugs[bugid] == 0) {
         delete this._autoStarBugs[bugid];
+        this.removeFromBug(bugid);
       }
     }
   },
 
   clearAutoStarBugs: function AddCommentUI_clearAutoStarBugs() {
-    this._autoStarBugs = {};
+    for (var bugid in this._autoStarBugs) {
+      this.removeAutoStarBug(bugid);
+    }
   },
 
   shouldAutoStarBug: function AddCommentUI_shouldAutoStarBug(bugid) {
@@ -196,23 +200,47 @@ var AddCommentUI = {
     this.numSendingBugChangedCallback = callback;
   },
 
-  toggleSuggestion: function AddCommentUI_toggleSuggestion(id, link) {
-    var box = $("#logNoteText");
-    if (box.val() == "") {
-      this.addToBugs[id] = true;
-      box.val(link.textContent);
-      $(link).addClass("added");
+  markSuggestedBug: function AddCommentUI_markSuggestedBug(bugid) {
+    var commentSuggestion = $('#logNoteSuggestions a[data-id=' + bugid + ']');
+    var resultSuggestion = $(".stars .summary [data-bugid=" + bugid + "] .starSuggestion");
+    if (bugid in this.addToBugs) {
+      commentSuggestion.addClass('added');
+      resultSuggestion.addClass('active');
     } else {
-      if (box.val().indexOf(link.textContent) >= 0) {
-        delete this.addToBugs[id];
-        box.val(box.val().replace(new RegExp("(, )?" + link.textContent), ""));
-        $(link).removeClass("added");
-      } else {
-        this.addToBugs[id] = true;
-        box.val(box.val() + ", " + link.textContent);
-        $(link).addClass("added");
-      }
+      commentSuggestion.removeClass('added');
+      resultSuggestion.removeClass('active');
     }
+    this.updateAutoStarState();
+  },
+
+  addToBug: function AddCommentUI_addToBug(bugid) {
+    this.addToBugs[bugid] = true;
+
+    var box = $("#logNoteText");
+    var comment = box.val();
+    if (comment == '')
+      box.val("Bug " + bugid);
+    else
+      box.val(comment + ", bug " + bugid);
+
+    this.markSuggestedBug(bugid);
+  },
+
+  removeFromBug: function AddCommentUI_removeFromBug(bugid) {
+    delete this.addToBugs[bugid];
+
+    var box = $("#logNoteText");
+    var comment = box.val();
+    box.val(comment.replace(new RegExp("(, )?[bB]ug " + bugid), ""));
+
+    this.markSuggestedBug(bugid);
+  },
+
+  toggleSuggestion: function AddCommentUI_toggleSuggestion(id) {
+    if (id in this.addToBugs)
+      this.removeFromBug(id);
+    else
+      this.addToBug(id);
   },
 
   _getEmail: function AddCommentUI__getEmail() {
