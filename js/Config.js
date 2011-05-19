@@ -17,6 +17,8 @@ var Config = {
   alternateTinderboxPushlogURL: "http://build.mozillamessaging.com/tinderboxpushlog/?tree=",
   alternateTinderboxPushlogName: "Mozilla Messaging",
   wooBugURL: "http://brasstacks.mozilla.com/starcomment.php", // war-on-orange database
+  defaultTimeout: 10000,
+
   // treeInfo gives details about the trees and repositories. There are various
   // items that can be specified:
   //

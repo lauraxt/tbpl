@@ -22,6 +22,9 @@ var Controller = {
     var onlyUnstarred = ("onlyunstarred" in params) && (params.onlyunstarred == "1");
     var jobName = ("jobname" in params) && params.jobname;
 
+    $.ajaxSetup({
+      timeout: Config.defaultTimeout,
+    });
 
     this._data = new Data(this.treeName, noIgnore, Config);
     this._uiCallbacks = UserInterface.init(this, onlyUnstarred, pusher, jobName);
