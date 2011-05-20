@@ -24,6 +24,13 @@ header("Access-Control-Allow-Origin: *");
 
 echo getSummary($_GET["tree"], $_GET["id"], $type);
 
+function fgets_whole_line($fp) {
+  $line = '';
+  while (!feof($fp) && substr($line, -1, 1) != "\n")
+    $line .= fgets($fp);
+  return $line;
+}
+
 function getSummary($tree, $id, $type) {
   if ($type != "starred" && $type != "notstarred" && $type != "reftest")
     die("invalid type passed to getSummary");
@@ -58,7 +65,7 @@ function getSummary($tree, $id, $type) {
       $fileExistedAfterAll = true;
       break;
     }
-    $line = fgets($fp);
+    $line = fgets_whole_line($fp);
     if ($line != "") {
       if (!$foundSummaryStart && !$foundLogStart) {
         if (preg_match("/Build Error Summary.*Build Error Log.*No More Errors/i", $line)) {
