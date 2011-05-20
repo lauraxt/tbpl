@@ -1036,7 +1036,7 @@ var UserInterface = {
     return push.patches.map(function buildHTMLForPushPatch(patch, patchIndex) {
       return '<li>\n' +
       '<a class="revlink" data-rev="' + patch.rev + '" href="' + self._changesetURL(patch.rev) + '">' + patch.rev +
-      '</a>\n<div><span><span class="author">' + patch.author + '</span> &ndash; ' +
+      '</a>\n<div><div class="patchTitle"><span><span class="author">' + patch.author + '</span> &ndash; ' +
       '<span class="desc">' + self._linkBugs(patch.desc.split("\n")[0], false) + '</span>' +
       (function buildHTMLForPatchTags() {
         if (!patch.tags.length)
@@ -1046,7 +1046,7 @@ var UserInterface = {
           return ' <span class="' + this.type + '">' + this.name + '</span>';
         }).get().join('') + '</span>';
       })() +
-      '</span></div>\n' +
+      '</span></div></div>\n' +
       '</li>';
     }).join("\n");
   },
@@ -1228,7 +1228,7 @@ var UserInterface = {
     context.unbind("mouseenter");
     context.bind("mouseenter", function createPopup() {
       $(this).unbind();
-      $(".patches > li > div", this).each(function createPopupPatch(i) {
+      $(".patches > li > div > .patchTitle", this).each(function createPopupPatch(i) {
         var div = $(this);
         if (div.width() - div.children().width() > 10)
           return; // There's enough space; no need to show the popup.

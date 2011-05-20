@@ -187,16 +187,15 @@ body.details > #container {
 }
 .patches > li {
   overflow: hidden;
+  white-space: nowrap;
 }
 .patches > li > div {
-  white-space: nowrap;
-  margin-left: 95px;
+  display: inline-block;
 }
-.patches > li > .popup > span {
+.patches > li > div > .popup > span {
   opacity: 0;
   white-space: normal;
   position: absolute;
-  display: block;
   padding: 2px 5px;
   margin: -2px 55px -2px -9000px;
   -moz-border-radius: 3px;
@@ -216,7 +215,7 @@ body.details > #container {
   transition-duration: 200ms, 0ms;
   transition-delay: 300ms, 500ms;
 }
-.patches > li:hover > .popup > span {
+.patches > li:hover > div > .popup > span {
   opacity: 1;
   margin-left: -5px;
   -moz-transition-delay: 500ms;
@@ -251,7 +250,7 @@ span.pusher:hover {
   text-decoration: underline;
 }
 .revlink {
-  float: left;
+  display: inline-block;
   width: 95px;
 }
 .results {
