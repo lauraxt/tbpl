@@ -246,7 +246,8 @@ var AddCommentUI = {
     html = html ? html + "&nbsp;(drag additional builds here)"
                 : "(none selected - drag builds here)";
     $("#logNoteRuns").html(html);
-    UserInterface._markActiveResultLinks(); // XXX fix this
+    UserInterface._didCreateNewMachineResultLinks("#logNoteRuns");
+    UserInterface._markActiveResultLinks();
     UserInterface._markSelected();
   },
 

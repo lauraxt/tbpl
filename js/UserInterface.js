@@ -72,6 +72,23 @@ var UserInterface = {
         $(".dropdown").removeClass("open");
     });
 
+    $(".machineResult").live("click", function clickMachineResult(e) {
+      var id = $(this).attr('resultID');
+      if (e.ctrlKey || e.metaKey)
+        self._toggleSelectedBuild(id);
+      else
+        self._resultLinkClick(id);
+      return false;
+    });
+
+    $(".revlink").live('click', function (event) {
+      if (event.ctrlKey || event.metaKey) {
+        self._toggleSelectedRev($(this).attr('data-rev'));
+        return false;
+      }
+      return true;
+    });
+
     SummaryLoader.init();
     AddCommentUI.init("http://tinderbox.mozilla.org/addnote.cgi");
     AddCommentUI.registerNumSendingCommentChangedCallback(function commentSendUpdater(changedResult) {
@@ -84,7 +101,7 @@ var UserInterface = {
         //  - the panel showing the star if the starred result is selected
         // We need to refresh all these places.
         self.handleUpdatedPush(changedResult.push);
-        self._updateTreeStatus();
+        self._updateFailingBuildsDisplay();
         self._setActiveResult(self._activeResult, false);
       }
     });
@@ -162,17 +179,7 @@ var UserInterface = {
         pushNode.hide();
       }
     }
-    var self = this;
-    $(".revlink").draggable({ helper: 'clone' });
-
-    $(".revlink").unbind('click.selectedRev');
-    $(".revlink").bind('click.selectedRev', function (event) {
-      if (event.ctrlKey || event.metaKey) {
-        self._toggleSelectedRev($(this).attr('data-rev'));
-        return false;
-      }
-      return true;
-    });
+    this._updateFailingBuildsDisplay();
   },
 
   _getInsertBeforeAnchor: function UserInterface__getInsertBeforeAnchor(push) {
@@ -207,9 +214,6 @@ var UserInterface = {
 
   updateStatus: function UserInterface_updateStatus(status) {
     var self = this;
-    if (status) {
-      this._updateTreeStatus();
-    }
 
     function showStatusMessage(statusType, messageText, messageType) {
       if (!self._statusMessageIDs[statusType]) {
@@ -377,7 +381,7 @@ var UserInterface = {
       this.handleUpdatedPush(pushes[i]);
     }
 
-    this._updateTreeStatus();
+    this._updateFailingBuildsDisplay();
   },
 
   _updatePusherFilter: function UserInterface__updatePusherFilter(pusher) {
@@ -393,7 +397,7 @@ var UserInterface = {
       }
     });
 
-    this._updateTreeStatus();
+    this._updateFailingBuildsDisplay();
   },
 
   _updateMachineFilter: function UserInterface__updateMachineFilter(machine) {
@@ -406,7 +410,7 @@ var UserInterface = {
       this.handleUpdatedPush(pushes[i]);
     }
 
-    this._updateTreeStatus();
+    this._updateFailingBuildsDisplay();
   },
 
   _initFilters: function UserInterface__initFilters() {
@@ -749,7 +753,11 @@ var UserInterface = {
     return !result.note && this._isFailureState(result.state);
   },
 
-  _updateTreeStatus: function UserInterface__updateTreeStatus() {
+  _didCreateNewMachineResultLinks: function UserInterface__didCreateNewMachineResultLinks(context) {
+    $(".machineResult:not(.pending):not(.running)", context).draggable({ helper: 'clone' });
+  },
+
+  _updateFailingBuildsDisplay: function UserInterface__updateFailingBuildsDisplay() {
     var failing = this._getFailingJobs(this._getCurrentResults());
     var unstarred = 0;
     for (var i = 0; i < failing.length; ++i) {
@@ -759,8 +767,8 @@ var UserInterface = {
     }
 
     var self = this;
-    $('#status').html(
-      '<strong>' + failing.length + '</strong> Job' + (failing.length != 1 ? 's are' : ' is') + ' failing:<br />' +
+    $('#status').get(0).innerHTML = (function calcHTML() {
+      return '<strong>' + failing.length + '</strong> Job' + (failing.length != 1 ? 's are' : ' is') + ' failing:<br />' +
       failing.map(function(machineResult) {
         var className = "machineResult " + machineResult.state;
         var title = self._resultTitle(machineResult);
@@ -774,20 +782,10 @@ var UserInterface = {
                (machineResult.runID == self._activeResult ? ' active="true"' : '') +
                ' resultID="' + machineResult.runID + '"' +
                '>' + title + '</a>';
-      }).join('\n')
-    );
+      }).join('\n');
+    })();
+    this._didCreateNewMachineResultLinks('#status');
     document.title = document.title.replace(/\[\d*\]/, "[" + unstarred + "]");
-
-    $(".machineResult:not(.pending):not(.running)").draggable({ helper: 'clone' });
-    $(".machineResult").unbind('click.selectedRev');
-    $(".machineResult").bind('click.selectedRev', function (event) {
-      var id = $(this).attr('resultID');
-      if (event.ctrlKey || event.metaKey)
-        self._toggleSelectedBuild(id);
-      else
-        self._resultLinkClick(id);
-      return false;
-    });
   },
 
   _toggleSelectedBuild: function UserInterface__toggleSelectedBuild(id) {
@@ -1086,15 +1084,24 @@ var UserInterface = {
       '<ul class="patches"></ul>\n' +
       '</li>';
     var node = $(nodeHtml);
-    $(".patches", node).html(this._buildHTMLForPushPatches(push));
+    this._refreshPushPatchesInPushNode(push, node);
     this._refreshPushResultsInPushNode(push, node);
     this._installComparisonClickHandler(node);
     this._installTooltips(node);
     return node;
   },
 
+  _refreshPushPatchesInPushNode: function UserInterface__refreshPushPatchesInPushNode(push, node) {
+    var self = this;
+    var patchesList = $(".patches", node);
+    patchesList.get(0).innerHTML = this._buildHTMLForPushPatches(push);
+    $(".revlink", patchesList).draggable({ helper: 'clone' });
+  },
+
   _refreshPushResultsInPushNode: function UserInterface__refreshPushResultsInPushNode(push, node) {
-    $(".results", node).html(this._buildHTMLForPushResults(push));
+    var resultsList = $(".results", node);
+    resultsList.get(0).innerHTML = this._buildHTMLForPushResults(push);
+    this._didCreateNewMachineResultLinks(resultsList);
   },
 
   _listChangesetsForPush: function(toprev) {
@@ -1119,7 +1126,7 @@ var UserInterface = {
   },
 
   _permanentMessagesShowing: function UserInterface__loadingMessagesShowing() {
-    return document.querySelectorAll("#messages .loading, #messages .error").length > 0;
+    return $("#messages").children().length > 0;
   },
 
   hideMessages: function UserInterface_hideMessages(onlyIfNoneLoading) {
