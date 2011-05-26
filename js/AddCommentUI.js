@@ -33,17 +33,19 @@ var AddCommentUI = {
     $("#logNoteEmail").val(self._getEmail());
     $("#addNotePopup").draggable({ containment: 'window', handle: 'form, h2, table, tbody, tr, th, td, label, p' });
 
-    $("#addNotePopup").droppable({
-        greedy: true,
-        drop: function(ev, ui) {
-          var id = ui.draggable.attr('resultID');
-          if (id) {
-            UserInterface._selectedBuilds[id] = true;
-            self.updateUI();
-          } else if (ui.draggable.hasClass('revlink')) {
-            UserInterface._toggleSelectedRev(ui.draggable.attr('data-rev'), true);
-          }
-        }
+    $.event.props.push("dataTransfer");
+    $("#addNotePopup").bind("dragover", function (e) { e.preventDefault(); });
+    $("#addNotePopup").bind("drop", function addNoteDropHandler(e) {
+      var id = e.dataTransfer.getData("text/x-tbpl-resultid");
+      if (id) {
+        UserInterface._selectedBuilds[id] = true;
+        self.updateUI();
+      } else {
+        var rev = e.dataTransfer.getData("text/x-tbpl-revision");
+        if (rev)
+          UserInterface._toggleSelectedRev(rev, true);
+      }
+      return false;
     });
 
     $("#addNoteForm").bind("submit", function addNoteFormSubmit() {
@@ -246,7 +248,6 @@ var AddCommentUI = {
     html = html ? html + "&nbsp;(drag additional builds here)"
                 : "(none selected - drag builds here)";
     $("#logNoteRuns").html(html);
-    UserInterface._didCreateNewMachineResultLinks("#logNoteRuns");
     UserInterface._markActiveResultLinks();
     UserInterface._markSelected();
   },

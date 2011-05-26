@@ -81,12 +81,25 @@ var UserInterface = {
       return false;
     });
 
+    $.event.props.push("dataTransfer");
+    $(".machineResult:not(.pending):not(.running)").live("dragstart", function (e) {
+      e.dataTransfer.effectAllowed = "link";
+      var resultID = $(this).attr("resultID");
+      // Note: This doesn't work in Chromium due to bug 31037.
+      e.dataTransfer.setData("text/x-tbpl-resultid", resultID);
+    });
+
     $(".revlink").live('click', function (event) {
       if (event.ctrlKey || event.metaKey) {
         self._toggleSelectedRev($(this).attr('data-rev'));
         return false;
       }
       return true;
+    });
+
+    $(".revlink").live("dragstart", function (e) {
+      e.dataTransfer.effectAllowed = "link";
+      e.dataTransfer.setData("text/x-tbpl-revision", $(this).attr("data-rev"));
     });
 
     SummaryLoader.init();
@@ -753,10 +766,6 @@ var UserInterface = {
     return !result.note && this._isFailureState(result.state);
   },
 
-  _didCreateNewMachineResultLinks: function UserInterface__didCreateNewMachineResultLinks(context) {
-    $(".machineResult:not(.pending):not(.running)", context).draggable({ helper: 'clone' });
-  },
-
   _updateFailingBuildsDisplay: function UserInterface__updateFailingBuildsDisplay() {
     var failing = this._getFailingJobs(this._getCurrentResults());
     var unstarred = 0;
@@ -784,7 +793,6 @@ var UserInterface = {
                '>' + title + '</a>';
       }).join('\n');
     })();
-    this._didCreateNewMachineResultLinks('#status');
     document.title = document.title.replace(/\[\d*\]/, "[" + unstarred + "]");
   },
 
@@ -1095,13 +1103,11 @@ var UserInterface = {
     var self = this;
     var patchesList = $(".patches", node);
     patchesList.get(0).innerHTML = this._buildHTMLForPushPatches(push);
-    $(".revlink", patchesList).draggable({ helper: 'clone' });
   },
 
   _refreshPushResultsInPushNode: function UserInterface__refreshPushResultsInPushNode(push, node) {
     var resultsList = $(".results", node);
     resultsList.get(0).innerHTML = this._buildHTMLForPushResults(push);
-    this._didCreateNewMachineResultLinks(resultsList);
   },
 
   _listChangesetsForPush: function(toprev) {
