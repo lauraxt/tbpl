@@ -459,26 +459,26 @@ var UserInterface = {
       return true;
     });
     
-    for each (var push in pushes) {
-      for each (var os in oses) {
+    pushes.forEach(function (push) {
+      oses.forEach(function (os) {
         if (!push.results[os])
-          continue;
+          return;
 
-        for each (var type in types) {
+        types.forEach(function (type) {
           if (!push.results[os][type])
-            continue;
+            return;
 
-          for each (var group in groups) {
+          groups.forEach(function (group) {
             if (!push.results[os][type][group])
-              continue;
+              return;
 
-            for each (var result in push.results[os][type][group]) {
+            push.results[os][type][group](function (result) {
               results.push(result);
-            }
-          }
-        }
-      }
-    }
+            });
+          });
+        });
+      });
+    });
 
     return results.filter(function (result) {
       return !(result.state == 'pending' ||
@@ -1001,9 +1001,9 @@ var UserInterface = {
 
     var oshtml = osresults.map(function (osresult) {
       if ('machineType' in osresult) {
-        for each (var result in osresult.results) {
+        osresult.results.forEach(function (result) {
           result.order = ++order[0];
-        }
+        });
         return self._machineGroupResultLink(osresult.machineType, osresult.results);
       } else {
         return osresult.map(function (result) {

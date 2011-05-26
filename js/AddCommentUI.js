@@ -89,13 +89,13 @@ var AddCommentUI = {
       self.pendingCommentsChanged(1);
     });
     var bugsSubmitData = {};
-    for each (var i in builds) {
+    builds.forEach(function (i) {
       var machineResult = data.getMachineResult(i);
       if (!machineResult.suggestions)
-        continue;
+        return;
       for (var j = 0; j < machineResult.suggestions.length; ++j) {
         var suggestion = machineResult.suggestions[j];
-        if (!(suggestion.id in this.addToBugs))
+        if (!(suggestion.id in self.addToBugs))
           continue;
         bugsSubmitData[suggestion.id] = {
           header: suggestion.signature,
@@ -104,7 +104,7 @@ var AddCommentUI = {
           logLink: 'http://tinderbox.mozilla.org/showlog.cgi?log=' + Controller.treeName + '/' + machineResult.runID
         };
       }
-    }
+    });
     for (var id in bugsSubmitData) {
       this._postOneBug(id, bugsSubmitData[id].header, bugsSubmitData[id].logLink,
                        bugsSubmitData[id].email, bugsSubmitData[id].log,

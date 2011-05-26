@@ -17,7 +17,6 @@ var NetUtils = {
 
     var errorTimer;
     var req = new XMLHttpRequest();
-    req.withCredentials = withCredentials;
     req.onerror = function requestFailed(e) {
       clearTimeout(errorTimer);
       failCallback(e);
@@ -28,6 +27,7 @@ var NetUtils = {
     };
     try {
       req.open(method, url, true); 
+      req.withCredentials = withCredentials;
       if (requestHeaders) {
         for (var k in requestHeaders) {
           req.setRequestHeader(k, requestHeaders[k]);
