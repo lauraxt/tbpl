@@ -1490,7 +1490,7 @@ var UserInterface = {
             testResults.map(function htmlForTestResultEntry(r) {
               return '<li>' + r.name +
                 (r.result ? ': ' + (r.resultURL ? '<a href="' + r.resultURL.escapeAttribute() +
-                                                  '">' + r.result.escapeContent + '</a>'
+                                                  '">' + r.result.escapeContent() + '</a>'
                                                 : r.result)
                       : '') +
                 (r.detailsURL ? ' (<a href="' + r.detailsURL.escapeAttribute() +
