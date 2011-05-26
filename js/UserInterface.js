@@ -1243,7 +1243,9 @@ var UserInterface = {
       $(this).unbind();
       $(".patches > li > div > .patchTitle", this).each(function createPopupPatch(i) {
         var div = $(this);
-        if (div.width() - div.children().width() > 10)
+        var rightEdgeLi = div.parents("li").get(0).getBoundingClientRect().right;
+        var rightEdgeDiv = div.get(0).getBoundingClientRect().right;
+        if (rightEdgeLi - rightEdgeDiv > 10)
           return; // There's enough space; no need to show the popup.
         div.clone().addClass("popup").insertBefore(div);
       });
