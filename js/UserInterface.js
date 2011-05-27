@@ -344,10 +344,10 @@ var UserInterface = {
       }
     } else {
       $("#wrongtree").html(
-        "The tree “" + this.treeName + "” does not exist in Tinderboxpushlog. " +
+        "The tree “" + this._treeName + "” does not exist in Tinderboxpushlog. " +
         "Please choose a tree from the list on the upper left.<br/>" +
         'Maybe the tree you’re looking for is on the <a href="' +
-        Config.alternateTinderboxPushlogURL + this.treeName +
+        Config.alternateTinderboxPushlogURL + this._treeName +
         '">' + Config.alternateTinderboxPushlogName +
         ' version of Tinderboxpushlog</a>.');
     }
