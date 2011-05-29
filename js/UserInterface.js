@@ -495,7 +495,7 @@ var UserInterface = {
             if (!push.results[os][type][group])
               return;
 
-            push.results[os][type][group](function (result) {
+            push.results[os][type][group].forEach(function (result) {
               results.push(result);
             });
           });
