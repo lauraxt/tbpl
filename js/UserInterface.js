@@ -179,6 +179,8 @@ var UserInterface = {
   },
 
   _getPrettyTreeName: function UserInterface_getPrettyTreeName(treeName) {
+    if (!(treeName in Config.treeInfo))
+      return "Unknown Tree";
     return ("prettierName" in Config.treeInfo[treeName])
              ? Config.treeInfo[treeName].prettierName : treeName;
   },
