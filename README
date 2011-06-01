@@ -2,17 +2,46 @@ This is Tinderboxpushlog.
 
 Some links:
 
- - official Firefox instance: http://tests.themasta.com/tinderboxpushlog/ 
+ - official Firefox instance: http://tbpl.mozilla.org/ 
  - repository: http://hg.mozilla.org/users/mstange_themasta.com/tinderboxpushlog/
  - all bugs: https://bugzilla.mozilla.org/buglist.cgi?product=Webtools&component=Tinderboxpushlog
  - file a bug: https://bugzilla.mozilla.org/enter_bug.cgi?product=Webtools&component=Tinderboxpushlog
 
-Hacking:
+Downloading:
 
-If you only want to hack the user interface, i.e. client-side stuff, open js/Config.js and change the baseURL to "http://tests.themasta.com/tinderboxpushlog/". Then running index.html from the local file system should just work.
+Clone the hg repository:
+hg clone http://hg.mozilla.org/users/mstange_themasta.com/tinderboxpushlog/ path/to/tbpl
 
-If you want a self-contained working instance of Tinderboxpushlog, you need a web server that runs some recent version of php. Additionally, you need to create a folder named "summaries" in tbpl's root directory and chmod it to 0777. That's where build log summaries will be stored.
-If you also want Tinderboxpushlog Robot to be able to comment in Bugzilla, you'll need to ask Ehsan for the tbplbot-password.php file and store it in the php folder. Alternatively you could create your own Bugzilla user, replace tbplbot@gmail.com in submitBugzillaComment.php with you user's email and add a tbplbot-password.php file that looks like this:
+Installing:
+
+TBPL has a client-side and a server-side component. Running only the client-side component is really simple, because you can just make it refer to the server-side component that runs on tbpl.mozilla.org. In order to do that, open js/Config.js and change the baseURL to "http://tbpl.mozilla.org/". Then you can open index.html and it will just work (even from the local file system).
+
+If you want a standalone instance of TBPL with your own server-side component, the requirements for your server are a little higher. Data is stored in a MongoDB database, which is accessed by both python (dataimport/import-buildbot-data.py) and PHP scripts. All in all, you need these things:
+
+ - a webserver (e.g. Apache)
+ - PHP 5.3
+ - Python 2.6 or better
+ - MongoDB (some recent version will do)
+ - Mongo drivers for both PHP and Python (called MongoPHP and pymongo)
+
+Then you can set everything up:
+
+cd path/to/tbpl
+# Create the folders "summaries" and "cache" in the tbpl directory and make them writable for all users:
+mkdir cache summaries
+chmod a+w cache summaries
+# Create the file php/sheriff-password.php that stores the hidden builder change password:
+echo "<?php define('SHERIFF_PASSWORD', 'thepassword');" > php/sheriff-password.php
+# Start the MongoDB server if it's not running already, for example like this (in a different shell):
+/path/to/bin/mongo -bind_ip 127.0.0.1
+# Start the initial import (this will take a while):
+python26 dataimport/import-buildbot-data.py -d 5 # 5 is the number of days to go back in time
+# Install a cronjob that runs dataimport/import-buildbot-data.py every 5 minutes
+echo "*/5 * * * * python26 /path/to/tbpl/datamiport/import-buildbot-data.py" >> /etc/crontab
+
+I hope this works. If it doesn't, pester mstange or file a TBPL bug.
+
+If yo want Tinderboxpushlog Robot to be able to comment in Bugzilla, you'll need to ask Ehsan for the tbplbot-password.php file and store it in the php folder. Alternatively you could create your own Bugzilla user, replace tbplbot@gmail.com in submitBugzillaComment.php with you user's email and add a tbplbot-password.php file that looks like this:
 <?php define('TBPLBOT_PASSWORD', 'yourpassword'); ?>
 
 If you have a question, just send me an email at mstange@themasta.com.
