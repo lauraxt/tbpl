@@ -2,3 +2,10 @@
 	ExpiresActive on
 	ExpiresDefault "access plus 15 minutes"
 </IfModule>
+
+# Parsing logs needs lots of memory, so be generous
+php_value memory_limit 2048M
+
+# Don't display PHP errors.
+php_value error_reporting 0
+php_value display_errors 0

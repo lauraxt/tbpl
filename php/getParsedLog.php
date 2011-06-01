@@ -1,0 +1,27 @@
+<?php
+/* -*- Mode: PHP; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+/* vim: set sw=2 ts=2 et tw=80 : */
+
+require_once 'inc/LogParser.php';
+require_once 'inc/GeneralErrorFilter.php';
+require_once 'inc/ShortLogGenerator.php';
+require_once 'inc/FullLogGenerator.php';
+require_once 'inc/GzipUtils.php';
+require_once 'inc/RunForLog.php';
+
+$run = getRequestedRun();
+$logParser = new LogParser($run, new GeneralErrorFilter());
+try {
+  // Create the plain text summary too, since we need to parse the
+  // log for errors anyway.
+  $logParser->ensureExcerptExists();
+
+  $viewFullLog = isset($_GET['full']) && $_GET['full'] == 1;
+  $logGenerator = $viewFullLog ?
+                         new FullLogGenerator($logParser, $run) :
+                         new ShortLogGenerator($logParser, $run);
+  $parsedLogFilename = $logGenerator->ensureLogExists();
+  GzipUtils::passThru($parsedLogFilename, "text/html");
+} catch (Exception $e) {
+  die($e->getMessage());
+}

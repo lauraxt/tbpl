@@ -1,2 +1,4 @@
 syntax: glob
-summaries/*.gz
+.DS_Store
+summaries/*
+cache/*
