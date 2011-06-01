@@ -54,7 +54,12 @@ if (!String.prototype.escapeAttribute) String.prototype.escapeAttribute = functi
              .replace(/'/g, "&apos;");
 }
 
-// TODO: move String.trim() here.
+if (!String.prototype.trim) String.prototype.trim = function String_trim() {
+  var x = this;
+  x = x.replace(/^\s*(.*?)/, "$1");
+  x = x.replace(/(.*?)\s*$/, "$1");
+  return x;
+}
 
 if (!Number.prototype.pad) Number.prototype.pad = function Number_pad(positions) {
   var divisor = Math.pow(10, (positions || 2) - 1);
