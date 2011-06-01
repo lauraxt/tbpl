@@ -10,6 +10,7 @@ var Config = {
   loadInterval: 120, // seconds
   goBackPushes: 10,
   baseURL: "",
+  absoluteBaseURL: "http://tbpl.mozilla.org/", // used for log links in tbplbot bugzilla comments
   useGoogleCalendar: true,
   jsonPendingOrRunningBaseURL: "http://build.mozilla.org/builds/",
   htmlPendingOrRunningBaseURL: "http://build.mozilla.org/buildapi/",

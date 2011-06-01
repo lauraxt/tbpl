@@ -44,6 +44,7 @@ var BuildbotDBUser = {
         "startTime": new Date(run.starttime * 1000),
         "endTime": new Date(run.endtime * 1000),
         "briefLogURL": Config.baseURL + 'php/getParsedLog.php?id=' + run._id,
+        "absoluteBriefLogURL": Config.absoluteBaseURL + 'php/getParsedLog.php?id=' + run._id,
         "fullLogURL": Config.baseURL + 'php/getParsedLog.php?id=' + run._id + '&full=1',
         "summaryURL": Config.baseURL + "php/getLogExcerpt.php?id=" + run._id,
         "annotatedSummaryURL": Config.baseURL + "php/getLogExcerpt.php?id=" + run._id + '&type=annotated',

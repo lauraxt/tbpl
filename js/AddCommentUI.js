@@ -8,10 +8,8 @@ var AddCommentUI = {
   numSendingCommentChangedCallback: function empty() {},
   numSendingBugs: 0,
   numSendingBugChangedCallback: function empty() {},
-  _submitURL: "",
 
   init: function AddCommentUI_init(submitURL) {
-    this._submitURL = submitURL;
     var self = this;
     $("a.addNote").live("click", function addNoteLinkClick() {
       self.openCommentBox();
@@ -103,7 +101,7 @@ var AddCommentUI = {
           header: suggestion.signature,
           log: suggestion.log,
           email: email.replace("@", "%"),
-          logLink: 'http://tinderbox.mozilla.org/showlog.cgi?log=' + Controller.treeName + '/' + machineResult.runID
+          logLink: machineResult.absoluteBriefLogURL
         };
       }
     });

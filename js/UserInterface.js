@@ -113,7 +113,7 @@ var UserInterface = {
     });
 
     SummaryLoader.init();
-    AddCommentUI.init("http://tinderbox.mozilla.org/addnote.cgi");
+    AddCommentUI.init();
     AddCommentUI.registerNumSendingCommentChangedCallback(function commentSendUpdater(changedResult) {
       self.updateStatus();
       if (changedResult) {
