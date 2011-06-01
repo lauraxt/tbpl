@@ -6,14 +6,16 @@ var BuildbotDBUser = {
   load: function BuildbotDBUser_load(tree, forPushes, noIgnore, loadTracker, loadCallback, data) {
     var self = this;
     var branch = Config.treeInfo[tree].buildbotBranch;
+    var urlPrefix = Config.baseURL + 'php/getRevisionBuilds.php?branch=' + branch;
+    if (noIgnore)
+      urlPrefix += '&noignore=1';
     forPushes.reverse(); // Load recent pushes first.
     forPushes.forEach(function (push) {
       loadTracker.addTrackedLoad();
       $.ajax({
-        url: Config.baseURL + 'php/getRevisionBuilds.php?branch=' + branch + '&rev=' + push.defaultTip,
+        url: urlPrefix + '&rev=' + push.defaultTip,
         dataType: 'json',
-        success: function (json) {
-          var runs = json.filter(function (run) { return Config.hiddenBuilds.indexOf(run.buildername) == -1; });
+        success: function (runs) {
           loadCallback(self._createMachineResults(tree, push.defaultTip, data, runs));
           loadTracker.loadCompleted();
         },

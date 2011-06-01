@@ -13,6 +13,9 @@ function Data(treeName, noIgnore, config) {
   this._finishedResultsWithoutPush = {};
   this._pendingJobs = {};
   this._runningJobs = {};
+  this._hiddenBuilders = null;
+  this._hiddenBuildersAreLoading = false;
+  this._afterLoadedHiddenBuildersCallback = null;
 };
 
 Data.prototype = {
@@ -171,6 +174,7 @@ Data.prototype = {
 
   _loadPendingAndRunningBuilds: function Data__loadPendingAndRunningBuilds(loadTracker, updatedPushCallback, infraStatsCallback) {
     var self = this;
+    this._reloadHiddenBuilders(loadTracker);
     ["pending", "running"].forEach(function (pendingOrRunning) {
       self._getPendingOrRunningBuilds(pendingOrRunning, loadTracker, function (data) {
         var updatedPushes = {};
@@ -558,8 +562,9 @@ Data.prototype = {
         if (!json || !json[pendingOrRunning])
           return;
         var data = json[pendingOrRunning];
-        self._filterHiddenBuilds(data);
-        loadCallback(data);
+        self._filterHiddenBuilds(data, function (filteredData) {
+          loadCallback(filteredData);
+        });
         loadTracker.loadCompleted();
       },
       error: function (request, textStatus, er) {
@@ -568,16 +573,65 @@ Data.prototype = {
     });
   },
 
-  _filterHiddenBuilds: function Data__filterHiddenBuilds(obj) {
+  _filterHiddenBuilds: function Data__filterHiddenBuilds(obj, callback) {
     if (this._noIgnore)
-      return;
-    for (var repo in obj) {
-      for (var toprev in obj[repo]) {
-        obj[repo][toprev] = obj[repo][toprev].filter(function (build) {
-          return Config.hiddenBuilds.indexOf(build.buildername) == -1;
-        });
+      return callback(obj);
+    var self = this;
+    this._afterHiddenBuildersHaveLoaded(function (hiddenBuilders) {
+      var filteredObj = {};
+      for (var repo in obj) {
+        filteredObj[repo] = {};
+        for (var toprev in obj[repo]) {
+          filteredObj[repo][toprev] = obj[repo][toprev].filter(function (build) {
+            return hiddenBuilders.indexOf(build.buildername) == -1;
+          });
+        }
       }
+      callback(filteredObj);
+    });
+  },
+
+  _afterHiddenBuildersHaveLoaded: function Data__afterHiddenBuildersHaveLoaded(callback) {
+    if (this._hiddenBuildersAreLoading) {
+      var oldCallback = this._afterLoadedHiddenBuildersCallback;
+      if (oldCallback) {
+        this._afterLoadedHiddenBuildersCallback = function (hiddenBuilders) {
+          oldCallback(hiddenBuilders);
+          callback(hiddenBuilders);
+        };
+      } else {
+        this._afterLoadedHiddenBuildersCallback = callback;
+      }
+      return;
     }
+
+    callback(this._hiddenBuilders || []);
+  },
+
+  _reloadHiddenBuilders: function Data__reloadHiddenBuilders(loadTracker) {
+    this._hiddenBuilders = null;
+    this._hiddenBuildersAreLoading = true;
+    var branch = Config.treeInfo[this._treeName].buildbotBranch;
+    var self = this;
+    $.ajax({
+      url: Config.baseURL + "php/getHiddenBuilderNames.php?branch=" + branch,
+      dataType: 'json',
+      success: function (json) {
+        self._hiddenBuildersAreLoading = false;
+        if (!json) {
+          loadTracker.loadFailed("JSON from getHiddenBuilderNames.php is invalid");
+          return;
+        }
+        self._hiddenBuilders = json;
+        if (self._afterLoadedHiddenBuildersCallback)
+          self._afterLoadedHiddenBuildersCallback(self._hiddenBuilders);
+        loadTracker.loadCompleted();
+      },
+      error: function (request, textStatus, er) {
+        self._hiddenBuildersAreLoading = false;
+        loadTracker.loadFailed(textStatus);
+      }
+    });
   },
 
   getPushes: function Data_getPushes() {
