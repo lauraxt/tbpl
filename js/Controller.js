@@ -18,7 +18,11 @@ var Controller = {
     "tree": ["rev", "pusher", "onlyunstarred", "jobname"],
     "rev": ["pusher"],
   },
-
+  _paramDefaults: {
+    // Unspecified params have the default value false.
+    // Parameters with a falsy value are not included in the URL.
+    "tree": Config.defaultTreeName,
+  },
   _pushStatableParams: ["pusher", "onlyunstarred", "jobname"],
 
   init: function Controller_init() {
@@ -47,7 +51,7 @@ var Controller = {
       Config.tinderboxDataLoader = BuildbotDBUser;
     }
 
-    this.treeName = (("tree" in params) && params.tree) || Config.defaultTreeName;
+    this.treeName = ("tree" in params) && params.tree;
     var noIgnore = ("noignore" in params) && (params.noignore == "1");
 
     this._data = new Data(this.treeName, noIgnore, Config);
@@ -220,7 +224,7 @@ var Controller = {
   _getURLForParams: function Controller__getURLForParams(params) {
     var items = [];
     for (var key in params) {
-      if (params[key])
+      if (params[key] && params[key] != this._paramDefaults[key])
         items.push(escape(key) + "=" + escape(params[key]));
     }
     return items.length ? "?" + items.join("&") : "./";
@@ -243,6 +247,10 @@ var Controller = {
           params[unescape(eqitems[0])] = unescape(eqitems.slice(1).join("="));
         }
       }
+    }
+    for (var key in this._paramDefaults) {
+      if (!(key in params))
+        params[key] = this._paramDefaults[key];
     }
     this._params = params;
     return this.getParams();
