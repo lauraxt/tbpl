@@ -305,10 +305,15 @@ var UserInterface = {
   },
 
   _refreshMostRecentlyUsedTrees: function UserInterface__refreshMostRecentlyUsedTrees() {
-    if (this._mostRecentlyUsedTrees().indexOf(this._treeName) == -1) {
+    if (this._treeName in Config.treeInfo) {
       // Remove the least recently used tree and add this tree as the most recently used one.
       // The array is ordered from recent to not recent.
-      this._setMostRecentlyUsedTrees([this._treeName].concat(this._mostRecentlyUsedTrees().slice(0, 2)));
+      var mruTrees = this._mostRecentlyUsedTrees();
+      if (mruTrees.indexOf(this._treeName) != -1)
+        mruTrees.splice(mruTrees.indexOf(this._treeName), 1);
+      else
+        mruTrees = mruTrees.slice(0, 2);
+      this._setMostRecentlyUsedTrees([this._treeName].concat(mruTrees));
     }
   },
 
