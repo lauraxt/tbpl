@@ -66,7 +66,14 @@
         <li><label>Only unstarred<input type="checkbox" id="onlyUnstarred"></label></li>
     </ul></div>
     Timezone: <a id="localTime">local</a> | <a id="mvtTime" title="Mountain View Time">MVT</a><br />
-    Tree: <span id="treechooser"></span>
+    Tree:
+    <span id="treechooser">
+      <ul id="mruList"></ul>
+      <div id="moreListContainer" class="dropdown">
+        <h2>more</h2>
+        <ul id="moreList" class="dropdownContents"></ul>
+      </div>
+    </span>
     <span id="tree-status"></span>
   </div>
   <div id="status"></div>

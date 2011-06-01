@@ -12,17 +12,33 @@ var Controller = {
   _trackingTip: false,
   _params: {},
 
+  _paramOverrides: {
+    // stronger: [weaker1, weaker2, ...]
+    // A param change to a stronger param will unset all its weaker params.
+    "tree": ["rev", "pusher", "onlyunstarred", "jobname"],
+    "rev": ["pusher"],
+  },
+
+  _pushStatableParams: ["pusher", "onlyunstarred", "jobname"],
+
   init: function Controller_init() {
+    var self = this;
+
     $("body").removeClass("noscript");
     var params = this._parseParams();
+
+    window.onpopstate = function(event) {
+      self._urlChanged();
+    };
 
     // Allow requests using the buildbot branch name instead of the Tinderbox
     // tree name, but redirect such requests to the tree name form.
     // e.g. redirect ?branch=mozilla-1.9.2 to ?tree=Firefox3.6
     if (!("tree" in params) && ("branch" in params)) {
-      params.tree = this._treeForBranch(params.branch);
-      delete params.branch;
-      document.location = this._createURLForParams(params);
+      document.location = this.getURLForChangedParams({
+        tree: this._treeForBranch(params.branch),
+        branch: null
+      });
       return;
     }
 
@@ -32,14 +48,11 @@ var Controller = {
     }
 
     this.treeName = (("tree" in params) && params.tree) || Config.defaultTreeName;
-    var pusher = ("pusher" in params) && params.pusher;
     var noIgnore = ("noignore" in params) && (params.noignore == "1");
-    var onlyUnstarred = ("onlyunstarred" in params) && (params.onlyunstarred == "1");
-    var jobName = ("jobname" in params) && params.jobname;
-
 
     this._data = new Data(this.treeName, noIgnore, Config);
-    this._uiCallbacks = UserInterface.init(this, onlyUnstarred, pusher, jobName);
+    this._uiCallbacks = UserInterface.init(this);
+    this._uiCallbacks.paramsChanged(params);
 
     if (!(this.treeName in Config.treeInfo))
       return;
@@ -59,6 +72,67 @@ var Controller = {
 
     if (Config.useGoogleCalendar)
       self.initCalendar();
+  },
+
+  _getChangedParams: function Controller__getChangedParams(paramChanges) {
+    var params = this.getParams();
+    for (var key in paramChanges) {
+      if (key in this._paramOverrides) {
+        // Unset all overridden params.
+        this._paramOverrides[key].forEach(function (overriddenParam) {
+          delete params[overriddenParam];
+        });
+      }
+      params[key] = paramChanges[key];
+    }
+    return params;
+  },
+
+  // Returns null if paramChanges don't make a difference.
+  // Otherwise, returns an object { url: "...", pushStatable: true / false }.
+  effectsOfParamChanges: function Controller__effectsOfParamChanges(paramChanges) {
+    var self = this;
+    var originalParams = this.getParams();
+    var changedParams = this._getChangedParams(paramChanges);
+    var unionKeys = Object.keys(originalParams).concat(Object.keys(changedParams));
+    function isDifferentAtKey(key) {
+      var original = originalParams[key] || false;
+      var changed = changedParams[key] || false;
+      return original != changed;
+    }
+    var differentKeys = {};
+    unionKeys.forEach(function (key) {
+      if (isDifferentAtKey(key))
+        differentKeys[key] = true;
+    });
+    differentKeys = Object.keys(differentKeys);
+
+    if (!differentKeys.length)
+      return null; // No differences.
+
+    return {
+      url: this.getURLForChangedParams(paramChanges),
+      pushStatable: differentKeys.every(function isKeyPushStatable(key) {
+        return self._pushStatableParams.indexOf(key) != -1;
+      })
+    };
+  },
+
+  getURLForChangedParams: function Controller_getURLForChangedParams(paramChanges) {
+    return this._getURLForParams(this._getChangedParams(paramChanges));
+  },
+
+  pushURL: function Controller_pushURL(newURL) {
+    if (history && "pushState" in history) {
+      history.pushState({}, "", newURL);
+      this._urlChanged();
+    } else {
+      location.href = newURL;
+    }
+  },
+
+  pushParamsChange: function Controller_pushParamsChange(paramChanges) {
+    this.pushURL(this.getURLForChangedParams(paramChanges));
   },
 
   getData: function Controller_getData() {
@@ -143,24 +217,18 @@ var Controller = {
     this._requestedRange = requestedRange;
   },
 
-  getURLForPusherFilteringView: function Controller_getURLForPusherFilteringView(pusher) {
-    var params = Object.clone(this._params);
-    params.pusher = pusher;
-    return this._createURLForParams(params);
-  },
-
-  getURLForSinglePushView: function Controller_getURLForSinglePushView(rev) {
-    var params = Object.clone(this._params);
-    params.rev = rev;
-    return this._createURLForParams(params);
-  },
-
-  _createURLForParams: function Controller__createURLForParams(params) {
+  _getURLForParams: function Controller__getURLForParams(params) {
     var items = [];
     for (var key in params) {
-      items.push(escape(key) + "=" + escape(params[key]));
+      if (params[key])
+        items.push(escape(key) + "=" + escape(params[key]));
     }
-    return "?" + items.join("&");
+    return items.length ? "?" + items.join("&") : "./";
+  },
+
+  _urlChanged: function Controller__urlChanged() {
+    var params = this._parseParams();
+    this._uiCallbacks.paramsChanged(params);
   },
 
   _parseParams: function Controller__parseParams() {

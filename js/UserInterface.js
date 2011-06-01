@@ -31,19 +31,15 @@ var UserInterface = {
              'show-comment': 'Show the comment box'
            },
 
-  init: function UserInterface_init(controller, onlyUnstarred, pusher, jobName) {
+  init: function UserInterface_init(controller) {
     var self = this;
     this._controller = controller;
     this._treeName = controller.treeName;
-    this._onlyUnstarred = onlyUnstarred;
-    this._pusher = pusher || "";
-    this._machine = jobName || "";
     this._data = controller.getData();
 
     document.title = "[0] " + this._getPrettyTreeName(controller.treeName) + " - Tinderboxpushlog";
 
     this._refreshMostRecentlyUsedTrees();
-    this._buildTreeSwitcher();
     this._buildShortcuts();
     this._buildLegend();
     this._buildTreeInfo();
@@ -109,6 +105,11 @@ var UserInterface = {
     $(".revlink").live("dragstart", function (e) {
       e.dataTransfer.effectAllowed = "link";
       e.dataTransfer.setData("text/x-tbpl-revision", $(this).attr("data-rev"));
+    });
+
+    $("a.pushStatable").live("click", function (e) {
+      self._controller.pushURL(this.href);
+      return false;
     });
 
     SummaryLoader.init();
@@ -183,6 +184,12 @@ var UserInterface = {
           result = '<a href="irc://irc.mozilla.org/' + result.slice(1) + '">' + result + '</a>';
 
         $("#current-" + role).html(result);
+      },
+      paramsChanged: function (params) {
+        self._updatePusherFilter(params.pusher || "");
+        self._updateMachineFilter(params.jobname || "");
+        self._updateUnstarredFilter(params.onlyunstarred == '1');
+        self._updateTreeSwitcher();
       }
     };
   },
@@ -317,17 +324,19 @@ var UserInterface = {
     }
   },
 
-  _buildTreeSwitcher: function UserInterface__buildTreeSwitcher() {
-    var mruList = $('<ul id="mruList"></ul>').appendTo("#treechooser");
-    var moreListContainer = $('<div id="moreListContainer" class="dropdown"><h2>more</h2></div></li>').appendTo("#treechooser");
-    var moreList = $('<ul id="moreList" class="dropdownContents"></ul>').appendTo(moreListContainer);
+  _updateTreeSwitcher: function UserInterface__updateTreeSwitcher() {
     var self = this;
-    Object.keys(Config.treeInfo).forEach(function (tree, i) {
-      var isMostRecentlyUsedTree = (self._mostRecentlyUsedTrees().indexOf(tree) != -1);
+    var mruList = $("#mruList").children().remove().end();
+    var moreList = $("#moreList").children().remove().end();
+    Object.keys(Config.treeInfo).forEach(function (tree) {
       var treeName = self._getPrettyTreeName(tree);
-      var treeLink = self._treeName == tree ?
-        "<strong>" + treeName + "</strong>" :
-        "<a href='?tree=" + tree + "'>" + treeName + "</a>";
+      var effects = self._controller.effectsOfParamChanges({tree:tree});
+      var treeLink = effects ?
+        '<a href="' + effects.url + '"' +
+        (effects.pushStatable ? ' class="pushStatable"' : '') +
+        '>' + treeName + '</a>' :
+        '<strong>' + treeName + '</strong>';
+      var isMostRecentlyUsedTree = (self._mostRecentlyUsedTrees().indexOf(tree) != -1);
       $("<li>" + treeLink + "</li>").appendTo(isMostRecentlyUsedTree ? mruList : moreList);
     });
   },
@@ -382,38 +391,6 @@ var UserInterface = {
     }
   },
 
-  _getParamsString: function UserInterface__getParamsString() {
-    var params = this._controller.getParams();
-    var items = [];
-
-    params.pusher = this._pusher;
-    params.jobname = this._machine;
-    params.onlyunstarred = this._onlyUnstarred ? "1" : "";
-
-    for (var key in params) {
-      if ((key == "pusher" && !this._pusher)
-          || (key == "jobname" && !this._machine)
-          || (key == "onlyunstarred") && !this._onlyUnstarred) {
-        continue;
-      }
-
-      items.push(escape(key) + "=" + escape(params[key]));
-    }
-
-    return "?" + items.join("&");
-  },
-
-  _updateLocation: function UserInterface__updateLocation() {
-    if (history && "pushState" in history) {
-      var state = {
-        pusher: this._pusher,
-        jobname: this._machine,
-        onlyUnstarred: this._onlyUnstarred,
-      };
-      history.pushState(state, "", this._getParamsString());
-    }
-  },
-
   _updateUnstarredFilter: function UserInterface__updateOnlyStarredFilter(state) {
     document.getElementById('onlyUnstarred').checked = state;
     this._onlyUnstarred = state;
@@ -431,10 +408,22 @@ var UserInterface = {
     this._pusher = pusher;
 
     var self = this;
+    // This loop needs to be executed even if the pusher hasn't changed
+    // because a different param might have changed, so we need to update
+    // the pusher link href.
     $(".push").each(function(index) {
-      if (self._pusher && self._pusher != $(this).attr('data-pusher')) {
-        $(this).hide();
+      var pusher = $(this).attr("data-pusher");
+      if (self._pusher) {
+        if (self._pusher != pusher) {
+          $(this).hide();
+        } else {
+          // Make pusher links work as an exit out of the pusher filtered mode.
+          var newURL = self._controller.getURLForChangedParams({pusher:null});
+          $(this).find("a.pusher").attr("href", newURL);
+        }
       } else {
+        var newURL = self._controller.getURLForChangedParams({pusher:pusher});
+        $(this).find("a.pusher").attr("href", newURL);
         $(this).show();
       }
     });
@@ -443,6 +432,9 @@ var UserInterface = {
   },
 
   _updateMachineFilter: function UserInterface__updateMachineFilter(machine) {
+    if (machine == this._machine)
+      return;
+
     document.getElementById('machine').value = machine;
     this._machine = machine;
 
@@ -468,25 +460,43 @@ var UserInterface = {
     var self = this;
 
     onlyUnstarredCheckbox.onchange = function() {
-      self._updateUnstarredFilter(onlyUnstarredCheckbox.checked);
-      self._updateLocation();
+      self._setOnlyUnstarred(onlyUnstarredCheckbox.checked);
+    }
+
+    machineField.onchange = function() {
+      self._setJobName(machineField.value);
     }
 
     pusherField.onchange = function() {
       // If the UA knows HTML5 Forms validation, don't update the UI when the
       // value isn't a valid email address.
-      if (("validity" in pusherField) && !pusherField.validity.valid) {
+      if (("validity" in pusherField) && !pusherField.validity.valid)
         return;
-      }
 
-      self._updatePusherFilter(pusherField.value);
-      self._updateLocation();
+      self._setPusher(pusherField.value);
     }
+  },
 
-    machineField.onchange = function() {
-      self._updateMachineFilter(machineField.value);
-      self._updateLocation();
-    }
+  _setPusher: function UserInterface__setPusher(pusher) {
+    this._controller.pushParamsChange({
+      pusher: pusher
+    });
+  },
+
+  _setJobName: function UserInterface__setJobName(jobname) {
+    this._controller.pushParamsChange({
+      jobname: jobname
+    });
+  },
+
+  _setOnlyUnstarred: function UserInterface__setOnlyUnstarred(value) {
+    this._controller.pushParamsChange({
+      onlyunstarred: value && 1
+    });
+  },
+
+  _toggleOnlyUnstarred: function UserInterface__toggleOnlyUnstarred() {
+    this._setOnlyUnstarred(!this._onlyUnstarred);
   },
 
   // Get all jobs' results, optionally filtered by a pusher
@@ -634,24 +644,6 @@ var UserInterface = {
   _initWindowEvents: function UserInterface__initWindowEvents() {
     var self = this;
 
-    window.onpopstate = function(event) {
-      var state = event.state;
-
-      // When the page is loaded, we don't have a state object but the
-      // parameters can be trusted.
-      if (!state) {
-        var params = self._controller.getParams();
-        self._updatePusherFilter(params.pusher ? params.pusher : "");
-        self._updateMachineFilter(params.jobname ? params.jobname : "");
-        self._updateUnstarredFilter(params.onlyunstarred == '1');
-        return;
-      }
-
-      self._updatePusherFilter(state['pusher'] ? state['pusher'] : "");
-      self._updateMachineFilter(state['jobname'] ? state['jobname'] : "");
-      self._updateUnstarredFilter(state['onlyUnstarred']);
-    }
-
     jQuery(document).keypress(function(event) {
       // We don't have keybindings with modifiers.
       if (event.metaKey || event.altKey || event.ctrlKey) {
@@ -668,8 +660,7 @@ var UserInterface = {
 
       // Toggle "Only unstarred" filter
       if (action == 'toggle-unstarred') {
-        self._updateUnstarredFilter(!self._onlyUnstarred);
-        self._updateLocation();
+        self._toggleOnlyUnstarred();
         return false;
       }
 
@@ -1094,24 +1085,14 @@ var UserInterface = {
       return 'http://hg.mozilla.org/' + Config.treeInfo[this._treeName].primaryRepo + '/rev/' + rev;
   },
 
-  _setPusherFromClick: function UserInterface__setPusherFromClick(pusher) {
-    var pusherField = document.getElementById('pusher');
-
-    if (pusherField.value == pusher) {
-      pusher = "";
-    }
-
-    this._updatePusherFilter(pusher);
-    this._updateLocation();
-  },
-
   _generatePushNode: function UserInterface__generatePushNode(push) {
     var self = this;
+    var linkedPusher = this._pusher == push.pusher ? null : push.pusher;
     var nodeHtml = '<li class="push" id="push-' + push.id + '" data-id="' + push.id + '" data-pusher="' + push.pusher + '">\n' +
-      '<h2><span onclick="UserInterface._setPusherFromClick(\'' + push.pusher + '\');"' +
-      'class="pusher">' + push.pusher + '</span> &ndash; ' +
+      '<h2><a href="' + this._controller.getURLForChangedParams({pusher:linkedPusher}) + '"' +
+      'class="pusher pushStatable">' + push.pusher + '</a> &ndash; ' +
       '<a class="date" data-timestamp="' + push.date.getTime() +
-      '" href="' + this._controller.getURLForSinglePushView(push.toprev) + '">' +
+      '" href="' + this._controller.getURLForChangedParams({rev:push.toprev}) + '">' +
       self._getDisplayDate(push.date) + '</a>' +
       ' <span class="talosCompare">(<label>compare: <input class="revsToCompare" type="checkbox" value="' + push.toprev + '"></label>)</span>' +
       '<a class="csetList" onclick="UserInterface._listChangesetsForPush(\''+ push.toprev +'\'); return false" href="#">List changeset URLs</a>';
