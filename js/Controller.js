@@ -15,7 +15,22 @@ var Controller = {
   init: function Controller_init() {
     $("body").removeClass("noscript");
     var params = this._parseParams();
-    this._params = params;
+
+    // Allow requests using the buildbot branch name instead of the Tinderbox
+    // tree name, but redirect such requests to the tree name form.
+    // e.g. redirect ?branch=mozilla-1.9.2 to ?tree=Firefox3.6
+    if (!("tree" in params) && ("branch" in params)) {
+      params.tree = this._treeForBranch(params.branch);
+      delete params.branch;
+      document.location = this._createURLForParams(params);
+      return;
+    }
+
+    if (("usebuildbot" in params) && (params.usebuildbot == "1")) {
+      // Override config until we can switch to Buildbot by default.
+      Config.tinderboxDataLoader = BuildbotDBUser;
+    }
+
     this.treeName = (("tree" in params) && params.tree) || Config.defaultTreeName;
     var pusher = ("pusher" in params) && params.pusher;
     var noIgnore = ("noignore" in params) && (params.noignore == "1");
@@ -161,11 +176,21 @@ var Controller = {
         }
       }
     }
-    return params;
+    this._params = params;
+    return this.getParams();
   },
 
   getParams: function Controller_getParams() {
     return Object.clone(this._params);
+  },
+
+  _treeForBranch: function Controller__treeForBranch(branch) {
+    for (var treeName in Config.treeInfo) {
+      var tree = Config.treeInfo[treeName];
+      if (("buildbotBranch" in tree) && tree.buildbotBranch == branch)
+        return treeName;
+    }
+    return "";
   },
 
   _getInitialPushRangeParams: function Controller__getInitialPushRangeParams(params) {
