@@ -129,7 +129,13 @@ class Run(object):
 
 def json_from_gz_url(url):
     """Returns the JSON parsed object found at url."""
-    io = urllib2.urlopen(url)
+    try:
+        io = urllib2.urlopen(url)
+    except urllib2.HTTPError, ex:
+        if ex.code == 404:
+            # It's ok for the file to be missing.
+            return
+        raise
     # thanks to http://diveintopython.org/http_web_services/gzip_compression.html
     sio = StringIO.StringIO(io.read())
     io.close()
@@ -138,16 +144,7 @@ def json_from_gz_url(url):
     gz.close()
     return j
 
-def get_runs(url):
-    try:
-        print "Fetching", url, "..."
-        j = json_from_gz_url(url)
-    except urllib2.HTTPError, ex:
-        if ex.code == 404:
-            # It's ok for the file to be missing.
-            return
-        raise
-    print "Traversing runs and inserting into database..."
+def get_runs(j):
     for build in j["builds"]:
         p = build["properties"]
         # some builds (which?) have no revision field, some (like fuzzer)
@@ -163,19 +160,58 @@ def get_runs(url):
         slave = j["slaves"][str(build["slave_id"])]
         yield Run(build, builder, slave)
 
-def add_to_db(url, table):
-    i = 0
-    for run in get_runs(url):
-        if not table.find_one({"_id": run.id}):
-            table.insert(run.get_info())
-            i = i + 1
-    print "Inserted", i, "new run entries."
+def get_builders(j):
+    for build in j["builds"]:
+        builder = j["builders"][str(build["builder_id"])]
+        props = build["properties"]
+        if "buildername" not in builder and "buildername" in props:
+            builder["buildername"] = props["buildername"]
+    for builder in j["builders"].values():
+        yield builder["name"], builder["category"], builder.get("buildername")
 
-def do_date(date, table):
-    add_to_db(date.strftime("http://build.mozilla.org/builds/builds-%Y-%m-%d.js.gz"), table)
+def add_run_to_db(run, db):
+    if db.runs.find_one({"_id": run.id}):
+        return False
+    db.runs.insert(run.get_info())
+    return True
 
-def do_recent(table):
-    add_to_db("http://build.mozilla.org/builds/builds-4hr.js.gz", table)
+def add_builder_to_db(builder, db):
+    (name, branch, buildername) = builder
+    existing = db.builders.find_one({"name": name}, {"buildername": 1})
+    if not existing:
+        db.builders.insert({
+            "name": name,
+            "branch": branch,
+            "buildername": buildername,
+            "history": [{
+                "date": int(time.time()),
+                "action": "insert"
+            }]
+        })
+        return True
+    if existing["buildername"] is None and buildername is not None:
+        db.builders.update({"name": name}, {"$set": {"buildername": buildername}})
+        return True
+    return False
+
+def add_to_db(url, db):
+    print "Fetching", url, "..."
+    j = json_from_gz_url(url)
+
+    print "Traversing runs and inserting into database..."
+    count = sum([add_run_to_db(run, db) for run in get_runs(j)])
+    print "Inserted", count, "new run entries."
+
+    print "Traversing builders and updating database..."
+    db.builders.ensure_index("name")
+    count = sum([add_builder_to_db(builder, db) for builder in get_builders(j)])
+    print "Updated", count, "builders."
+
+def do_date(date, db):
+    add_to_db(date.strftime("http://build.mozilla.org/builds/builds-%Y-%m-%d.js.gz"), db)
+
+def do_recent(db):
+    add_to_db("http://build.mozilla.org/builds/builds-4hr.js.gz", db)
 
 os.environ["TZ"] = "America/Los_Angeles"
 time.tzset()
@@ -188,10 +224,9 @@ Import run information from JSON files on build.mozilla.org into the local Mongo
 parser.add_option("-d","--days",help="number of days to import",type=int,default=0)
 (options,args) = parser.parse_args()
 
-runs = Connection().tbpl.runs
-do_recent(runs)
+do_recent(Connection().tbpl)
 
 today = datetime.date.today()
 
 for i in range(options.days):
-    do_date(today - datetime.timedelta(i), runs)
+    do_date(today - datetime.timedelta(i), Connection().tbpl)

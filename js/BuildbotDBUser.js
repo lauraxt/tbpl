@@ -25,6 +25,11 @@ var BuildbotDBUser = {
     });
   },
 
+  openAdminUI: function BuildbotDBUser_openAdminUI(tree) {
+    var branch = Config.treeInfo[tree].buildbotBranch;
+    HiddenBuildsAdminUI.open(branch);
+  },
+
   _createMachineResults: function BuildbotDBUser__createMachineResults(tree, rev, data, runs) {
     var machineResults = {};
     var self = this;

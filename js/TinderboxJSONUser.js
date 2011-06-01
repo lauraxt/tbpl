@@ -28,6 +28,10 @@ var TinderboxJSONUser = {
     });
   },
 
+  openAdminUI: function TinderboxJSONUser_openAdminUI(tree) {
+    window.open("http://tinderbox.mozilla.org/admintree.cgi?tree=" + tree);
+  },
+
   _getRequestStartForPushes: function TinderboxJSONUser__getRequestStartForPushes(pushes, now) {
     // Return the earliest time for which there's no existing Tinderbox data
     // for any push in pushes.

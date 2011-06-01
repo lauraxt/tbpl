@@ -54,10 +54,29 @@
         </table>
       </div>
     </div>
-    <div id="treeInfoContainer" class="dropdown"><h2>Tree Info</h2><dl id="treeInfo" class="dropdownContents">
-      <dt>Sheriff:</dt><dd><span id="sheriff"><span id="current-sheriff"><span style="opacity: 0.7">loading</span></span> (<a href="http://www.google.com/calendar/embed?src=j6tkvqkuf9elual8l2tbuk2umk%40group.calendar.google.com" target="_blank">schedule</a>)</span></dd>
-      <dt>Buildduty:</dt><dd><span id="releng"><span id="current-releng"><span style="opacity: 0.7">loading</span></span> (<a href="http://www.google.com/calendar/embed?src=aelh98g866kuc80d5nbfqo6u54%40group.calendar.google.com" target="_blank">schedule</a>)</span></dd>
-    </dl></div>
+    <div id="treeInfoContainer" class="dropdown">
+      <h2>Tree Info</h2>
+      <dl id="treeInfo" class="dropdownContents">
+        <dt>Sheriff:</dt>
+        <dd>
+          <span id="sheriff">
+            <span id="current-sheriff"><span style="opacity: 0.7">loading</span></span>
+            (<a href="http://www.google.com/calendar/embed?src=j6tkvqkuf9elual8l2tbuk2umk%40group.calendar.google.com" target="_blank">schedule</a>)
+          </span>
+        </dd>
+        <dt>Buildduty:</dt>
+        <dd>
+          <span id="releng">
+            <span id="current-releng"><span style="opacity: 0.7">loading</span></span>
+            (<a href="http://www.google.com/calendar/embed?src=aelh98g866kuc80d5nbfqo6u54%40group.calendar.google.com" target="_blank">schedule</a>)
+          </span>
+        </dd>
+        <dt>Admin:</dt>
+        <dd>
+          <a href="#" id="adminUILink">Open tree admin panel</a>
+        </dd>
+      </dl>
+    </div>
     <div class="dropdown"><h2>Infrastructure</h2><dl id="infrastructure" class="dropdownContents"></dl></div>
     <div class="dropdown"><h2>Filters</h2>
       <ul id="filters" class="dropdownContents">
@@ -96,8 +115,8 @@
 </div>
 
 
-<div id="addNotePopup">
-  <a id="closeAddNotePopup" href="">close</a>
+<div id="addNotePopup" class="popupForm">
+  <a class="closePopup" href="">close</a>
   <form id="addNoteForm">
     <h2>Add a Comment</h2>
     <table>
@@ -122,6 +141,43 @@
   </form>
 </div>
 
+<div id="hiddenBuildsAdminUI">
+  <p><a href="#" id="hideHiddenBuildsAdminUILink">&laquo; Back</a></p>
+  <h2>Hidden Builders</h2>
+  <p class="loading">Loading builders...</p>
+  <div id="loadedUI">
+    <input type="search" id="builderSearch" placeholder="Filter list">
+    <ol id="builderList"></ol>
+    <p>
+      <input type="button" value="Hide selected builders" id="hideBuilders">
+      <input type="button" value="Unhide selected builders" id="unhideBuilders">
+      <input type="button" value="Save changes..." id="saveBuilderHidings" disabled>
+    </p>
+  </div>
+</div>
+
+<div id="submitHiddenBuilderChangesPopup" class="popupForm">
+  <a class="closePopup" href="">close</a>
+  <form id="hiddenBuilderForm">
+    <h2>Submit hidden builder config changes</h2>
+    <table>
+      <tr>
+        <th><label for="who">Name/nick:</label></th>
+        <td><input required type="text" id="who"></td>
+      </tr>
+      <tr>
+        <th><label for="password">Sheriff password:</label></th>
+        <td><input required type="password" id="password"></td>
+      </tr>
+      <tr>
+        <th><label for="reason">Change description:</label></th>
+        <td><input required type="text" id="reason"></td>
+      </tr>
+    </table>
+    <p><input type="submit" value="Submit" id="submitBuilderHidings"></p>
+  </form>
+</div>
+
 <script type="text/javascript" src="http://www.google.com/jsapi"></script>
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript" src="js/jquery-ui-drag.js"></script>
@@ -132,6 +188,7 @@
 <script type="text/javascript" src="js/BuildbotDBUser.js"></script>
 <script type="text/javascript" src="js/BuildAPI.js"></script>
 <script type="text/javascript" src="js/AddCommentUI.js"></script>
+<script type="text/javascript" src="js/HiddenBuildsAdminUI.js"></script>
 <script type="text/javascript" src="js/Config.js"></script>
 <script type="text/javascript" src="js/Data.js"></script>
 <script type="text/javascript" src="js/SummaryLoader.js"></script>

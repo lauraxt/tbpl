@@ -19,17 +19,13 @@ var AddCommentUI = {
       self.commentWithoutUI();
     });
     this.updateAutoStarState();
-    $("#closeAddNotePopup").bind("click", function closeAddNotePopupClick() {
-      $("#addNotePopup").fadeOut('fast', function afterAddNotePopupFadeOut() {
-        self.reset();
-      });
-      return false;
-    });
     $("#logNoteEmail").bind("change", function logNoteEmailChange() {
       self._setEmail(this.value);
     });
     $("#logNoteEmail").val(self._getEmail());
-    $("#addNotePopup").draggable({ containment: 'window', handle: 'form, h2, table, tbody, tr, th, td, label, p' });
+    $("#addNotePopup").get(0).afterCloseCallback = function resetAfterClosed() {
+      self.reset();
+    };
 
     $.event.props.push("dataTransfer");
     $("#addNotePopup").bind("dragover", function (e) { e.preventDefault(); });

@@ -1,8 +1,6 @@
 html {
   font-family: "Lucida Grande", Verdana, sans-serif;
   line-height: 1.5;
-}
-p {
   font-size: 0.8em;
 }
 
@@ -12,13 +10,12 @@ p {
 }
 #topbar {
   position: absolute;
-  z-index: 3;
+  z-index: 6;
   top: 0;
   left: 0;
   right: 0;
   text-align: left;
   padding: 4px;
-  font-size: 0.8em;
   background-color: rgba(255, 255, 255, 0.8);
   height: 42px;
 }
@@ -64,7 +61,7 @@ p {
   padding: 0;
   display: inline;
   position: absolute;
-  z-index: 1; /* must be above rel-pos #moreListContainer, etc. */
+  z-index: 6; /* must be above #hiddenBuildsAdminUI */
   left: -5px;
   top: 99%;
   padding: 5px !important;
@@ -155,7 +152,8 @@ p {
 iframe {
   display: none;
 }
-#container {
+#container,
+#hiddenBuildsAdminUI {
   font-weight: normal;
   text-align: left;
   padding: 10px 20px;
@@ -168,7 +166,7 @@ iframe {
   right: 0;
 }
 #pushes {
-  font-size: 0.76em;
+  font-size: 0.95em;
 }
 body.details > #container {
   bottom: 121px;
@@ -289,7 +287,7 @@ span.pusher:hover {
   overflow: hidden;
 }
 #pushes .machineResult,
-#addNotePopup .machineResult,
+.popupForm .machineResult,
 #addNotePopup #logNoteSuggestions a {
   font-size: 1.1em;
   font-weight: bold;
@@ -455,7 +453,7 @@ a:active {
   right: 0;
   height: 120px;
   background: white;
-  font-size: 0.76em;
+  font-size: 0.95em;
 }
 body.details > #details
 {
@@ -576,10 +574,6 @@ body.details > #details
   padding-left: 15px;
 }
 
-#results > p {
-  font-size: 1em;
-}
-
 em.testfail {
   font-style: normal;
   font-weight: bold;
@@ -660,17 +654,75 @@ em.testfail {
   background: url(../images/starred.png);
 }
 
-#addNotePopup {
+#hiddenBuildsAdminUI {
+  background: white;
+  display: none;
+  z-index: 5;
+}
+#loadedUI {
+  width: 600px;
+  margin-right: auto;
+  display: none;
+}
+#builderSearch {
+  width: 60%;
+}
+#builderList {
+  border: 1px solid #999;
+  font-size: 10px;
+  height: 300px;
+  padding: 0;
+  overflow: auto;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+}
+#builderList > li {
+  display: block;
+  margin: 0;
+  padding: 1px 4px;
+  position: relative;
+}
+#builderList > li:focus {
+  outline: 1px dotted black;
+  outline-offset: -1px;
+}
+#builderList > li.selected {
+  background: Highlight;
+  color: HighlightText;
+}
+#builderList > li.changed {
+  font-weight: bold;
+}
+#builderList > li > .hiddenState {
+  position: absolute;
+  right: 4px;
+  font-weight: bold;
+  color: green;
+}
+#builderList > li > .hiddenState.hidden {
+  color: red;
+}
+#builderList > li.selected > .hiddenState {
+  color: inherit;
+}
+#who, #password {
+  width: 150px;
+}
+#reason {
+  width: 300px;
+}
+
+.popupForm {
   position: absolute;
   top: 40%;
   margin-top: -150px;
   left: 50%;
   margin-left: -180px;
   display: none;
-  z-index: 4;
+  z-index: 7;
   color: white;
   padding: 0;
-  font-size: 0.72em;
+  font-size: 0.9em;
   cursor: default;
   background: rgba(0, 0, 0, 0.75);
   -moz-border-radius: 10px;
@@ -679,7 +731,7 @@ em.testfail {
   border: solid transparent;
   border-width: 10px 18px 25px;
 }
-#addNotePopup:nth-child(1n) {
+.popupForm:nth-child(1n) {
   -moz-border-image: url(../images/hudborderimage.png) 10 18 25 repeat;
   -webkit-border-image: url(../images/hudborderimage.png) 10 18 25 repeat;
   border-image: url(../images/hudborderimage.png) 10 18 25 repeat;
@@ -688,7 +740,7 @@ em.testfail {
 #bar:nth-child(1n) { /* Preload the border image (XXX hack) */
   background: url(../images/hudborderimage.png) -1000px -1000px no-repeat white;
 }
-#closeAddNotePopup {
+.closePopup {
   position: absolute;
   top: -5px;
   left: -7px;
@@ -699,13 +751,13 @@ em.testfail {
   text-indent: -1000px;
   overflow: hidden;
 }
-#closeAddNotePopup:hover {
+.closePopup:hover {
   opacity: 0.7;
 }
-#closeAddNotePopup:active {
+.closePopup:active {
   opacity: 0.9;
 }
-#addNotePopup h2 {
+.popupForm h2 {
   font-size: 1em;
   font-weight: normal;
   text-align: center;
@@ -713,28 +765,28 @@ em.testfail {
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   line-height: 19px;
 }
-#addNotePopup form {
+.popupForm form {
   margin: -8px -13px -15px;
 }
-#addNotePopup table,
-#addNotePopup p {
+.popupForm table,
+.popupForm p {
   padding: 8px 10px;
   margin: 0;
 }
-#addNotePopup th,
-#addNotePopup td {
+.popupForm th,
+.popupForm td {
   padding: 2px;
   vertical-align: top;
 }
-#addNotePopup th,
-#addNotePopup p {
+.popupForm th,
+.popupForm p {
   text-align: right;
 }
-#addNotePopup th {
+.popupForm th {
   padding-bottom: 4px;
   text-shadow: 0 1px #000;
 }
-#addNotePopup .machineResult,
+.popupForm .machineResult,
 #addNotePopup #logNoteSuggestions a {
   padding: 0 5px;
   -moz-border-radius: 4px;
@@ -753,13 +805,13 @@ em.testfail {
   color: white;
   background: #aaf;
 }
-#addNotePopup .machineResult[active=true] {
+.popupForm .machineResult[active=true] {
   -moz-box-shadow: 0 1px rgba(0, 0, 0, 0.6);
   -webkit-box-shadow: 0 1px rgba(0, 0, 0, 0.6);
   box-shadow: 0 1px rgba(0, 0, 0, 0.6);
 }
-#addNotePopup input[type=text],
-#addNotePopup textarea {
+.popupForm input:not([type=submit]),
+.popupForm textarea {
   background: rgba(0, 0, 0, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.2);
   -moz-box-shadow: 0pt 1px 1px rgba(0, 0, 0, 0.4) inset;
@@ -769,14 +821,14 @@ em.testfail {
   color: white;
   -moz-user-select: text;
 }
-#addNotePopup input[type=text]:focus,
-#addNotePopup textarea:focus {
+.popupForm input:not([type=submit]):focus,
+.popupForm textarea:focus {
   outline: 2px solid rgba(255, 255, 255, 0.7);
   -moz-outline-radius: 2px;
   -webkit-outline-radius: 2px;
   outline-radius: 2px;
 }
-#addNotePopup input[type=submit] {
+.popupForm input[type=submit] {
   -moz-border-radius: 1000px;
   -webkit-border-radius: 1000px;
   border-radius: 1000px;
@@ -789,22 +841,22 @@ em.testfail {
   padding: 1px 10px;
   margin: 0 5px 5px 0;
 }
-#addNotePopup input[type=submit][disabled] {
+.popupForm input[type=submit][disabled] {
   color: rgba(255, 255, 255, 0.4);
 }
-#addNotePopup input[type=submit]:focus {
+.popupForm input[type=submit]:focus {
   -moz-box-shadow: inset 0 0 2px 1px rgba(255, 255, 255, 0.4), inset 0 12px 16px -4px rgba(255, 255, 255, 0.25), 0 1px #000;
   -webkit-box-shadow: inset 0 0 2px 1px rgba(255, 255, 255, 0.4), inset 0 12px 16px -4px rgba(255, 255, 255, 0.25), 0 1px #000;
   box-shadow: inset 0 0 2px 1px rgba(255, 255, 255, 0.4), inset 0 12px 16px -4px rgba(255, 255, 255, 0.25), 0 1px #000;
   outline: 0;
 }
-#addNotePopup input[type=submit]:not([disabled]):active:hover {
+.popupForm input[type=submit]:not([disabled]):active:hover {
   -moz-box-shadow: inset 0 12px 16px -4px rgba(255, 255, 255, 0.25), 0 1px #000;
   -webkit-box-shadow: inset 0 12px 16px -4px rgba(255, 255, 255, 0.25), 0 1px #000;
   box-shadow: inset 0 12px 16px -4px rgba(255, 255, 255, 0.25), 0 1px #000;
   background: rgba(255, 255, 255, 0.4);
 }
-#addNotePopup input[type=submit]::-moz-focus-inner {
+.popupForm input[type=submit]::-moz-focus-inner {
   border: 0;
 }
 

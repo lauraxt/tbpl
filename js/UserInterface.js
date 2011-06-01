@@ -62,12 +62,31 @@ var UserInterface = {
       return false;
     });
 
+    $("#adminUILink").bind("click", function adminUILinkClick() {
+      Config.tinderboxDataLoader.openAdminUI(self._treeName);
+      $(".dropdown").removeClass("open");
+      return false;
+    });
+
     $("#pushes, #topbar").bind("mousedown", function pushesMouseDown(e) {
       self._clickNowhere(e);
     });
 
     $(".dropdown").live("click", function dropdownClick(ev) {
       $(this).addClass("open");
+    });
+
+    $(".popupForm").draggable({
+      containment: 'window',
+      handle: 'form, h2, table, tbody, tr, th, td, label, p'
+    });
+
+    $(".closePopup").bind("click", function closePopupClick() {
+      $(this).parents(".popupForm").fadeOut('fast', function afterFadeOut() {
+        if ("afterCloseCallback" in this)
+          this.afterCloseCallback();
+      });
+      return false;
     });
 
     $("html").bind("mousedown", function clickAnywhere(e) {
@@ -131,6 +150,7 @@ var UserInterface = {
     AddCommentUI.registerNumSendingBugChangedCallback(function bugSendUpdater() {
       self.updateStatus();
     });
+    HiddenBuildsAdminUI.init();
 
     this._updateTimezoneDisplay();
 
