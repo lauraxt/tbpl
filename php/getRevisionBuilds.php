@@ -15,5 +15,5 @@ if (!isset($_GET['rev']) || !$_GET['rev'])
 $mongo = new Mongo();
 $result = $mongo->tbpl->runs->find(
             array('branch' => $_GET['branch'], 'revision' => $_GET['rev']),
-            array('branch' => 0, 'revision' => 0, 'log' => 0));
+            array('branch' => 0, 'revision' => 0, 'log' => 0, 'notes.ip' => 0));
 echo json_encode(iterator_to_array($result, false)) . "\n";

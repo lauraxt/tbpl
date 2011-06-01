@@ -21,7 +21,7 @@ var TinderboxJSONUser = {
             // up-to-date Tinderbox data for this push.
             push.latestTinderboxData = Math.max(push.latestTinderboxData || push.date, timeRange.endTime);
           });
-          loadCallback(self.parseTinderbox(tree, tinderbox_data, data));
+          self.parseTinderbox(tree, tinderbox_data, data, loadTracker, loadCallback);
           loadTracker.loadCompleted();
         }
       });
@@ -98,7 +98,7 @@ var TinderboxJSONUser = {
     return td.scrape[machineRunID];
   },
   
-  parseTinderbox: function TinderboxJSONUser_parseTinderbox(tree, td, data) {
+  parseTinderbox: function TinderboxJSONUser_parseTinderbox(tree, td, data, loadTracker, callback) {
     var self = this;
     var machines = [];
     $(td.build_names).each(function buildMachinesArray(i, name) {
@@ -150,6 +150,67 @@ var TinderboxJSONUser = {
         "_scrape": buildScrape,
       });
     } }
-    return machineResults;
-  }
+    this._loadESNoteData(tree, loadTracker, machineResults, callback);
+  },
+
+  _addNotesToMachineResult: function TinderboxJSONUser___addNotesToMachineResult(machineResult, notes) {
+    var startTime = machineResult.startTime.getTime() / 1000;
+    notes.forEach(function (note) {
+      if (note.startTime == startTime && note.slave == machineResult.slave) {
+        machineResult.notes.push(note);
+      }
+    });
+  },
+
+  _loadESNoteData: function TinderboxJSONUser__loadNoteData(tree, loadTracker, machineResults, callback) {
+    var self = this;
+
+    // Generate the query string data to use to request note data from ElasticSearch;
+    // this consists of the tree name and a list of dates encompassing all
+    // the machineResults.
+    var dates = [];
+    for (var resultID in machineResults) {
+      if (machineResults[resultID].startTime) {
+        var resultDate = UserInterface._ISODateString(machineResults[resultID].startTime);
+        if (dates.indexOf(resultDate) == -1 && resultDate != 'NaN-NaN-NaN') {
+          dates.push(resultDate);
+        }
+      }
+    }
+
+    if (!dates.length) {
+      callback(machineResults);
+      return;
+    }
+
+    var noteparams = { 
+      'tree': Config.treeInfo[tree].primaryRepo,
+      'dates': dates 
+    };
+
+    loadTracker.addTrackedLoad();
+    $.ajax({
+      url: Config.wooBugURL,
+      data: noteparams,
+      dataType: 'text json',
+      error: function (request, textStatus, error) {
+        loadTracker.loadFailed(textStatus);
+      },
+      success: function(notes) {
+        try {
+          // Loop through machineResults and see if we have any matching notes.
+          for (var resultID in machineResults) {
+            self._addNotesToMachineResult(machineResults[resultID], notes);
+          }
+
+          callback(machineResults);
+          loadTracker.loadCompleted();
+        } catch (e) {
+          console.log(e);
+          loadTracker.loadFailed('note data is invalid');
+        }
+      }
+    });
+  },
+
 };

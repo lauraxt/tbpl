@@ -321,11 +321,24 @@ var AddCommentUI = {
       who: email,
       comment: comment,
       timestamp: Math.ceil((new Date()).getTime()/1000),
-    }, callback);
+    }, function () { /* dummy callback */ });
+    $.ajax({
+      url: Config.baseURL + "php/submitBuildStar.php",
+      type: "POST",
+      data: {
+        id: machineResult.runID,
+        who: email,
+        note: comment,
+        machinename: machineResult.slave,
+        starttime: machineResult.startTime.getTime() / 1000,
+      },
+      success: callback,
+    });
 
     machineResult.notes.push({
-      'who': email,
-      'note': comment,
+      who: email,
+      note: comment,
+      timestamp: new Date().getTime() / 1000,
     });
   },
 

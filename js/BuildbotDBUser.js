@@ -27,6 +27,7 @@ var BuildbotDBUser = {
 
   _createMachineResults: function BuildbotDBUser__createMachineResults(tree, rev, data, runs) {
     var machineResults = {};
+    var self = this;
     runs.forEach(function (run) {
       var machine = data.getMachine(run.buildername);
       if (!machine)
@@ -49,7 +50,7 @@ var BuildbotDBUser = {
         "reftestLogURL": Config.baseURL + "php/getLogExcerpt.php?id=" + run._id + '&type=reftest',
         "_scrapeURL": Config.baseURL + "php/getLogExcerpt.php?id=" + run._id + '&type=tinderbox_print',
         "revs": revs,
-        "notes": [],
+        "notes": run.notes || [],
         "_similarBuildID": run._id,
       });
     });
