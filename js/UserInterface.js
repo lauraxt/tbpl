@@ -606,7 +606,7 @@ var UserInterface = {
       // Ignore filtered jobs.
       if (machineFilter && result.machine.name.match(machineFilter) == null)
         return;
-      if (self._onlyUnstarred && result.note) {
+      if (self._onlyUnstarred && self._machineResultHasNotes(result)) {
         return;
       }
 
@@ -787,7 +787,7 @@ var UserInterface = {
   },
 
   _isUnstarredFailure: function UserInterface__isUnstarredFailure(result) {
-    return !result.note && this._isFailureState(result.state);
+    return !(this._machineResultHasNotes(result)) && this._isFailureState(result.state);
   },
 
   _updateFailingBuildsDisplay: function UserInterface__updateFailingBuildsDisplay() {
@@ -805,7 +805,7 @@ var UserInterface = {
       failing.map(function(machineResult) {
         var className = "machineResult " + machineResult.state;
         var title = self._resultTitle(machineResult);
-        if (machineResult.note) {
+        if (self._machineResultHasNotes(machineResult)) {
           className += " hasNote";
           title = "(starred) " + title;
         }
@@ -923,12 +923,16 @@ var UserInterface = {
       + 'mins';
   },
 
+  _machineResultHasNotes: function UserInterface__machineResultHasNotes(machineResult) {
+    return (machineResult.notes && machineResult.notes.length);
+  },
+
   _machineResultLink: function UserInterface__machineResultLink(machineResult, onlyNumber) {
     var machine = machineResult.machine;
     var linkText = machine.type == "Mochitest" && onlyNumber ?
       machine.machineNumber() :
       Config.resultNames[machine.type] + machine.machineNumber();
-    if (machineResult.note)
+    if (this._machineResultHasNotes(machineResult))
       linkText += '*';
     return '<a' +
       (machineResult.isFinished() ? ' href="' + machineResult.briefLogURL + '"' : '') +
@@ -1437,7 +1441,7 @@ var UserInterface = {
     body.addClass("details");
     box.attr("state", result.state);
     box.removeClass("hasStar");
-    if (result.note)
+    if (this._machineResultHasNotes(result))
       box.addClass("hasStar");
     box.html((function htmlForResultInBottomBar() {
       var revs = result.revs;
@@ -1543,10 +1547,15 @@ var UserInterface = {
        (function htmlForPopup() {
          return '<div class="stars">' +
           (function htmlForNoteInPopup() {
-            if (!result.note)
+            if (!self._machineResultHasNotes(result))
               return '';
             return '<div class="note">' +
-            self._linkBugs(result.note, true) + '</div>';
+              result.notes.map(function htmlForNote(note) {
+                return '[<b><a href="mailto:' + note.who + '">' + note.who + '</a></b>' +
+                  (note.timestamp ? (' - ' + UserInterface._getDisplayDate(new Date(note.timestamp * 1000))) : '') +
+                  ']<br/>' + self._linkBugs(note.note, true);
+                }).join("<br/><br/>") +
+                '</div>';
           })() +
           (result.state == 'running' || result.state == 'pending' ? '' : '<div class="summary"><span id="summaryLoader"></span></div>') +
           '</div>';

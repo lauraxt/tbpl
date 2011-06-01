@@ -153,6 +153,71 @@ Data.prototype = {
     );
   },
 
+  _addNotesToMachineResult: function Data___addNotesToMachineResult(machineResult, notes) {
+    var startTime = machineResult.startTime.getTime() / 1000;
+    notes.forEach(function (note) {
+      if (note.startTime == startTime && note.slave == machineResult.slave) {
+        machineResult.notes.push(note);
+      }
+    });
+  },
+
+  _addUpdatedResultsToPushes: function Data___addUpdatedResultsToPushes(machineResults, updatedPushCallback) {
+    var updatedPushes = {};
+    this._addFinishedResultsToPushes(machineResults, this._pushes, updatedPushes);
+    this._notifyUpdatedPushes(updatedPushes, updatedPushCallback);
+  },
+
+  _loadESNoteData: function Data__loadNoteData(loadTracker, machineResults, updatedPushCallback) {
+    var self = this;
+
+    // Generate the query string data to use to request note data from ElasticSearch;
+    // this consists of the tree name and a list of dates encompassing all
+    // the machineResults.
+    var dates = [];
+    for (var resultID in machineResults) {
+      if (machineResults[resultID].startTime) {
+        var resultDate = UserInterface._ISODateString(machineResults[resultID].startTime);
+        if (dates.indexOf(resultDate) == -1 && resultDate != 'NaN-NaN-NaN') {
+          dates.push(resultDate);
+        }
+      }
+    }
+
+    if (!dates.length) {
+      this._addUpdatedResultsToPushes(machineResults, updatedPushCallback);
+      return;
+    }
+
+    var noteparams = { 
+      'tree': Config.treeInfo[this._treeName].primaryRepo,
+      'dates': dates 
+    };
+
+    loadTracker.addTrackedLoad();
+    $.ajax({
+      url: Config.wooBugURL,
+      data: noteparams,
+      dataType: 'text json',
+      error: function (request, textStatus, error) {
+        loadTracker.loadFailed(textStatus);
+      },
+      success: function(notes) {
+        try {
+          // Loop through machineResults and see if we have any matching notes.
+          for (var resultID in machineResults) {
+            self._addNotesToMachineResult(machineResults[resultID], notes);
+          }
+
+          self._addUpdatedResultsToPushes(machineResults, updatedPushCallback);
+          loadTracker.loadCompleted();
+        } catch (e) {
+          loadTracker.loadFailed('note data is invalid');
+        }
+      }
+    });
+  },
+
   _loadTinderboxDataForPushes: function Data__loadTinderboxDataForPushes(unfilteredPushes, loadTracker, updatedPushCallback) {
     var self = this;
     Config.tinderboxDataLoader.load(
@@ -160,10 +225,8 @@ Data.prototype = {
       this._getSortedPushesArray(unfilteredPushes),
       this._noIgnore,
       loadTracker,
-      function tinderboxDataLoadCallback(data) {
-        var updatedPushes = {};
-        self._addFinishedResultsToPushes(data, self._pushes, updatedPushes);
-        self._notifyUpdatedPushes(updatedPushes, updatedPushCallback);
+      function tinderboxDataLoadCallback(machineResults) {
+        self._loadESNoteData(loadTracker, machineResults, updatedPushCallback);
       },
       this
     );
@@ -274,8 +337,8 @@ Data.prototype = {
 
     if (result.runID in this._finishedResultsWithPush) {
       var existing = this._finishedResultsWithPush[result.runID];
-      if (result.note != existing.note) {
-        existing.note = result.note;
+      if (result.notes != existing.notes) {
+        existing.notes = result.notes;
         updatedPushes[existing.push.toprev] = existing.push;
       }
       return;

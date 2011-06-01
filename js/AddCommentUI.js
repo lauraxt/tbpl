@@ -304,16 +304,10 @@ var AddCommentUI = {
   },
 
   _postOneComment: function AddCommentUI__postOneComment(email, comment, machineResult, callback) {
-    var machinename = "";
-    for (var i = 0; i < machineResult._scrape.length; i++) {
-      if (machineResult._scrape[i].indexOf("s: ") > -1) {
-        machinename = machineResult._scrape[i].substring(machineResult._scrape[i].indexOf("s: ") + 3);
-      }
-    }
     var d = machineResult.startTime;
     NetUtils.crossDomainPost(Config.wooBugURL, {
       buildname: machineResult.machine.name,
-      machinename: machinename,
+      machinename: machineResult.slave,
       os: machineResult.machine.os,
       date: d.getUTCFullYear() + "-" +
             (d.getUTCMonth() < 9 ? "0" : "") + (d.getUTCMonth() + 1) + "-" +
@@ -327,18 +321,12 @@ var AddCommentUI = {
       who: email,
       comment: comment,
       timestamp: Math.ceil((new Date()).getTime()/1000),
-    }, function() { /* dummy callback */ });
-
-    NetUtils.crossDomainPost(this._submitURL, {
-      buildname: machineResult.machine.name,
-      buildtime: machineResult.startTime.getTime() / 1000,
-      errorparser: machineResult.errorParser,
-      logfile: machineResult.runID,
-      tree: machineResult.tree,
-      who: email,
-      note: comment,
     }, callback);
-    machineResult.note += "[<b>" + email + "</b>]<br>" + comment;
+
+    machineResult.notes.push({
+      'who': email,
+      'note': comment,
+    });
   },
 
   _postOneBug: function AddCommentUI__postOneBug(id, header, logLink, email, summary, callback) {

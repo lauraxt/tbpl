@@ -27,7 +27,7 @@ var SummaryLoader = {
     var summaryLoader = $("#summaryLoader").get(0);
     summaryLoader.innerHTML = "Retrieving summary..."
     summaryLoader.className = "loading";
-    var url = result.note ? result.summaryURL : result.annotatedSummaryURL;
+    var url = (result.notes && result.notes.length) ? result.summaryURL : result.annotatedSummaryURL;
     this._fetchSummary(result.runID, url, function fetchSummaryLoadCallback(summary) {
       var summaryPlaceholder = $(".stars .summary").get(0);
       summaryPlaceholder.innerHTML = summary ? summary.replace(/\n/g, "<br>\n") : "Summary is empty.";

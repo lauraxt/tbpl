@@ -67,10 +67,17 @@ var TinderboxJSONUser = {
     return scriptURL;
   },
 
-  processNote: function TinderboxJSONUser_processNote(note) {
-    return note.replace(/<\/?pre>/g, "").trim().replace(/\n/g, "<br>");
+  _getSlaveName: function TinderboxJSONUser__getSlaveName(buildScrape) {
+    if (buildScrape) {
+      for (var i = 0; i < buildScrape.length; i++) {
+        var matches = /^(\s*)s:(\s*)(.*?)$/.exec(buildScrape[i]);
+        if (matches)
+          return matches[3];
+      }
+    }
+    return "";
   },
-  
+
   findRevInScrape: function TinderboxJSONUser_findRevInScrape(scrape) {
     var revs = {};
     if (!scrape)
@@ -101,8 +108,6 @@ var TinderboxJSONUser = {
       machines[i] = machine;
     });
   
-    var notes = td.note_array.map(self.processNote);
-  
     var machineResults = {};
     for (var rowIndex = 0; rowIndex < td.build_table.length; rowIndex++) {
     for (var machineIndex = 0; machineIndex < td.build_table[rowIndex].length; machineIndex++) {
@@ -127,11 +132,10 @@ var TinderboxJSONUser = {
       if (machineResults[machineRunID])
         continue;
 
-      var note = build.hasnote ? notes[build.noteid * 1] : "";
-
       var result = machineResults[machineRunID] = new MachineResult ({
         "tree" : tree,
         "machine": machine,
+        "slave": self._getSlaveName(buildScrape),
         "runID": machineRunID,
         "state": state,
         "startTime": startTime,
@@ -142,7 +146,7 @@ var TinderboxJSONUser = {
         "annotatedSummaryURL": Config.baseURL + "php/getTinderboxSummary.php?tree=" + tree + "&id=" + machineRunID,
         "reftestLogURL": Config.baseURL + "php/getTinderboxSummary.php?tree=" + tree + "&id=" + machineRunID + '&reftest=true',
         "revs": revs,
-        "note": note,
+        "notes": [],
         "errorParser": build.errorparser,
         "_scrape": buildScrape,
       });
