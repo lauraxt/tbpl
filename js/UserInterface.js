@@ -98,14 +98,6 @@ var UserInterface = {
       e.dataTransfer.setData("text/x-tbpl-resultid", resultID);
     });
 
-    $(".revlink").live('click', function (event) {
-      if (event.ctrlKey || event.metaKey) {
-        self._toggleSelectedRev($(this).attr('data-rev'));
-        return false;
-      }
-      return true;
-    });
-
     $(".revlink").live("dragstart", function (e) {
       e.dataTransfer.effectAllowed = "link";
       e.dataTransfer.setData("text/x-tbpl-revision", $(this).attr("data-rev"));
