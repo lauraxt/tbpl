@@ -46,6 +46,11 @@ var Config = {
       orangeFactor: true,
       buildbotBranch: "mozilla-aurora",
     },
+    "Mozilla-Inbound": {
+      primaryRepo: "integration/mozilla-inbound",
+      hasGroups: true,
+      buildbotBranch: "mozilla-inbound",
+    },
     "Firefox4.0": {
       primaryRepo: "releases/mozilla-2.0",
       hasGroups: true,
