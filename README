@@ -36,12 +36,14 @@ echo "<?php define('SHERIFF_PASSWORD', 'thepassword');" > php/sheriff-password.p
 /path/to/bin/mongo -bind_ip 127.0.0.1
 # Start the initial import (this will take a while):
 python26 dataimport/import-buildbot-data.py -d 5 # 5 is the number of days to go back in time
-# Install a cronjob that runs dataimport/import-buildbot-data.py every 5 minutes
-echo "*/5 * * * * python26 /path/to/tbpl/datamiport/import-buildbot-data.py" >> /etc/crontab
 
-I hope this works. If it doesn't, pester mstange or file a TBPL bug.
+In order to keep the run data in the database up to date, the import script needs to be run periodically. You can do this with cron by editing your crontab file using the command "crontab -e" and adding this line:
+*/5 * * * * python26 /path/to/tbpl/dataimport/import-buildbot-data.py
+This will run dataimport/import-buildbot-data.py every 5 minutes.
 
-If yo want Tinderboxpushlog Robot to be able to comment in Bugzilla, you'll need to ask Ehsan for the tbplbot-password.php file and store it in the php folder. Alternatively you could create your own Bugzilla user, replace tbplbot@gmail.com in submitBugzillaComment.php with you user's email and add a tbplbot-password.php file that looks like this:
+If any of this doesn't work, pester mstange or file a TBPL bug.
+
+If you want Tinderboxpushlog Robot to be able to comment in Bugzilla, you'll need to ask Ehsan for the tbplbot-password.php file and store it in the php folder. Alternatively you could create your own Bugzilla user, replace tbplbot@gmail.com in submitBugzillaComment.php with you user's email and add a tbplbot-password.php file that looks like this:
 <?php define('TBPLBOT_PASSWORD', 'yourpassword'); ?>
 
 If you have a question, just send me an email at mstange@themasta.com.
