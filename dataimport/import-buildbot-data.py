@@ -20,8 +20,10 @@ import optparse
 from pymongo import Connection
 from string import Template
 
-log_path_try = Template("http://ftp.mozilla.org/pub/mozilla.org/firefox/try-builds/$pusher-$rev/$branch_platform/$builder-build$buildnumber.txt.gz")
-log_path_other = Template("http://ftp.mozilla.org/pub/mozilla.org/firefox/tinderbox-builds/$branch_platform/$buildid/$builder-build$buildnumber.txt.gz")
+log_path_try = Template("http://ftp.mozilla.org/pub/mozilla.org/$product/try-builds/$pusher-$rev/$branch_platform/$builder-build$buildnumber.txt.gz")
+log_path_other = Template("http://ftp.mozilla.org/pub/mozilla.org/$product/tinderbox-builds/$branch_platform/$buildid/$builder-build$buildnumber.txt.gz")
+
+verify_log_existence = False
 
 try_pushers = {}
 
@@ -85,23 +87,21 @@ class Run(object):
         }
         log = self._log()
         if log:
+            if verify_log_existence:
+                self._verify_existence_of_log(log)
             info["log"] = log
         return info
 
     def _log(self):
         """Return the log URL for this run, or None if it can't be figured out."""
-        # Ignore packageUrl, build_url and fileURL since the logs might be in a
-        # totally different directory than the used binary. This happens at least
-        # for mobile builds, and in different ways:
-        #  1. Builds are in .../mobile/..., but the logs might be in .../firefox/... Bug 637838
-        #  2. Builds are in .../try-mob-andrd-r7-bld/ but logs in .../try-android-r7/ Bug 655046
         data = {
           "builder": self._builder,
           "buildnumber": self._props["buildnumber"],
           "branch_platform": self._branchplatform(),
           "rev": self._rev,
+          "product": self._props.get("product", "firefox"),
         }
-        if self._props["branch"] in ["try", "try-mobile-browser"]:
+        if self._props["branch"] == "try":
             data["pusher"] = try_pusher(self._rev)
             if all(data.values()):
                 return log_path_try.substitute(data)
@@ -114,7 +114,7 @@ class Run(object):
     def _branchplatform(self):
         """Constructs the directory name that's based on branch and platform.
         The rules for this have been reverse-engineered."""
-        platform = self._props.get("build_platform", self._props.get("platform"))
+        platform = self._props.get("stage_platform", self._props.get("platform"))
         if not platform: # probably because it's a nightly l10n build (what is that?)
             return None
         dir = self._props["branch"] + "-" + platform
@@ -126,6 +126,13 @@ class Run(object):
         if self._props["branch"] in ["mozilla-1.9.1", "mozilla-1.9.2"] and "-unittest" in self._builder:
             dir += "-unittest"
         return dir
+
+    def _verify_existence_of_log(self, logurl):
+        try:
+            io = urllib2.urlopen(logurl)
+        except urllib2.HTTPError, ex:
+            print "Log not available:"
+            print self.id, logurl
 
 def json_from_gz_url(url):
     """Returns the JSON parsed object found at url."""
