@@ -17,6 +17,7 @@ $noIgnore = isset($_GET['noignore']) && $_GET['noignore'] == '1';
 
 $mongo = new Mongo();
 $hiddenBuilderNames = $noIgnore ? array() : getHiddenBuilderNames($_GET['branch']);
+$mongo->tbpl->runs->ensureIndex(array('branch' => true, 'revision' => true));
 $result = $mongo->tbpl->runs->find(
             array('branch' => $_GET['branch'], 'revision' => $_GET['rev'],
                   'buildername' => array('$nin' => $hiddenBuilderNames)),
