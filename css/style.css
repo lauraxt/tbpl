@@ -301,7 +301,7 @@ a.machineResult {
 .machineResult:hover {
   text-decoration: none;
 }
-.machineResult:hover:not(.running):not(.pending), .machineResult[active=true],
+.machineResult:hover, .machineResult[active=true],
 #logNoteSuggestions a:hover {
   color: white !important;
   text-decoration: none;
