@@ -89,7 +89,7 @@ p {
   padding: 0;
 }
 #moreList a {
-  padding: 5px 0;
+  display: block;
 }
 .dropdown dt {
   position: absolute;
