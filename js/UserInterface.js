@@ -513,6 +513,7 @@ var UserInterface = {
 
   // Get all jobs' results, optionally filtered by a pusher
   _getAllResults: function UserInterface__getAllResults() {
+    var self = this;
     var results = [];
     var oses = Object.keys(Config.OSNames);
     var types = ['debug', 'opt'];
@@ -520,7 +521,7 @@ var UserInterface = {
 
     var pushes = Object.values(this._data.getPushes());
     pushes = pushes.filter(function (push) {
-      if (this._pusher && push.pusher != this._pusher)
+      if (self._pusher && push.pusher != self._pusher)
         return false;
       if (!push.results)
         return false;
