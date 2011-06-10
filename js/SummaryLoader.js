@@ -29,6 +29,11 @@ var SummaryLoader = {
     summaryLoader.className = "loading";
     var url = (result.notes && result.notes.length) ? result.summaryURL : result.annotatedSummaryURL;
     this._fetchSummary(result.runID, url, function fetchSummaryLoadCallback(summary) {
+      function inTag(str, index, start, end) {
+        var prePart = str.substr(0, index);
+        return prePart.split(start).length > prePart.split(end).length;
+      }
+
       var summaryPlaceholder = $(".stars .summary").get(0);
       summaryPlaceholder.innerHTML = summary ? summary.replace(/\n/g, "<br>\n") : "Summary is empty.";
       result.suggestions = [];
@@ -52,10 +57,6 @@ var SummaryLoader = {
           return b.length - a.length;
         });
         var summary = item.attr("data-summary").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        function inTag(str, index, start, end) {
-          var prePart = str.substr(0, index);
-          return prePart.split(start).length > prePart.split(end).length;
-        }
         highlightTokens.forEach(function(token) {
           if (token.length > 0)
             summary = summary.replace(new RegExp(token, "gi"), function (token, index, str) {
