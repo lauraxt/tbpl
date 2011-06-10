@@ -4,7 +4,7 @@
 var TinderboxJSONUser = {
 
   load: function TinderboxJSONUser_load(tree, pushes, noIgnore, loadTracker, loadCallback, data) {
-    delete tinderbox_data;
+    delete window.tinderbox_data;
     var self = this;
     if (!pushes.length)
       return;
