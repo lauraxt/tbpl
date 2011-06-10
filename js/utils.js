@@ -73,13 +73,13 @@ if (!Number.prototype.pad) Number.prototype.pad = function Number_pad(positions)
 
 // Fallbacks for localStorage:
 try {
-  storage = window.localStorage;
+  window.storage = window.localStorage;
 } catch (e) {}
 if (!storage) {
   try {
     if (window.globalStorage)
-      storage = globalStorage[location.host];
+      window.storage = globalStorage[location.host];
   } catch (e) {}
 }
-storage = storage || {};
+window.storage = window.storage || {};
 
