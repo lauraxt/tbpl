@@ -1,6 +1,8 @@
 /* -*- Mode: JS; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 /* vim: set sw=2 ts=2 et tw=80 : */
 
+"use strict";
+
 function Data(treeName, noIgnore, config) {
   this._bugcache = {};
   this._treeName = treeName;

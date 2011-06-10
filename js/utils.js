@@ -1,6 +1,8 @@
 /* -*- Mode: JS; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 /* vim: set sw=2 ts=2 et tw=80 : */
 
+"use strict";
+
 // see: https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object/keys#Compatiblity
 if (!Object.keys) Object.keys = function Object_keys(o) {
   if (o !== Object(o))
