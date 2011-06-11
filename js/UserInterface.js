@@ -1147,8 +1147,12 @@ var UserInterface = {
     return base + "/" + treeInfo.buildbotBranch + "/rev/" + toprev;
   },
 
-  _permanentMessagesShowing: function UserInterface__loadingMessagesShowing() {
-    return $("#messages").children().length > 0;
+  _permanentMessagesShowing: function UserInterface__permanentMessagesShowing() {
+    // Only messages of type "loading" and "error" are permanent.
+    // Other messages aren't permanent and should be hidden after a timeout,
+    // for example the ones created by rebuild success callbacks, which have
+    // no type (and thus className == "").
+    return document.querySelector("#messages > .loading, #messages > .error") != null;
   },
 
   hideMessages: function UserInterface_hideMessages(onlyIfNoneLoading) {
