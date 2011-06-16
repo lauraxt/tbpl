@@ -488,6 +488,7 @@ Data.prototype = {
         /leopard/.test(name) ? "osx" :
         /OS\s?X/.test(name) ? "osx" :
         /w764/.test(name) ? "windows7-64" :
+        /WINNT 6\.1 x86-64/i.test(name) ? "windows7-64" :
         /WINNT 6\.1 x64/i.test(name) ? "windows7-64" :
         /WINNT 5\.1/i.test(name) ? "windowsxp" :
         /win7/.test(name) ? "windows" :

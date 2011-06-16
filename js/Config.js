@@ -177,6 +177,11 @@ var Config = {
       buildbotBranch: "addon-sdk",
       prettierName: "Addon-SDK",
     },
+    "Mozilla-Release": {
+      primaryRepo: "releases/mozilla-release",
+      hasGroups: true,
+      buildbotBranch: "mozilla-release",
+    },
   },
   groupedMachineTypes: {
     "Mochitest" : ["Mochitest"],
