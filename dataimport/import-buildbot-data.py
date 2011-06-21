@@ -39,7 +39,11 @@ def try_pusher(rev):
             io = urllib2.urlopen("http://hg.mozilla.org/try/json-pushes?changeset=" + rev)
         except urllib2.HTTPError:
             return None
-        pushinfo = json.load(io).values()
+        try:
+            pushinfo = json.load(io).values()
+        except ValueError:
+            print "Warning: Invalid JSON returned by pushlog when asking for pusher of revision", rev
+            return None
         io.close()
         if not pushinfo:
             return None
@@ -170,7 +174,11 @@ def get_runs(j):
             # Ignore builds with unspecified result for now.
             continue
         builder = j["builders"][str(build["builder_id"])]["name"]
-        slave = j["slaves"][str(build["slave_id"])]
+        slave_id = str(build["slave_id"])
+        slave = j["slaves"].get(slave_id)
+        if slave is None:
+            print "Warning: The slave", slave_id, "for build", build["id"], "doesn't exist in the slave list."
+            continue
         yield Run(build, builder, slave)
 
 def get_builders(j):
