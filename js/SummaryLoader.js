@@ -58,10 +58,10 @@ var SummaryLoader = {
         highlightTokens.sort(function(a, b) {
           return b.length - a.length;
         });
-        var summary = item.attr("data-summary").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        var bugSummaryHTML = item.attr("data-summary").escapeContent();
         highlightTokens.forEach(function(token) {
           if (token.length > 0)
-            summary = summary.replace(new RegExp(token, "gi"), function (token, index, str) {
+            bugSummaryHTML = bugSummaryHTML.replace(new RegExp(token, "gi"), function (token, index, str) {
               if (inTag(str, index, "<", ">") ||
                   inTag(str, index, "&", ";")) // don't replace stuff in already injected tags or entities
                 return token;
@@ -77,7 +77,7 @@ var SummaryLoader = {
         item.html('<div class="starSuggestion' + className + '"></div>' + 
           '<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=' +
           item.attr("data-bugid") + '" target="_blank">Bug ' +
-          item.attr("data-bugid") + ' - ' + summary + '</a>');
+          item.attr("data-bugid") + ' - ' + bugSummaryHTML + '</a>');
         item.attr("title", item.attr("data-status"));
       }
       AddCommentUI.updateUI();

@@ -186,18 +186,15 @@ var UserInterface = {
       updateCalendar: function (role, result, error) {
         var fallbacks = {"sheriff": "#developers", "releng": "#build"};
         if (error) {
-          $("#current-" + role).html('<span style="color:red; text-decoration:underline" title="Error: ' + ((error.cause) ? error.cause.statusText : error.message) + '">probably ' + fallbacks[role] + '</span>');
+          $("#current-" + role).html('<span style="color:red; text-decoration:underline" title="Error: ' + (error.cause ? error.cause.statusText : error.message).escapeAttribute() + '">probably ' + fallbacks[role].escapeContent() + '</span>');
           return;
         }
-        if (!!result.length)
-          result = result[0].getTitle().getText();
-        else
-          result = fallbacks[role];
 
-        if (result.indexOf("#") == 0)
-          result = '<a href="irc://irc.mozilla.org/' + result.slice(1) + '">' + result + '</a>';
-
-        $("#current-" + role).html(result);
+        var resultText = result.length ? result[0].getTitle().getText() : fallbacks[role];
+        var resultHTML = (resultText.charAt(0) == '#') ?
+          '<a href="irc://irc.mozilla.org/' + escape(resultText.slice(1)) + '">' +
+          resultText.escapeContent() + '</a>' : resultText.escapeContent();
+        $("#current-" + role).html(resultHTML);
       },
       paramsChanged: function (params) {
         self._updatePusherFilter(params.pusher || "");
@@ -254,7 +251,7 @@ var UserInterface = {
       'running">running</a></dd>';
     var total = {pending: 0, running: 0};
     for (var branch in infraStats) {
-      html += "<dt>" + branch + "</dt><dd>" + infraStats[branch].pending + " / " + infraStats[branch].running + "</dd>";
+      html += "<dt>" + branch.escapeContent() + "</dt><dd>" + infraStats[branch].pending + " / " + infraStats[branch].running + "</dd>";
       total.pending += infraStats[branch].pending;
       total.running += infraStats[branch].running;
     }
@@ -396,11 +393,12 @@ var UserInterface = {
       }
     } else {
       $("#wrongtree").html(
-        "The tree “" + this._treeName + "” does not exist in Tinderboxpushlog. " +
+        "The tree “" + this._treeName.escapeContent() +
+        "” does not exist in Tinderboxpushlog. " +
         "Please choose a tree from the list on the upper left.<br/>" +
         'Maybe the tree you’re looking for is on the <a href="' +
         Config.alternateTinderboxPushlogURL + this._treeName +
-        '">' + Config.alternateTinderboxPushlogName +
+        '">' + Config.alternateTinderboxPushlogName.escapeContent() +
         ' version of Tinderboxpushlog</a>.');
     }
   },
@@ -771,7 +769,8 @@ var UserInterface = {
       buglink += ' [<a href="http://brasstacks.mozilla.com/orangefactor/?display=Bug&endday=' +
                   this._ISODateString(today) + '&startday=' + this._ISODateString(sixtyDaysAgo) + '&bugid=$2">orangefactor</a>]'
     }
-    return text.replace(/(bug\s*|b=)([1-9][0-9]*)\b/ig, buglink)
+    return text.escapeContent()
+           .replace(/(bug\s*|b=)([1-9][0-9]*)\b/ig, buglink)
            .replace(/(changeset\s*)?([0-9a-f]{12})\b/ig, '<a href="http://hg.mozilla.org/' + Config.treeInfo[this._treeName].primaryRepo + '/rev/$2">$1$2</a>');
   },
 
@@ -822,10 +821,10 @@ var UserInterface = {
         }
         return '<a href="' + machineResult.briefLogURL + '"' +
                ' class="' + className + '"' +
-               ' title="' + title + '"' +
+               ' title="' + title.escapeAttribute() + '"' +
                (machineResult.runID == self._activeResult ? ' active="true"' : '') +
                ' resultID="' + machineResult.runID + '"' +
-               '>' + title + '</a>';
+               '>' + title.escapeContent() + '</a>';
       }).join('\n');
     })();
     document.title = document.title.replace(/\[\d*\]/, "[" + unstarred + "]");
@@ -1024,7 +1023,7 @@ var UserInterface = {
       return a.startTime.getTime() - b.startTime.getTime();
     }
 
-    var osresults = Object.keys(Config.resultNames).map(function buildHTMLForPushResultsOnOSForMachineType(machineType) {
+    var osresults = Object.keys(Config.resultNames).map(function getFilteredAndSortedResults(machineType) {
       var displayedResults = self._filterDisplayedResults(results[machineType] || []);
       if ("hasGroups" in Config.treeInfo[self._treeName] &&
           Object.keys(Config.groupedMachineTypes).indexOf(machineType) != -1) {
@@ -1061,7 +1060,7 @@ var UserInterface = {
     if (!oshtml)
       return '';
 
-    return '<li><span class="os ' + os + '">' + Config.OSNames[os] + debug +
+    return '<li><span class="os ' + os + '">' + (Config.OSNames[os] + debug).escapeContent() +
     '</span><span class="osresults">' + oshtml + '</span></li>';
   },
 
@@ -1081,14 +1080,15 @@ var UserInterface = {
     return push.patches.map(function buildHTMLForPushPatch(patch, patchIndex) {
       return '<li>\n' +
       '<a class="revlink" data-rev="' + patch.rev + '" href="' + self._changesetURL(patch.rev) + '">' + patch.rev +
-      '</a>\n<div><div class="patchTitle"><span><span class="author">' + patch.author + '</span> &ndash; ' +
+      '</a>\n<div><div class="patchTitle"><span><span class="author">' +
+      patch.author.escapeContent() + '</span> &ndash; ' +
       '<span class="desc">' + self._linkBugs(patch.desc.split("\n")[0], false) + '</span>' +
       (function buildHTMLForPatchTags() {
         if (!patch.tags.length)
           return '';
 
         return ' <span class="logtags">' + $(patch.tags).map(function () {
-          return ' <span class="' + this.type + '">' + this.name + '</span>';
+          return ' <span class="' + this.type.escapeAttribute() + '">' + this.name.escapeContent() + '</span>';
         }).get().join('') + '</span>';
       })() +
       '</span></div></div>\n' +
@@ -1097,7 +1097,7 @@ var UserInterface = {
   },
 
   _changesetURL: function UserInterface__changesetUrl(rev) {
-      return 'http://hg.mozilla.org/' + Config.treeInfo[this._treeName].primaryRepo + '/rev/' + rev;
+    return 'http://hg.mozilla.org/' + Config.treeInfo[this._treeName].primaryRepo + '/rev/' + rev;
   },
 
   _generatePushNode: function UserInterface__generatePushNode(push) {
@@ -1105,7 +1105,7 @@ var UserInterface = {
     var linkedPusher = this._pusher == push.pusher ? null : push.pusher;
     var nodeHtml = '<li class="push" id="push-' + push.id + '" data-id="' + push.id + '" data-pusher="' + push.pusher + '">\n' +
       '<h2><a href="' + this._controller.getURLForChangedParams({pusher:linkedPusher}) + '"' +
-      'class="pusher pushStatable">' + push.pusher + '</a> &ndash; ' +
+      'class="pusher pushStatable">' + push.pusher.escapeContent() + '</a> &ndash; ' +
       '<a class="date" data-timestamp="' + push.date.getTime() +
       '" href="' + this._controller.getURLForChangedParams({rev:push.toprev}) + '">' +
       self._getDisplayDate(push.date) + '</a>' +
@@ -1139,7 +1139,7 @@ var UserInterface = {
     resultsList.get(0).innerHTML = this._buildHTMLForPushResults(push);
   },
 
-  _listChangesetsForPush: function(toprev) {
+  _listChangesetsForPush: function UserInterface__listChangesetsForPush(toprev) {
     var self = this;
     var push = this._data.getPushForRev(toprev);
     var urls = push.patches.map(function (patch) { return self._changesetURL(patch.rev); });
@@ -1151,7 +1151,7 @@ var UserInterface = {
     window.open("data:text/html," + escape(html), "", "width=600,height=300,scrollbars=yes");
   },
 
-  _buildAPIURL: function(toprev) {
+  _buildAPIURL: function UserInterface__buildAPIURL(toprev) {
     var base = Config.selfServeAPIBaseURL;
     var treeInfo = Config.treeInfo[this._treeName];
     if (!base || !base.length || !('buildbotBranch' in treeInfo)) {
@@ -1556,7 +1556,7 @@ var UserInterface = {
               return '';
             return '<div class="note">' +
               result.notes.map(function htmlForNote(note) {
-                return '[<b><a href="mailto:' + note.who + '">' + note.who + '</a></b>' +
+                return '[<strong>' + note.who.escapeContent() + '</strong>' +
                   (note.timestamp ? (' - ' + UserInterface._getDisplayDate(new Date(note.timestamp * 1000))) : '') +
                   ']<br/>' + self._linkBugs(note.note, true);
                 }).join("<br/><br/>") +

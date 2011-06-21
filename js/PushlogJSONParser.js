@@ -36,8 +36,12 @@ var PushlogJSONParser = {
 
             // Revert the order because we want most recent pushes / patches to
             // come first.
-            patches.unshift({rev: patch.rev, author: author,
-                    desc: patch.desc.escapeContent(), tags: tags});
+            patches.unshift({
+              rev: patch.rev,
+              author: author,
+              desc: patch.desc,
+              tags: tags
+            });
           }
 
           var toprev = patches[0].rev;
