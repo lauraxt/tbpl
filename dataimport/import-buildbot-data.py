@@ -86,7 +86,6 @@ class Run(object):
 
     def get_info(self):
         info = {
-            "_id": self.id,
             "buildername": self._props.get("buildername", self._builder), # builder ux_leopard_test-scroll doesn't have a props["buildername"]
             "slave": self._slave,
             "revision": self._rev,
@@ -190,10 +189,11 @@ def get_builders(j):
     for builder in j["builders"].values():
         yield builder["name"], builder["category"], builder.get("buildername")
 
-def add_run_to_db(run, db):
-    if db.runs.find_one({"_id": run.id}):
+def add_run_to_db(run, db, overwrite):
+    id_criterion = {"_id": run.id}
+    if not overwrite and db.runs.find_one(id_criterion):
         return False
-    db.runs.insert(run.get_info())
+    db.runs.update(id_criterion, {"$set": run.get_info()}, True)
     return True
 
 def add_builder_to_db(builder, db):
@@ -215,26 +215,29 @@ def add_builder_to_db(builder, db):
         return True
     return False
 
-def add_to_db(url, db):
+def add_to_db(url, db, overwrite):
     print "Fetching", url, "..."
     j = json_from_gz_url(url)
     if j is None:
         return
 
     print "Traversing runs and inserting into database..."
-    count = sum([add_run_to_db(run, db) for run in get_runs(j)])
-    print "Inserted", count, "new run entries."
+    count = sum([add_run_to_db(run, db, overwrite) for run in get_runs(j)])
+    if overwrite:
+        print "Inserted or updated", count, "run entries."
+    else:
+        print "Inserted", count, "new run entries."
 
     print "Traversing builders and updating database..."
     db.builders.ensure_index("name")
     count = sum([add_builder_to_db(builder, db) for builder in get_builders(j)])
     print "Updated", count, "builders."
 
-def do_date(date, db):
-    add_to_db(date.strftime("http://build.mozilla.org/builds/builds-%Y-%m-%d.js.gz"), db)
+def do_date(date, db, overwrite):
+    add_to_db(date.strftime("http://build.mozilla.org/builds/builds-%Y-%m-%d.js.gz"), db, overwrite)
 
-def do_recent(db):
-    add_to_db("http://build.mozilla.org/builds/builds-4hr.js.gz", db)
+def do_recent(db, overwrite):
+    add_to_db("http://build.mozilla.org/builds/builds-4hr.js.gz", db, overwrite)
 
 usage = """
 %prog [options]
@@ -244,16 +247,17 @@ Import run information from JSON files on build.mozilla.org into the local Mongo
 def main():
     parser = optparse.OptionParser(usage=usage)
     parser.add_option("-d","--days",help="number of days to import",type=int,default=0)
+    parser.add_option("-f","--force",help="force overwrite",dest="overwrite",action="store_true",default=False)
     (options,args) = parser.parse_args()
 
     # Import recent runs.
-    do_recent(Connection().tbpl)
+    do_recent(Connection().tbpl, options.overwrite)
 
     # Import options.days days of history.
     tzinfo = pytz.timezone("America/Los_Angeles")
     today = datetime.datetime.now(tzinfo)
     for i in range(options.days):
-        do_date(today - datetime.timedelta(i), Connection().tbpl)
+        do_date(today - datetime.timedelta(i), Connection().tbpl, options.overwrite)
 
 if __name__ == "__main__":
    main()
