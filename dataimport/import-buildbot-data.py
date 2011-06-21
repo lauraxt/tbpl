@@ -8,7 +8,6 @@
 # performance reasons. The JSON files are very large and include data from
 # all branches, and most of that data isn't of interest to TBPL.
 
-import json
 import urllib2
 import os
 import datetime
@@ -17,8 +16,14 @@ import StringIO
 import time
 import re
 import optparse
+import pytz
 from pymongo import Connection
 from string import Template
+
+try:
+   import simplejson as json
+except ImportError:
+   import json
 
 log_path_try = Template("http://ftp.mozilla.org/pub/mozilla.org/$product/try-builds/$pusher-$rev/$branch_platform/$builder-build$buildnumber.txt.gz")
 log_path_other = Template("http://ftp.mozilla.org/pub/mozilla.org/$product/tinderbox-builds/$branch_platform/$buildid/$builder-build$buildnumber.txt.gz")
@@ -47,7 +52,8 @@ def buildidnumber(buildid):
         return None
     (Y, m, d) = (int(buildid[0:4]), int(buildid[4:6]), int(buildid[6:8]))
     (H, i, s) = (int(buildid[8:10]), int(buildid[10:12]), int(buildid[12:14]))
-    return int(time.mktime(datetime.datetime(Y, m, d, H, i, s).timetuple()))
+    tzinfo = pytz.timezone("America/Los_Angeles")
+    return int(time.mktime(datetime.datetime(Y, m, d, H, i, s, 0, tzinfo).utctimetuple()))
 
 def fix_revision(revision):
     if revision is None:
@@ -204,6 +210,8 @@ def add_builder_to_db(builder, db):
 def add_to_db(url, db):
     print "Fetching", url, "..."
     j = json_from_gz_url(url)
+    if j is None:
+        return
 
     print "Traversing runs and inserting into database..."
     count = sum([add_run_to_db(run, db) for run in get_runs(j)])
@@ -220,20 +228,24 @@ def do_date(date, db):
 def do_recent(db):
     add_to_db("http://build.mozilla.org/builds/builds-4hr.js.gz", db)
 
-os.environ["TZ"] = "America/Los_Angeles"
-time.tzset()
-
-parser = optparse.OptionParser(usage="""
+usage = """
 %prog [options]
 
-Import run information from JSON files on build.mozilla.org into the local MongoDB database.
-""")
-parser.add_option("-d","--days",help="number of days to import",type=int,default=0)
-(options,args) = parser.parse_args()
+Import run information from JSON files on build.mozilla.org into the local MongoDB database."""
 
-do_recent(Connection().tbpl)
+def main():
+    parser = optparse.OptionParser(usage=usage)
+    parser.add_option("-d","--days",help="number of days to import",type=int,default=0)
+    (options,args) = parser.parse_args()
 
-today = datetime.date.today()
+    # Import recent runs.
+    do_recent(Connection().tbpl)
 
-for i in range(options.days):
-    do_date(today - datetime.timedelta(i), Connection().tbpl)
+    # Import options.days days of history.
+    tzinfo = pytz.timezone("America/Los_Angeles")
+    today = datetime.datetime.now(tzinfo)
+    for i in range(options.days):
+        do_date(today - datetime.timedelta(i), Connection().tbpl)
+
+if __name__ == "__main__":
+   main()
