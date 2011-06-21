@@ -77,7 +77,7 @@ if (!Number.prototype.pad) Number.prototype.pad = function Number_pad(positions)
 try {
   window.storage = window.localStorage;
 } catch (e) {}
-if (!storage) {
+if (!window.storage) {
   try {
     if (window.globalStorage)
       window.storage = globalStorage[location.host];
