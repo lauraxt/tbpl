@@ -619,6 +619,7 @@ Data.prototype = {
     this._hiddenBuildersAreLoading = true;
     var branch = Config.treeInfo[this._treeName].buildbotBranch;
     var self = this;
+    loadTracker.addTrackedLoad();
     $.ajax({
       url: Config.baseURL + "php/getHiddenBuilderNames.php?branch=" + branch,
       dataType: 'json',
