@@ -564,9 +564,9 @@ body.details > #details
    * try changing these values using firebug, the columns simply won't
    * respect their set width.
    */
-  -moz-column-width: 280px;
-  -webkit-column-width: 280px;
-  column-width: 280px;
+  -moz-column-width: 40em;
+  -webkit-column-width: 40em;
+  column-width: 40em;
 }
 
 #results > ul {
