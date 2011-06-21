@@ -6,17 +6,15 @@
 // [ { "name": "...", "buildername": "...", "hidden": 0/1 }, ... ]
 // hidden:0 may be ommitted.
 
-header("Content-Type: text/plain, charset=utf-8");
-header("Access-Control-Allow-Origin: *");
-header("Cache-Control: no-cache, must-revalidate");
-header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
+require_once 'inc/Communication.php';
 
-if (empty($_GET['branch']))
-  die("No branch set.");
+Headers::send(Headers::ALLOW_CROSS_ORIGIN | Headers::NO_CACHE, "application/json");
+
+$branch = requireStringParameter('branch', $_GET);
 
 $mongo = new Mongo();
 $mongo->tbpl->builders->ensureIndex(array('branch' => true));
 $result = $mongo->tbpl->builders->find(
-            array('branch' => $_GET['branch']),
+            array('branch' => $branch),
             array('_id' => 0, 'branch' => 0, 'history' => 0));
 echo json_encode(iterator_to_array($result->sort(array('name'=>1)), false)) . "\n";

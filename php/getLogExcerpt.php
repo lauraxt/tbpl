@@ -9,8 +9,9 @@ require_once 'inc/TinderboxPrintFilter.php';
 require_once 'inc/AnnotatedSummaryGenerator.php';
 require_once 'inc/GzipUtils.php';
 require_once 'inc/RunForLog.php';
+require_once 'inc/Communication.php';
 
-header("Access-Control-Allow-Origin: *");
+Headers::send(Headers::ALLOW_CROSS_ORIGIN);
 
 $type = isset($_GET["type"]) ? $_GET["type"] : "plaintext";
 

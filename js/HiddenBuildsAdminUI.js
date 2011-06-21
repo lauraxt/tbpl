@@ -85,7 +85,7 @@ var HiddenBuildsAdminUI = {
         branch: branch,
       },
       success: function getBuildersSuccess(data) {
-        self._builders = JSON.parse(data);
+        self._builders = data;
         for (var i = 0; i < self._builders.length; i++) {
           var builder = self._builders[i];
           var oldHidden = ("hidden" in builder) && !!builder.hidden;
@@ -265,6 +265,7 @@ var HiddenBuildsAdminUI = {
         reason: $("#reason").val(),
         actions: this._getSubmitActions()
       },
+      dataType: 'json',
       success: function updateBuilderSubmitSuccess(errors) {
         if (!errors) {
           self._acceptChanges();
@@ -275,8 +276,7 @@ var HiddenBuildsAdminUI = {
           });
         } else {
           try {
-            var errorObj = JSON.parse(errors);
-            if (("error" in errorObj) && errorObj.error == "password") {
+            if (("error" in errors) && errors.error == "password") {
               $("#password").val("").focus();
             }
           } catch (e) { }

@@ -5,17 +5,15 @@
 // Returns the change history of the builder identified by $_GET['name'].
 // [ { "date": 1306421449, "action": "insert / hide / unhide", "who": "...", "reason": "..." }, ... ]
 
-header("Content-Type: text/plain, charset=utf-8");
-header("Access-Control-Allow-Origin: *");
-header("Cache-Control: no-cache, must-revalidate");
-header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
+require_once 'inc/Communication.php';
 
-if (empty($_GET['name']))
-  die("No name set.");
+Headers::send(Headers::ALLOW_CROSS_ORIGIN | Headers::NO_CACHE, "application/json");
+
+$name = requireStringParameter('name', $_GET);
 
 $mongo = new Mongo();
 $mongo->tbpl->builders->ensureIndex(array('name' => true));
 $result = $mongo->tbpl->builders->findOne(
-            array('name' => $_GET['name']),
+            array('name' => $name),
             array('_id' => 0, 'name' => 0, 'history.ip' => 0));
 echo json_encode($result['history']) . "\n";

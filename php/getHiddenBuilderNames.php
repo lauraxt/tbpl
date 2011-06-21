@@ -6,13 +6,8 @@
 // branch $_GET['branch'] as a JSON encoded array.
 
 require_once 'inc/HiddenBuilders.php';
+require_once 'inc/Communication.php';
 
-header("Content-Type: text/plain, charset=utf-8");
-header("Access-Control-Allow-Origin: *");
-header("Cache-Control: no-cache, must-revalidate");
-header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
-
-if (empty($_GET['branch']))
-  die("No branch set.");
-
-echo json_encode(getHiddenBuilderNames($_GET['branch'])) . "\n";
+Headers::send(Headers::ALLOW_CROSS_ORIGIN | Headers::NO_CACHE, "application/json");
+$branch = requireStringParameter('branch', $_GET);
+echo json_encode(getHiddenBuilderNames($branch)) . "\n";

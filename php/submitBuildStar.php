@@ -1,46 +1,42 @@
 <?php
 
-header("Content-Type: text/plain, charset=utf-8");
-header("Access-Control-Allow-Origin: *");
+require_once 'inc/Communication.php';
+
+Headers::send(Headers::ALLOW_CROSS_ORIGIN, "application/json");
 
 $mongo = new Mongo();
 
-if (!isset($_POST["id"]))
-  die("No id set.");
+$id = requireStringParameter('id', $_POST);
 
-if (is_numeric($_POST["id"])) {
-  // $_POST['id'] is a Buildbot ID.
+if (is_numeric($id)) {
+  // $id is a Buildbot ID.
   $run = $mongo->tbpl->runs->findOne(
-    array('_id' => +$_POST['id']),
+    array('_id' => +$id),
     array('_id' => 1));
   if ($run === NULL)
     die("No build with that id in database.");
 } else {
-  // $_POST['id'] is not a Buildbot ID; it could be a Tinderbox result ID.
+  // $id is not a Buildbot ID; it could be a Tinderbox result ID.
   // TBPL with Tinderbox backend doesn't know the Buildbot ID of a run,
   // so it lets us figure it out from the slave name and the start time
   // of the run.
-  if (empty($_POST["machinename"]))
-    die("No machinename provided.");
-  if (empty($_POST["starttime"]))
-    die("No starttime provided.");
+  $slave = requireStringParameter('machineName', $_POST);
+  $starttime = +requireStringParameter('starttime', $_POST);
 
   $run = $mongo->tbpl->runs->findOne(
-    array('slave' => $_POST["machinename"],
-          'starttime' => +$_POST["starttime"]),
+    array('slave' => $slave,
+          'starttime' => $starttime),
     array('_id' => 1));
   if ($run === NULL)
     die("No build with that slave/starttime combination in database.");
 }
 
-if (!isset($_POST["who"]))
-  die("No author ('who') provided.");
-if (!isset($_POST["note"]))
-  die("No note provided.");
+$who = requireStringParameter('who', $_POST);
+$note = requireStringParameter('note', $_POST);
 
 $noteObject = array(
-  'who' => $_POST["who"],
-  'note' => $_POST["note"],
+  'who' => $who,
+  'note' => $note,
   'timestamp' => time(),
   'ip' => $_SERVER['REMOTE_ADDR']
 );

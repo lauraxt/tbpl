@@ -8,6 +8,9 @@ require_once 'inc/ShortLogGenerator.php';
 require_once 'inc/FullLogGenerator.php';
 require_once 'inc/GzipUtils.php';
 require_once 'inc/RunForLog.php';
+require_once 'inc/Communication.php';
+
+Headers::send(Headers::ALLOW_CROSS_ORIGIN);
 
 $run = getRequestedRun();
 $logParser = new LogParser($run, new GeneralErrorFilter());
