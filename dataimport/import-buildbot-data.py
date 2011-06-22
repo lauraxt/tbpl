@@ -9,7 +9,7 @@
 # all branches, and most of that data isn't of interest to TBPL.
 
 import urllib2
-import os
+import calendar
 import datetime
 import gzip
 import StringIO
@@ -57,7 +57,7 @@ def buildidnumber(buildid):
     (Y, m, d) = (int(buildid[0:4]), int(buildid[4:6]), int(buildid[6:8]))
     (H, i, s) = (int(buildid[8:10]), int(buildid[10:12]), int(buildid[12:14]))
     tzinfo = pytz.timezone("America/Los_Angeles")
-    return int(time.mktime(datetime.datetime(Y, m, d, H, i, s, 0, tzinfo).utctimetuple()))
+    return calendar.timegm(tzinfo.localize(datetime.datetime(Y, m, d, H, i, s)).utctimetuple())
 
 def fix_revision(revision):
     if revision is None:
