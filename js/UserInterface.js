@@ -397,7 +397,7 @@ var UserInterface = {
         "” does not exist in Tinderboxpushlog. " +
         "Please choose a tree from the list on the upper left.<br/>" +
         'Maybe the tree you’re looking for is on the <a href="' +
-        Config.alternateTinderboxPushlogURL + this._treeName +
+        Config.alternateTinderboxPushlogURL + escape(this._treeName) +
         '">' + Config.alternateTinderboxPushlogName.escapeContent() +
         ' version of Tinderboxpushlog</a>.');
     }
