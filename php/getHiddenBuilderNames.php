@@ -9,5 +9,7 @@ require_once 'inc/HiddenBuilders.php';
 require_once 'inc/Communication.php';
 
 Headers::send(Headers::ALLOW_CROSS_ORIGIN | Headers::NO_CACHE, "application/json");
+
 $branch = requireStringParameter('branch', $_GET);
+
 echo json_encode(getHiddenBuilderNames($branch)) . "\n";
