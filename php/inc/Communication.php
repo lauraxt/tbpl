@@ -6,7 +6,7 @@ class Headers {
   const ALLOW_CROSS_ORIGIN = 1;
   const NO_CACHE           = 2;
 
-  function send($flags = 0, $mimeType = "text/html") {
+  public static function send($flags = 0, $mimeType = "text/html") {
     header("Content-Type: {$mimeType}, charset=utf-8");
     if ($flags & self::ALLOW_CROSS_ORIGIN)
       header("Access-Control-Allow-Origin: *");
