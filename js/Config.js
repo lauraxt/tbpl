@@ -179,6 +179,11 @@ var Config = {
       hasGroups: true,
       buildbotBranch: "mozilla-release",
     },
+    "Fx-Team": {
+      primaryRepo: "integration/fx-team",
+      hasGroups: true,
+      buildbotBranch: "fx-team",
+    },
   },
   groupedMachineTypes: {
     "Mochitest" : ["Mochitest"],
