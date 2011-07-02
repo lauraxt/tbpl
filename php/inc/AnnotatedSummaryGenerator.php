@@ -77,6 +77,8 @@ class AnnotatedSummaryGenerator implements FileGenerator {
   }
 
   protected function getBugsForTestFailure($fileName) {
+    if ($fileName == '')
+      return array();
     if (isset($this->bugsCache[$fileName]))
       return array();
     if ($fileName == 'automation.py') {

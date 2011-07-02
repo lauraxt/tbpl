@@ -168,6 +168,9 @@ function parseJSON($json) {
 
 $bugsCache = array();
 function getBugsForTestFailure($fileName) {
+  if ($fileName == '') {
+    return array();
+  }
   global $bugsCache;
   if (isset($bugsCache[$fileName]))
     return array();
