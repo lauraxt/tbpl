@@ -19,7 +19,7 @@ var Config = {
   selfServeAPIBaseURL: "https://build.mozilla.org/buildapi/self-serve",
   alternateTinderboxPushlogURL: "http://build.mozillamessaging.com/tinderboxpushlog/?tree=",
   alternateTinderboxPushlogName: "Mozilla Messaging",
-  wooBugURL: "http://brasstacks.mozilla.com/starcomment.php", // war-on-orange database
+  wooBugURL: "http://tbpl.mozilla.org/php/starcomment.php", // war-on-orange database
   // treeInfo gives details about the trees and repositories. There are various
   // items that can be specified:
   //
