@@ -19,10 +19,10 @@ TBPL has a client-side and a server-side component. Running only the client-side
 If you want a standalone instance of TBPL with your own server-side component, the requirements for your server are a little higher. Data is stored in a MongoDB database, which is accessed by both python (dataimport/import-buildbot-data.py) and PHP scripts. All in all, you need these things:
 
  - a webserver (e.g. Apache)
+ - MongoDB (any recent version will do)
  - PHP 5.3
- - Python 2.6 or better
- - MongoDB (some recent version will do)
- - Mongo drivers for both PHP and Python (called MongoPHP and pymongo)
+ - MongoPHP (the Mongo driver for PHP)
+ - Python 2.6 or better with the packages pymongo, pytz and simplejson
 
 Then you can set everything up:
 
@@ -30,7 +30,7 @@ cd path/to/tbpl
 # Create the folders "summaries" and "cache" in the tbpl directory and make them writable for all users:
 mkdir cache summaries
 chmod a+w cache summaries
-# Create the file php/sheriff-password.php that stores the hidden builder change password:
+# Create the file php/sheriff-password.php that stores the hidden builder admin password:
 echo "<?php define('SHERIFF_PASSWORD', 'thepassword');" > php/sheriff-password.php
 # Start the MongoDB server if it's not running already, for example like this (in a different shell):
 /path/to/bin/mongo -bind_ip 127.0.0.1
