@@ -301,23 +301,27 @@ var AddCommentUI = {
 
   _postOneComment: function AddCommentUI__postOneComment(email, comment, machineResult, callback) {
     var d = machineResult.startTime;
-    NetUtils.crossDomainPost(Config.wooBugURL, {
-      buildname: machineResult.machine.name,
-      machinename: machineResult.slave,
-      os: machineResult.machine.os,
-      date: d.getUTCFullYear() + "-" +
-            (d.getUTCMonth() < 9 ? "0" : "") + (d.getUTCMonth() + 1) + "-" +
-            (d.getUTCDate() < 10 ? "0" : "") + d.getUTCDate(),
-      type: machineResult.machine.type,
-      debug: machineResult.machine.debug,
-      starttime: machineResult.startTime.getTime() / 1000,
-      logfile: machineResult.runID,
-      tree: Config.treeInfo[machineResult.tree].primaryRepo,
-      rev: machineResult.revs[Config.treeInfo[machineResult.tree].primaryRepo],
-      who: email,
-      comment: comment,
-      timestamp: Math.ceil((new Date()).getTime()/1000),
-    }, function () { /* dummy callback */ });
+    $.ajax({
+      url: Config.wooBugURL,
+      type: "POST",
+      data: {
+        buildname: machineResult.machine.name,
+        machinename: machineResult.slave,
+        os: machineResult.machine.os,
+        date: d.getUTCFullYear() + "-" +
+              (d.getUTCMonth() < 9 ? "0" : "") + (d.getUTCMonth() + 1) + "-" +
+              (d.getUTCDate() < 10 ? "0" : "") + d.getUTCDate(),
+        type: machineResult.machine.type,
+        debug: machineResult.machine.debug,
+        starttime: machineResult.startTime.getTime() / 1000,
+        logfile: machineResult.runID,
+        tree: Config.treeInfo[machineResult.tree].primaryRepo,
+        rev: machineResult.revs[Config.treeInfo[machineResult.tree].primaryRepo],
+        who: email,
+        comment: comment,
+        timestamp: Math.ceil((new Date()).getTime()/1000),
+      },
+    });
     $.ajax({
       url: Config.baseURL + "php/submitBuildStar.php",
       type: "POST",
@@ -328,7 +332,7 @@ var AddCommentUI = {
         machinename: machineResult.slave,
         starttime: machineResult.startTime.getTime() / 1000,
       },
-      success: callback,
+      complete: callback,
     });
 
     machineResult.notes.push({
@@ -339,10 +343,15 @@ var AddCommentUI = {
   },
 
   _postOneBug: function AddCommentUI__postOneBug(id, header, logLink, email, summary, callback) {
-    NetUtils.crossDomainPost(Config.baseURL + "php/submitBugzillaComment.php", {
-      id: id,
-      comment: email + "\n" + logLink + "\n" + header + "\n\n" + summary,
-    }, callback);
+    $.ajax({
+      url: Config.baseURL + "php/submitBugzillaComment.php",
+      type: "POST",
+      data: {
+        id: id,
+        comment: email + "\n" + logLink + "\n" + header + "\n\n" + summary,
+      },
+      complete: callback,
+    });
   },
 
 };

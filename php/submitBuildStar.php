@@ -20,7 +20,7 @@ if (is_numeric($id)) {
   // TBPL with Tinderbox backend doesn't know the Buildbot ID of a run,
   // so it lets us figure it out from the slave name and the start time
   // of the run.
-  $slave = requireStringParameter('machineName', $_POST);
+  $slave = requireStringParameter('machinename', $_POST);
   $starttime = +requireStringParameter('starttime', $_POST);
 
   $run = $mongo->tbpl->runs->findOne(

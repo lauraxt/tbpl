@@ -81,30 +81,4 @@ var NetUtils = {
     return this._loadText(url, 'POST', headers, body, true, loadCallback, failCallback, timeoutCallback, timeout);
   },
 
-  crossDomainPost: function NetUtils_crossDomainPost(url, values, loadCallback, timeoutCallback, timeout) {
-    if (!timeout) {
-      timeout = 30; // seconds
-    }
-    if (!arguments.callee.c)
-      arguments.callee.c = 1;
-    var iframeName = "iframe" + arguments.callee.c++;
-    var iframe = $("<iframe></iframe>").hide().attr("name", iframeName).appendTo("body");
-    var form = $("<form></form>").hide().attr({ action: url, method: "post", target: iframeName }).appendTo("body");
-    for (var i in values) {
-      $("<input type='hidden'>").attr({ name: i, value: values[i]}).appendTo(form);
-    }
-    form.get(0).submit();
-    form.remove();
-    var timeoutID = setTimeout(function() {
-      iframe.get(0).onload = null;
-      timeoutCallback();
-      setTimeout(function() { iframe.remove(); }, 0);
-    }, timeout * 1000);
-    iframe.get(0).onload = function crossDomainIframeLoaded() {
-      clearTimeout(timeoutID);
-      loadCallback();
-      setTimeout(function () { iframe.remove(); }, 0);
-    }
-  },
-
 };
