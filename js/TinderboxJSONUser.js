@@ -201,6 +201,7 @@ var TinderboxJSONUser = {
       dataType: 'text json',
       error: function (request, textStatus, error) {
         loadTracker.loadFailed(textStatus);
+        callback(machineResults);
       },
       success: function(notes) {
         try {
@@ -209,12 +210,12 @@ var TinderboxJSONUser = {
             self._addNotesToMachineResult(machineResults[resultID], notes);
           }
 
-          callback(machineResults);
           loadTracker.loadCompleted();
         } catch (e) {
           console.log(e);
           loadTracker.loadFailed('note data is invalid');
         }
+        callback(machineResults);
       }
     });
   },
