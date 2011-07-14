@@ -28,13 +28,13 @@ class GzipUtils {
   }
 
   public static function mendBrokenLines($lineArray) {
-    for ($i = 0; $i < count($lineArray) - 1; $i++) {
-      if (substr($lineArray[$i], -1) != "\n") {
-        $lineArray[$i] .= $lineArray[$i + 1];
-        array_splice($lineArray, $i + 1, 1);
-        $i--;
+    $numLines = count($lineArray);
+    for ($i = 0; $i < $numLines - 1; $i = $j) {
+      for ($j = $i + 1; $j < $numLines && substr($lineArray[$i], -1) != "\n"; $j++) {
+        $lineArray[$i] .= $lineArray[$j];
+        unset($lineArray[$j]);
       }
     }
-    return $lineArray;
+    return array_values($lineArray);
   }
 }
