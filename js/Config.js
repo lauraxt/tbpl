@@ -184,6 +184,11 @@ var Config = {
       hasGroups: true,
       buildbotBranch: "fx-team",
     },
+    "Ionmonkey": {
+      primaryRepo: "projects/ionmonkey",
+      hasGroups: true,
+      buildbotBranch: "ionmonkey",
+    },
   },
   groupedMachineTypes: {
     "Mochitest" : ["Mochitest"],
