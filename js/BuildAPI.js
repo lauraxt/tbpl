@@ -56,4 +56,13 @@ var BuildAPI = {
       this._makeRequestResultLoadedCallback(successCallback, failCallback),
       failCallback, timeoutCallback);
   },
+
+  cancelRevision: function BuildAPI_cancelRevision(tree, rev, successCallback, failCallback, timeoutCallback) {
+    NetUtils.crossDomainPostWithCredentials(
+      Config.selfServeAPIBaseURL + '/' + tree + '/rev/' + rev,
+      { Accept: 'application/json' },
+      { _method: 'DELETE' },
+      this._makeRequestResultLoadedCallback(successCallback, failCallback),
+      failCallback, timeoutCallback);
+  },
 };

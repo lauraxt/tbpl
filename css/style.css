@@ -845,8 +845,30 @@ em.testfail {
   background: rgba(255, 255, 255, 0.75);
 }
 
-.buildButtons > img {
+.buildButtons > img, .cancelAllBuildsButton {
   cursor: pointer;
+}
+
+.cancelAllBuildsButton {
+  position: absolute;
+  margin: 1px 0 0 4px;
+  opacity: 0;
+  -moz-transition: opacity 200ms ease-in-out;
+  -webkit-transition: opacity 200ms ease-in-out;
+  -o-transition: opacity 200ms ease-in-out;
+  transition: opacity 200ms ease-in-out;
+}
+
+#pushes > li:hover .cancelAllBuildsButton {
+  opacity: 0.25;
+}
+
+#pushes > li .cancelAllBuildsButton:hover {
+  opacity: 1;
+  -moz-transition: none;
+  -webkit-transition: none;
+  -o-transition: none;
+  transition: none;
 }
 
 #messages .error {
