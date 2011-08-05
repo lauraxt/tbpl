@@ -1115,8 +1115,11 @@ var UserInterface = {
     if (buildAPILink) {
       nodeHtml += '<a class="buildAPI" target="_blank" href="'+ buildAPILink +'">Self-serve Build API</a>';
     }
-    nodeHtml += 
-      '</h2>\n' +
+    nodeHtml += '</h2>\n';
+    if (this._treeName == 'Try') {
+      nodeHtml += '<img class="cancelAllBuildsButton" src="images/tango-process-stop.png" title="Cancel all builds" onclick="UserInterface._cancelAllButtonClick(this, \'' + push.toprev + '\')">\n';
+    }
+    nodeHtml +=
       '<ul class="results"></ul>\n' +
       '<ul class="patches"></ul>\n' +
       '</li>';
@@ -1419,6 +1422,26 @@ var UserInterface = {
 
     var method = result.state == 'pending' ? 'cancelRequest' : 'cancelBuild';
     BuildAPI[method](result.getBuildbotBranch(), requestOrBuildID, onSuccess, onFailure, onTimeout);
+  },
+
+  _cancelAllButtonClick: function UserInterface__cancelAllButtonClick(cancelAllButton, rev) {
+    function showCancelAllButton() {
+      cancelAllButton.style.display = 'inline';
+    }
+
+    if (!window.confirm('This will cancel all pending and running builds for revision ' + rev + '!\n\nAre you sure?')) {
+      return;
+    }
+
+    var mid = this.showMessage('Requesting cancellation of revision ' + rev + '…', 'loading');
+    var onSuccess = this._makeStatusCallback(mid, 'Cancellation of revision ' + rev + ' requested.');
+    var onTimeout = this._makeStatusCallback(mid, 'Cancellation request for revision ' + rev + ' timed out.', 'error', showCancelAllButton);
+    var onFailure = this._makeStatusCallback(mid, 'Cancellation request for revision ' + rev + ' failed.', 'error', showCancelAllButton);
+
+    cancelAllButton.style.display = 'none';
+
+    var treeInfo = Config.treeInfo[this._treeName];
+    BuildAPI.cancelRevision(treeInfo.buildbotBranch, rev, onSuccess, onFailure, onTimeout);
   },
 
   _activeResultObject: function UserInterface__activeResultObject() {
