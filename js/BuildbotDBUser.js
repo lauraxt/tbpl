@@ -61,7 +61,6 @@ var BuildbotDBUser = {
         "_scrapeURL": Config.baseURL + "php/getLogExcerpt.php?id=" + run._id + '&type=tinderbox_print',
         "revs": revs,
         "notes": run.notes || [],
-        "_similarBuildID": run._id,
       });
     });
     return machineResults;
