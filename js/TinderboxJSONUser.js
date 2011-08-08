@@ -153,6 +153,7 @@ var TinderboxJSONUser = {
         "reftestLogURL": Config.baseURL + "php/getTinderboxSummary.php?tree=" + tree + "&id=" + machineRunID + '&reftest=true',
         "revs": revs,
         "notes": [],
+        "errorParser": build.errorparser,
         "_scrape": buildScrape,
       });
     } }

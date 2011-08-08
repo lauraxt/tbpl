@@ -322,6 +322,25 @@ var AddCommentUI = {
         timestamp: Math.ceil((new Date()).getTime()/1000),
       },
     });
+
+    if ("errorParser" in machineResult) {
+      // "errorParser" is a give-away of Tinderbox mode.
+      // Also post the star to Tinderbox.
+      $.ajax({
+        url: "http://tinderbox.mozilla.org/addnote.cgi",
+        type: "POST",
+        data: {
+          buildname: machineResult.machine.name,
+          buildtime: machineResult.startTime.getTime() / 1000,
+          errorparser: machineResult.errorParser,
+          logfile: machineResult.runID,
+          tree: machineResult.tree,
+          who: email,
+          note: comment,
+        },
+      });
+    }
+
     $.ajax({
       url: Config.baseURL + "php/submitBuildStar.php",
       type: "POST",
