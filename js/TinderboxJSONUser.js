@@ -147,6 +147,7 @@ var TinderboxJSONUser = {
         "startTime": startTime,
         "endTime": endTime,
         "briefLogURL": "http://tinderbox.mozilla.org/showlog.cgi?log=" + tree + '/' + machineRunID,
+        "absoluteBriefLogURL": "http://tinderbox.mozilla.org/showlog.cgi?log=" + tree + '/' + machineRunID,
         "fullLogURL": "http://tinderbox.mozilla.org/showlog.cgi?log=" + tree + '/' + machineRunID + '&fulltext=1',
         "summaryURL": Config.baseURL + "php/getTinderboxSummary.php?tree=" + tree + "&id=" + machineRunID + '&starred=true',
         "annotatedSummaryURL": Config.baseURL + "php/getTinderboxSummary.php?tree=" + tree + "&id=" + machineRunID,
