@@ -49,14 +49,14 @@ class LogParser implements FileGenerator {
   }
 
   public function getLines() {
-    if (!$this->lines) {
+    if ($this->lines === null) {
       $this->lines = RawGzLogDownloader::getLines($this->run);
     }
     return $this->lines;
   }
 
   public function getFilteredLines() {
-    if (!$this->filteredLines) {
+    if ($this->filteredLines === null) {
       $this->filteredLines = $this->findFilteredLines();
     }
     return $this->filteredLines;
