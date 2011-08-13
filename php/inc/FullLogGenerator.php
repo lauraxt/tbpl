@@ -17,24 +17,32 @@ class FullLogGenerator extends ParsedLogGenerator {
     return "full";
   }
 
+  private function encodeLines($lines) {
+    $numLines = count($lines);
+    $encodedLines = array($numLines);
+    for ($i = 0; $i < $numLines; $i++) {
+      $encodedLines[$i] = htmlspecialchars($lines[$i]);
+    }
+    return $encodedLines;
+  }
+
+  private function linkLinesWithErrors($lines, $linesWithErrors) {
+    foreach ($linesWithErrors as $errorNumber => $lineWithError) {
+      $lines[$i] = '<strong id="error'.$errorNumber.'">'.$lines[$i].'</strong>';
+    }
+  }
+  
+  private function mergeToPRE($lines) {
+    return '<pre>'.implode("", $lines).'</pre>';
+  }
+
   protected function getLog() {
     $lines = $this->logParser->getLines();
     $numLines = count($lines);
     $linesWithErrors = $this->logParser->getFilteredLines();
-    $errorCount = count($linesWithErrors);
-    $upcomingErrorNumber = 0;
-    $upcomingErrorLine = $upcomingErrorNumber < $errorCount ? $linesWithErrors[$upcomingErrorNumber] : -1;
-    $transformedLines = array();
-    for ($i = 0; $i < $numLines; $i++) {
-      if ($i == $upcomingErrorLine) {
-        $transformedLines[] = '<strong id="error'.$upcomingErrorNumber.'">'.htmlspecialchars($lines[$i]).'</strong>';
-        $upcomingErrorNumber++;
-        $upcomingErrorLine = $upcomingErrorNumber < $errorCount ? $linesWithErrors[$upcomingErrorNumber] : -1;
-      } else {
-        $transformedLines[] = htmlspecialchars($lines[$i]);
-      }
-    }
-    return '<pre>'.implode("", $transformedLines).'</pre>';
+    $transformedLines = $this->encodeLines($lines);
+    $this->linkLinesWithErrors($transformedLines, $linesWithErrors);
+    return $this->mergeToPRE($transformedLines);
   }
 
   protected function generateHTML($summary, $fullLog) {
